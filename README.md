@@ -7,3 +7,7 @@ Voice-over-Internet-Protocol.
 
 
 ![image](https://user-images.githubusercontent.com/74924806/128001446-bc59ef9e-be17-4640-80e6-9eeaf235dcf2.png)
+
+# Node.js client and server for FreeSwitch Event Socket
+
+Able to intercept call using ESL 
