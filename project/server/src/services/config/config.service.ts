@@ -1,11 +1,10 @@
 import { TypeOrmModuleOptions } from "@nestjs/typeorm";
 import { postgreConstants } from "./constants/postgreconstants";
-
+import { fscreds } from '../../entity/freeswitch.entity';
 require('dotenv').config();
 
 class ConfigService{
     constructor(private env: { [key: string]: string | undefined }) { }
-
     private getValue(key: string, throwOnMissing = true): string{
         const value = this.env[key];
         if (!value && throwOnMissing){
@@ -37,7 +36,7 @@ class ConfigService{
             username: this.getValue('POSTGRES_USER'),
             password: this.getValue('POSTGRES_PASSWORD'),
             database: this.getValue('POSTGRES_DATABASE'),
-            entities: ['**/*.entity{.ts,.js}'],
+            entities: [fscreds],
             migrationsTableName: 'migration',
             migrations: ['src/migration/*.ts'],
             cli: {
@@ -48,22 +47,22 @@ class ConfigService{
     }
 }
 
-// const configService = new ConfigService(process.env)
-// .ensureValues([
-//   'POSTGRES_HOST',
-//   'POSTGRES_PORT',
-//   'POSTGRES_USER',
-//   'POSTGRES_PASSWORD',
-//   'POSTGRES_DATABASE'
-// ]);
-
 const configService = new ConfigService(process.env)
 .ensureValues([
-  postgreConstants.HOST,
-  postgreConstants.POSTGRES_PORT,
-  postgreConstants.USER,
-  postgreConstants.PASSWORD,
-  postgreConstants.DATABASE
+  'POSTGRES_HOST',
+  'POSTGRES_PORT',
+  'POSTGRES_USER',
+  'POSTGRES_PASSWORD',
+  'POSTGRES_DATABASE'
 ]);
+
+// const configService = new ConfigService(process.env)
+// .ensureValues([
+//   postgreConstants.HOST,
+//   postgreConstants.POSTGRES_PORT,
+//   postgreConstants.USER,
+//   postgreConstants.PASSWORD,
+//   postgreConstants.DATABASE
+// ]);
 
 export { configService };

@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { fscreds } from 'src/entity/freeswitch.entity';
+import { fscreds } from '../entity/freeswitch.entity';
 import { Repository } from 'typeorm';
 
 @Injectable()
