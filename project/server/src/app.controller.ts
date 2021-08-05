@@ -10,7 +10,6 @@ export class AppController {
   constructor(
     private readonly appService: AppService,
     private authService: AuthService) {}
-
   @UseGuards(LocalAuthGuard)
   @Post('auth/login')
   async login(@Request() req) {
