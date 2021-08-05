@@ -1,10 +1,15 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import { InjectRepository } from '@nestjs/typeorm';
+import { fscreds } from 'src/entity/freeswitch.entity';
 import { UsersService } from 'src/users/users.service';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class AuthService {
   constructor(
+     @InjectRepository(fscreds)
+    private freeswitchRepo: Repository<fscreds>,
       private usersService: UsersService,
       private jwtService: JwtService,
       ) {}
@@ -24,5 +29,14 @@ export class AuthService {
       return {
           access_token: this.jwtService.sign(payload)
       }
+  }
+
+  async getOneById(id: number): Promise<fscreds> {
+    try {
+      const vehicle = await this.freeswitchRepo.findOneOrFail(id);
+      return vehicle;
+    } catch (err) {
+      console.log('error loading vehicle - ', err);
+    }
   }
 }
