@@ -13,4 +13,24 @@ export class FreeswitchController{
         this._freeswitchService.clickToCall(originateParam);
         return "Successfully triggered click-to-call";
     }
+
+    //proceed to ivr
+    dialVerify(){
+
+    }
+
+    //outbound call
+    dialNumber(){
+
+    }
+
+    //completed - end call
+    dialEnd(){
+
+    }
+
+    //incoming call to connect - ivr
+    inboundCall(){
+        
+    }
 }
