@@ -5,7 +5,7 @@ import { fscreds } from '../entity/freeswitch.entity';
 import { UsersService } from 'src/users/users.service';
 import { Repository } from 'typeorm';
 import { ApiCredential } from 'src/models/apiCredential.model';
-import { configService } from 'src/services/config/config.service';
+import { configService } from 'src/config/config.service';
 
 @Injectable()
 export class AuthService {
