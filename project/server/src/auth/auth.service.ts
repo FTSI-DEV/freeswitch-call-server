@@ -4,6 +4,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { fscreds } from '../entity/freeswitch.entity';
 import { UsersService } from 'src/users/users.service';
 import { Repository } from 'typeorm';
+import { ApiCredential } from 'src/models/apiCredential.model';
+import { configService } from 'src/services/config/config.service';
 
 @Injectable()
 export class AuthService {
@@ -39,4 +41,11 @@ export class AuthService {
       console.log('error loading vehicle - ', err);
     }
   }
+
+  validateApiCredential(apiKey:string, apiPassword: string):boolean
+  {
+    let result = configService.validateApiCredential(apiKey, apiPassword);
+    return result;
+  }
+
 }

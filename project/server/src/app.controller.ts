@@ -1,4 +1,4 @@
-import { Controller, Get, Post, UseGuards, Request } from '@nestjs/common';
+import { Controller, Get, Post, UseGuards, Request, UnauthorizedException } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { AppService } from './app.service';
 import { AuthService } from './auth/auth.service';
@@ -6,6 +6,7 @@ import { FsCredsService } from './auth/fs-creds.service';
 import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
 import { LocalAuthGuard } from './auth/guards/local-auth.guard';
 import { fscreds } from './entity/freeswitch.entity';
+import { ApiCredential } from './models/apiCredential.model';
 
 @Controller()
 export class AppController {
@@ -40,4 +41,9 @@ export class AppController {
     // return this.fsService.getOne('freeswitch', 'machaik-fs2021');
     return this.authService.getOneById(1);
   }
+
+  // @Get('validateApi')
+  // async validateApi(apiKey: string, apiPassword: string){
+  //   return this.authService.validateApiCredential(apiKey, apiPassword);
+  // }
 }

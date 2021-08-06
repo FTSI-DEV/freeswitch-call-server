@@ -10,6 +10,7 @@ import { jwtConstants } from './constants';
 import { FsCredsService } from './fs-creds.service';
 import { JwtStrategy } from './strategies/jwt-strategy';
 import { LocalStrategy } from './strategies/local.strategy';
+import { AuthenticationController } from './auth.controller';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { LocalStrategy } from './strategies/local.strategy';
     })
   ],
   providers: [AuthService, LocalStrategy, JwtStrategy],
-  exports: [UsersService,AuthService]
+  exports: [UsersService,AuthService],
+  controllers: [AuthenticationController]
 })
 export class AuthModule {}
