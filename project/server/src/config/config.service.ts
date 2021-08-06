@@ -1,10 +1,12 @@
+import { Injectable } from "@nestjs/common";
 import { TypeOrmModuleOptions } from "@nestjs/typeorm";
-import { postgreConstants } from "./constants/postgreconstants";
-import { fscreds } from '../../entity/freeswitch.entity';
-import { ApiCredential, ApiCredentialResult } from "src/models/apiCredential.model";
+import { fscreds } from "src/entity/freeswitch.entity";
+import { ApiCredential } from "src/models/apiCredential.model";
+import { IConfigService } from "./iconfig.interface";
 require('dotenv').config();
 
-class ConfigService{
+@Injectable()
+export class ConfigService implements IConfigService{
     constructor(private env: { [key: string]: string | undefined }) { }
     private getValue(key: string, throwOnMissing = true): string{
         const value = this.env[key];
@@ -61,12 +63,7 @@ class ConfigService{
     }
 
     public validateApiCredential(apiKey: string, apiPassword:string):boolean{
-        console.log('apiKeyParam: ', apiKey);
-        console.log('apiPassword PAram: ', apiPassword);
-
         let apiCredential = this.getApiCredentials();
-
-        console.log('ApiCredential', apiCredential);
 
         if (apiCredential.apiKey != apiKey){
             return false;

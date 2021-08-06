@@ -26,15 +26,18 @@ export class AuthenticationController{
     @UseGuards(LocalAuthGuard)
     @Get('validateApi')
     validateApiByReqBody(@Request() req){
-        console.log('paramkey: ', req);
-        // let result = this.authService.validateApiCredential(apiKey, apiPassword);
-        
-        // console.log('result validate', result);
-        // if (result === false){
-        //     return new UnauthorizedException;
-        // }
+        // console.log('paramkey: ', req);
 
-        // return result;
+        let requestBody = req.body;
+
+        let result = this.authService.validateApiCredential(requestBody.apiKey, requestBody.apiPassword);
+        
+        console.log('result validate', result);
+        if (result === false){
+            return new UnauthorizedException;
+        }
+
+        return result;
     }
 
      @UseGuards(LocalAuthGuard)

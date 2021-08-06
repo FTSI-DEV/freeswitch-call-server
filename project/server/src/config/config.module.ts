@@ -1,6 +1,6 @@
 import { Module } from "@nestjs/common";
-import { CONFIG_SERVICE } from "src/services/interface/config/iconfig.interface";
 import { ConfigService, configService } from "./config.service";
+import { CONFIG_SERVICE } from "./iconfig.interface";
 
 
 @Module({
@@ -12,4 +12,4 @@ import { ConfigService, configService } from "./config.service";
       }
     ]
   })
-  export class GreetingModule {}
+  export class ConfigModule {}
