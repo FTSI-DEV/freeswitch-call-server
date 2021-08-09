@@ -14,23 +14,23 @@ export class FreeswitchController{
         return "Successfully triggered click-to-call";
     }
 
-    //proceed to ivr
-    dialVerify(){
+    // //proceed to ivr
+    // dialVerify(){
 
-    }
+    // }
 
-    //outbound call
-    dialNumber(){
+    // //outbound call
+    // dialNumber(){
 
-    }
+    // }
 
-    //completed - end call
-    dialEnd(){
+    // //completed - end call
+    // dialEnd(){
 
-    }
+    // }
 
-    //incoming call to connect - ivr
-    inboundCall(){
+    // //incoming call to connect - ivr
+    // inboundCall(){
         
-    }
+    // }
 }
