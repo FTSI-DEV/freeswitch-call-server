@@ -19,4 +19,8 @@ export class FsEslService implements IFSEslService {
 
         this._callDispatchHelper.clickToCall(conn, originateParam);
     }
+
+    inboundCall(){
+        
+    }
 }

@@ -1,6 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { EslServerHelper } from './helpers/fs-esl/server';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -12,6 +13,8 @@ async function bootstrap() {
     .build()
     const document = SwaggerModule.createDocument(app, config);
     SwaggerModule.setup('/', app, document);
+
+    new EslServerHelper().startEslServer()
 
   await app.listen(3000);
 }
