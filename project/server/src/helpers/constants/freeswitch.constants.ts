@@ -1,4 +1,4 @@
-const FS_ESL = {
+export const FS_ESL = {
     CONNECTION: {
         READY: 'esl::ready',
         CLOSED: 'esl::end',
@@ -7,12 +7,18 @@ const FS_ESL = {
     RECEIVED: 'esl::event::*::*'
 };
 
-const ALL_EVENTS = 'all';
-const DTMF_EVENTS = 'DTMF';
-const DTMF = 'esl::Event::DTMF';
+export const ALL_EVENTS = 'all';
+export const DTMF_EVENTS = 'DTMF';
+export const DTMF = 'esl::Event::DTMF';
 
-const ESL_SERVER = {
+export const ESL_SERVER = {
     CONNECTION: {
         READY: 'connection::ready'
     }
 };
+
+export const FS_DIALPLAN = {
+    Say: 'say',
+    Hangup: 'hangup',
+    Dial: 'bridge'
+}

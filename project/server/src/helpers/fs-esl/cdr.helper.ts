@@ -1,0 +1,46 @@
+export class CDRHelper{
+
+    getCallRecords(fsEvent){
+
+        const eventName = fsEvent.getHeader('Event-Name');
+
+        if (eventName != 'CHANNEL_HANGUP_COMPLETE') return;
+
+        const uuid = this.getHeader('Unique-ID', fsEvent);
+        const callerId = this.getHeader('Caller-Caller-ID-Number', fsEvent);
+        const callerName = this.getHeader('Caller-Caller-ID-Name', fsEvent);
+        const calleeIdNumber = this.getHeader('Caller-Callee-ID-Number', fsEvent);
+        const callDirection = this.getHeader('Call-Direction', fsEvent);
+        const hangup_cause = this.getHeader('Hangup-Cause', fsEvent);
+        const started_date = this.getHeader('Event-Date-Local', fsEvent);
+        const start_stamp = this.getHeader('Event-Date-Timestamp', fsEvent);
+        const answer_stamp = this.getHeader('variable_answer_stamp' ,fsEvent);
+        const end_stamp = this.getHeader('variable_end_stamp', fsEvent);
+        const answer_epoch = this.getHeader('variable_answer_epoch', fsEvent);
+        const start_epoch = this.getHeader('variable_start_epoch', fsEvent);
+        const end_epoch = this.getHeader('variable_end_epoch' , fsEvent);
+        const duration = this.getHeader('variable_duration', fsEvent);
+
+        console.log(`Name -> ${eventName}, 
+                    UUID -> ${uuid} ,
+                    CallerId -> ${callerId} ,
+                    CallerName -> ${callerName} ,
+                    calleIdNumber -> ${calleeIdNumber} ,
+                    callDirection -> ${callDirection} ,
+                    Hangup_Cause -> ${hangup_cause} ,
+                    StartedDate -> ${started_date} , 
+                    StartedStamp -> ${start_stamp} , 
+                    AnswerStamp -> ${answer_stamp},
+                    End_Stamp -> ${end_stamp} , 
+                    Start_Epoch -> ${start_epoch} , 
+                    End_Epoch -> ${end_epoch} , 
+                    Answer_Epoch -> ${answer_epoch} , 
+                    Duration -> ${duration}`);
+
+
+    }
+
+    private getHeader(variableName: string, fsEvent):string{
+        return fsEvent.getHeader(variableName);
+    }
+}

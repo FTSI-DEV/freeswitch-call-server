@@ -24,3 +24,10 @@ export class OriginateModel{
     cidNumber: string;
     timeOutSec: number;
 }
+
+export interface IOriginateOptions{
+    profile: string;
+    number: string;
+    gateway: string;
+    app?: string;
+}

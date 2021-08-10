@@ -1,8 +1,5 @@
-import e from 'express';
 import { TwiMLContants } from '../constants/twiml.constants';
 
-const xml2js = require('xml2js');
-const parser = new xml2js.Parser({ attrKey: 'ATTR' });
 const xmldoc = require('xmldoc');
 
 export interface KeyValues {
@@ -11,7 +8,8 @@ export interface KeyValues {
 }
 
 export class XMLParser {
-  tryParseXMLBody(xmlText: string) {
+
+  tryParseXMLBody(xmlText: string):KeyValues[] {
     let keyValues: KeyValues[] = [];
 
     let xmlDocResult = new xmldoc.XmlDocument(xmlText);
@@ -35,5 +33,6 @@ export class XMLParser {
 
     console.log('KEY VALUES -> ', keyValues);
     
+    return keyValues;
   }
 }

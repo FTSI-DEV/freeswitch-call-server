@@ -31,4 +31,22 @@ export default {
             params: { StoreId, SystemId }
         })
     },
+    getIncomingStatusCallBack(request: InboundRequestCall){
+        return apiClient.get('/NewInboundCall/IncomingStatusCallBack',{
+            params: { request }
+        })
+    }
+}
+
+export interface InboundRequestCall{
+    call_sid: string;
+    dial_call_status: string;
+    call_duration: number;
+    from: string;
+    to: string;
+    storeId: number;
+    direction: string;
+    systemId: number;
+    recording_url: string;
+    call_type: number;
 }
