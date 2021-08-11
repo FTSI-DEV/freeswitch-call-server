@@ -1,10 +1,53 @@
+import { log } from 'console';
+import e from 'express';
 import apiClient from 'src/utils/apiClient';
-import { FS_DIALPLAN } from '../constants/freeswitch.constants';
+import { FS_DIALPLAN, FS_ESL } from '../constants/freeswitch.constants';
 import { TwiMLContants } from '../constants/twiml.constants';
 import { KeyValues, XMLParser } from '../parser/twimlXML.parser';
+import { CDRHelper } from './cdr.helper';
 import { StartFreeswitchApplication } from './event-socket-monitor';
 
 export class EslServerHelper {
+
+  private readonly _callRecords = new CDRHelper();
+
+  private _onListen(conn:any):any{
+    conn.on(FS_ESL.RECEIVED, fsEvent => {
+      const eventName = fsEvent.getHeader('Event-Name');
+      console.log('LISTENING TO AN EVENT ->' ,eventName);
+      let call_record = this._callRecords.getCallRecords(fsEvent);
+
+      if (call_record != undefined){
+        return call_record;
+      }
+    });
+  }
+
+  private _executeCrmApi(conn:any){
+    console.log('EXECUTING CRM API -> ');
+    apiClient.getIncomingCallEnter({
+      StoreId: 60,
+      SystemId: 1
+    })
+    .then((res) => {
+      let xmlParserResult = new XMLParser().tryParseXMLBody(res.data);
+
+      let dialplan_taskList = this.XmlConversionTaskValues(xmlParserResult);
+
+      dialplan_taskList.forEach(element => {
+          console.log(`Key: ${element.key} , Value: ${element.value}`);
+
+          if (element.key === FS_DIALPLAN.Say){
+            element.value = 'ivr/ivr-welcome_to_freeswitch.wav';
+            element.key = 'playback';
+          }
+
+          conn.execute(element.key, element.value);
+
+      });
+    }).catch((err) => console.log('UNEXPECTED ERROR -> ', err));
+
+  }
 
   //for InboundCall
   startEslServer() {
@@ -27,33 +70,23 @@ export class EslServerHelper {
     esl_server.on('connection::ready', function (conn) {
       console.log('CONNECTION SERVER READY');
 
-      //return this a promise
-      apiClient
-        .getIncomingCallVerify({
-          StoreId: 60,
-          SystemId: 1,
-        })
-        .then((res) => {
-          // //semantic-processor
-          let xmlParserResult = new XMLParser().tryParseXMLBody(res.data);
+      let call_record = self._onListen(conn);
 
-          let dialplan_taskList = self.XmlConversionTaskValues(xmlParserResult);
+      console.log('CDR2 -> ', call_record);
 
-          dialplan_taskList.forEach(element => {
-            conn.execute(element.key, element.value);
-          });
-        })
-        .catch((err) => console.log(err));
+      self._executeCrmApi(conn);
 
       conn.execute('bridge', 'sofia/gateway/fs-test3/1000');
-
+      
       conn.on('esl::end', function (evt, body) {
+
+        if (call_record != undefined){
+          console.log('CDR -> ', call_record);
+        }
+
         console.log('END CALL -> ', evt);
 
         console.log('END CALL BODY -> ', body);
-
-       
-
         //save the record..
         //CDR..
         //insert code here how to handle a call when its end...

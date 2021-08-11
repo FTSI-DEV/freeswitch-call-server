@@ -1,6 +1,8 @@
+import { CDRModels } from "src/models/cdr.models";
+
 export class CDRHelper{
 
-    getCallRecords(fsEvent){
+    getCallRecords(fsEvent):CDRModels{
 
         const eventName = fsEvent.getHeader('Event-Name');
 
@@ -21,6 +23,8 @@ export class CDRHelper{
         const end_epoch = this.getHeader('variable_end_epoch' , fsEvent);
         const duration = this.getHeader('variable_duration', fsEvent);
 
+        console.log(eventName);
+
         console.log(`Name -> ${eventName}, 
                     UUID -> ${uuid} ,
                     CallerId -> ${callerId} ,
@@ -37,6 +41,22 @@ export class CDRHelper{
                     Answer_Epoch -> ${answer_epoch} , 
                     Duration -> ${duration}`);
 
+        return{
+            UUID: uuid,
+            CallerId: callerId,
+            CallerName: callerName,
+            CalleeIdNumber: calleeIdNumber,
+            CallDirection: callDirection,
+            CallStatus: hangup_cause,
+            StartedDate: started_date,
+            StartStamp: start_stamp,
+            AnswerStamp: answer_stamp,
+            EndStamp: end_stamp,
+            AnswerEpoch: answer_epoch,
+            StartEpoch: start_epoch,
+            EndEpoch: end_epoch,
+            Duration: duration
+        };
 
     }
 

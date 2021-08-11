@@ -16,7 +16,7 @@ async function bootstrap() {
     SwaggerModule.setup('/', app, document);
 
 
-    new StartFreeswitchApplication().startFS();
+    // new StartFreeswitchApplication().startFS();
     //starting esl-server
     new EslServerHelper().startEslServer()
 
