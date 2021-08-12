@@ -1,6 +1,6 @@
 export class CDRModels{
     UUID: string;
-    CallerId: string;
+    CallerIdNumber: string;
     CallerName: string;
     CalleeIdNumber: string;
     CallDirection: string;

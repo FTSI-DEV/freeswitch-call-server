@@ -1,11 +1,8 @@
-import { log } from 'console';
-import e from 'express';
 import apiClient from 'src/utils/apiClient';
 import { FS_DIALPLAN, FS_ESL } from '../constants/freeswitch.constants';
 import { TwiMLContants } from '../constants/twiml.constants';
 import { KeyValues, XMLParser } from '../parser/twimlXML.parser';
 import { CDRHelper } from './cdr.helper';
-import { StartFreeswitchApplication } from './event-socket-monitor';
 
 export class EslServerHelper {
 
@@ -30,6 +27,7 @@ export class EslServerHelper {
       SystemId: 1
     })
     .then((res) => {
+      
       let xmlParserResult = new XMLParser().tryParseXMLBody(res.data);
 
       let dialplan_taskList = this.XmlConversionTaskValues(xmlParserResult);
@@ -77,19 +75,18 @@ export class EslServerHelper {
       self._executeCrmApi(conn);
 
       conn.execute('bridge', 'sofia/gateway/fs-test3/1000');
-      
+
       conn.on('esl::end', function (evt, body) {
+        
+        // call webhook here
 
-        if (call_record != undefined){
-          console.log('CDR -> ', call_record);
-        }
+        // if (call_record != undefined){
+        //   console.log('CDR -> ', call_record);
+        // }
 
-        console.log('END CALL -> ', evt);
+        // console.log('END CALL -> ', evt);
 
-        console.log('END CALL BODY -> ', body);
-        //save the record..
-        //CDR..
-        //insert code here how to handle a call when its end...
+        // console.log('END CALL BODY -> ', body);
       });
     });
   }
