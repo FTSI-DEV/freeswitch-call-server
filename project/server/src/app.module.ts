@@ -8,7 +8,7 @@ import { Connection } from 'typeorm';
 import { configService } from './config/config.service';
 import { FreeswitchCallConfigModule } from './modules/config/freeswitch-call-config/freeswitch-call-config.module';
 import { IvrModule } from './modules/ivr/ivr.module';
-import { IncomingCallModule } from './incomingCall/incomingCall.module';
+import { IncomingCallModule } from './modules/incomingCall/incomingCall.module';
 
 @Module({
   imports: [AuthModule, 

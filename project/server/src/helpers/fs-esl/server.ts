@@ -65,12 +65,12 @@ export class EslServerHelper {
     eslServerRes = esl_server;
   }
 
-  incomingCallEnter() {
+  incomingCallEnter(): any {
     const self = this;
-
+    let connData = null;
     eslServerRes.on('connection::ready', function (conn) {
       console.log('CONNECTION SERVER READY');
-
+      connData = conn;
       let call_record = self._onListen(conn);
 
       console.log('CDR2 -> ', call_record);
@@ -87,6 +87,14 @@ export class EslServerHelper {
         // console.log('END CALL -> ', evt);
         // console.log('END CALL BODY -> ', body);
       });
+    });
+
+    return new Promise<any>((resolve, reject) => {
+      if (connData) {
+        resolve(connData);
+      } else {
+        reject('Connection Error')
+      }
     });
   }
 

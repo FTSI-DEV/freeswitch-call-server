@@ -1,6 +1,6 @@
 import { Controller, Get, Query } from '@nestjs/common';
 import { IncomingCallService } from './incomingCall.service'
-import { callEnter, callVerify, waitingToConnect } from './IncomingCallWorker';
+import { callEnter, callVerify, waitingToConnect } from '../../jobs/IncomingCall';
 @Controller('NewInboundCall')
 export class IncomingCallController {
   constructor(private incomingCallService: IncomingCallService) {}
