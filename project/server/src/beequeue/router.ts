@@ -9,9 +9,9 @@ export default {
       queues: [
         {
           // Required for each queue definition.
-          name: 'callEnter',
+          name: 'incomingCallEnter',
           // User-readable display name for the host. Required.
-          hostId: 'callEnter',
+          hostId: 'incomingCallEnter',
           // Queue type (Bull or Bee - default Bull).
           type: 'bee',  
           redis: {
@@ -21,9 +21,9 @@ export default {
         },
           {
           // Required for each queue definition.
-          name: 'callVerify',
+          name: 'incomingCallVerify',
           // User-readable display name for the host. Required.
-          hostId: 'callVerify',
+          hostId: 'incomingCallVerify',
           // Queue type (Bull or Bee - default Bull).
           type: 'bee',  
           redis: {

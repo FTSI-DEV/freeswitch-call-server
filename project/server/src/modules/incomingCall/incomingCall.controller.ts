@@ -8,21 +8,18 @@ export class IncomingCallController {
   @Get('IncomingCallEnter')
   getIncomingCallEnter(@Query('StoreId') StoreId:string,@Query('SystemId') SystemId:string): any {
     const callData = { StoreId, SystemId };
-    if (StoreId && SystemId)
-      callEnter(callData)
+    return this.incomingCallService.getIncomingCallEnter(callData);
   }
 
   @Get('IncomingCallVerify')
   getIncomingCallVerify(@Query('StoreId') StoreId:string, @Query('SystemId') SystemId:string): any {
     const callData = { StoreId, SystemId };
-    if (StoreId && SystemId)
-      callVerify(callData)
+    return this.incomingCallService.getIncomingCallVerify(callData);
   }
 
   @Get('WaitingToConnect')
   getWaitingToConnect(@Query('StoreId') StoreId:string,@Query('SystemId') SystemId:string): any {
     const callData = { StoreId, SystemId };
-    if (StoreId && SystemId)
-      waitingToConnect(callData)
+    return this.incomingCallService.getWaitingToConnect(callData);
   }
 }

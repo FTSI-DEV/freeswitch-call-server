@@ -13,18 +13,23 @@ const incomingCallVerifyQueue = new Queue('incomingCallVerify', options);
 const waitingToConnectQueue = new Queue('waitingToConnect', options);
 
 // IncomingCallEnter
-export const callEnter = (order) => {
-    return incomingCallEnterQueue.createJob(order).save();
+export const callEnter = (data) => {
+    return incomingCallEnterQueue.createJob(data).save();
 };
+
 incomingCallEnterQueue.process((job, done) => {
-    console.log(`🧾 ${job.data.StoreId} ${job.data.SystemId}`);
-    // Notify the client via push notification, web socket or email etc.
-    done();
+    setTimeout(() => {
+        console.log(`🧾 ${job.data.StoreId} ${job.data.SystemId}`);
+    }, 5000)
+    setTimeout(() => {
+        console.log(`🧾 ${job.data.StoreId} ${job.data.SystemId}`);
+        done();
+    }, 10000)
 });
 
 // IncomingCallVerify
-export const callVerify = (order) => {
-    return incomingCallVerifyQueue.createJob(order).save();
+export const callVerify = (data) => {
+    return incomingCallVerifyQueue.createJob(data).save();
 };
 incomingCallVerifyQueue.process((job, done) => {
     console.log(`🧾 ${job.data.StoreId} ${job.data.SystemId}`);
@@ -33,8 +38,8 @@ incomingCallVerifyQueue.process((job, done) => {
 });
 
 // WaitingToConnect
-export const waitingToConnect = (order) => {
-    return waitingToConnectQueue.createJob(order).save();
+export const waitingToConnect = (data) => {
+    return waitingToConnectQueue.createJob(data).save();
 };
 waitingToConnectQueue.process((job, done) => {
     console.log(`🧾 ${job.data.StoreId} ${job.data.SystemId}`);
