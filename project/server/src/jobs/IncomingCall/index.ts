@@ -1,4 +1,4 @@
-const Queue = require('beequeue');
+const Queue = require('bee-queue');
 
 const options = {
     removeOnSuccess: true,
