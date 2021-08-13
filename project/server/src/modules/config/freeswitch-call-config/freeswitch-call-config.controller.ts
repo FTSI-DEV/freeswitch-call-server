@@ -1,11 +1,12 @@
 import { Controller, Get, Post } from "@nestjs/common";
 import { FreeswitchCallConfigModelParam } from "src/models/freeswitchCallConfigModel";
+import { FreeswitchCallConfigService } from "./freeswitch-call-config.service";
 import { IFreeswitchCallConfigService } from "./ifreeswitch-call-config.interface";
 
 @Controller()
-export class FreeswitchCallConfig{
+export class FreeswitchCallConfigController{
     constructor(
-        private _freeswitchCallConfigService: IFreeswitchCallConfigService
+        private _freeswitchCallConfigService: FreeswitchCallConfigService
     ) {}
 
     @Get()

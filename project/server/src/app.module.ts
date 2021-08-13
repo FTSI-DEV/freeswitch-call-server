@@ -13,7 +13,6 @@ import { FreeswitchCallConfigModule } from './modules/config/freeswitch-call-con
   imports: [AuthModule, 
             UsersModule, 
             TypeOrmModule.forRoot(configService.getTypeOrmConfig()), 
-            FreeswitchCallSystemModule, 
             FreeswitchCallConfigModule],
   controllers: [AppController],
   providers: [AppService],

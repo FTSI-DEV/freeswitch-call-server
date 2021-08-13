@@ -4,7 +4,7 @@ import { FreeswitchCallSystemService } from './freeswitch-call-system.service';
 
 @Module({
   providers: [FreeswitchCallSystemService],
-  imports: [FreeswitchCallSystemService, TypeOrmModule.forFeature([FreeswitchCallSystemService])],
+  imports: [TypeOrmModule.forFeature([FreeswitchCallSystemService])],
   exports: [FreeswitchCallSystemService]
 })
 export class FreeswitchCallSystemModule {}
