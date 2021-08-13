@@ -1,5 +1,5 @@
 import { Controller, Get, Post } from "@nestjs/common";
-import { FreeswitchCallConfigModel, FreeswitchCallConfigModelParam } from "src/models/freeswitchCallConfigModel";
+import { FreeswitchCallConfigModelParam } from "src/models/freeswitchCallConfigModel";
 import { IFreeswitchCallConfigService } from "./ifreeswitch-call-config.interface";
 
 @Controller()
