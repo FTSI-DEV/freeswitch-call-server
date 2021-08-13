@@ -3,6 +3,8 @@ import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { EslServerHelper } from './helpers/fs-esl/server';
 import { StartFreeswitchApplication } from './helpers/fs-esl/event-socket-monitor';
+import ArenaConfig from './beequeue/router';
+const Arena = require('bull-arena');
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -14,6 +16,9 @@ async function bootstrap() {
     .build()
     const document = SwaggerModule.createDocument(app, config);
     SwaggerModule.setup('/', app, document);
+    
+    // Beequeue Arena initialization
+    Arena(ArenaConfig);
     
     // new StartFreeswitchApplication().startFS();
     //starting esl-server
