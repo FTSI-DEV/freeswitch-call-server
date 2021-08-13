@@ -6,10 +6,10 @@ export class FreeswitchCallSystem extends BaseEntity{
     id: number;
 
     @Column()
-    PhoneNumberTo: number;
+    PhoneNumberTo: string;
 
     @Column()
-    PhoneNumberFrom : number;
+    PhoneNumberFrom : string;
 
     @Column()
     CallStatus: string;

@@ -1,5 +1,4 @@
 import { Controller, Post, UseGuards, Request, Get, UnauthorizedException } from "@nestjs/common";
-import { exception } from "console";
 import { AuthService } from "./auth.service";
 import { JwtAuthGuard } from "./guards/jwt-auth.guard";
 import { LocalAuthGuard } from "./guards/local-auth.guard";

@@ -43,7 +43,7 @@ export class CDRHelper{
 
         return{
             UUID: uuid,
-            CallerId: callerId,
+            CallerIdNumber: callerId,
             CallerName: callerName,
             CalleeIdNumber: calleeIdNumber,
             CallDirection: callDirection,

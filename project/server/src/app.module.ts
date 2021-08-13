@@ -6,9 +6,14 @@ import { UsersModule } from './users/users.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Connection } from 'typeorm';
 import { configService } from './config/config.service';
+import { FreeswitchCallConfigModule } from './modules/config/freeswitch-call-config/freeswitch-call-config.module';
 import { IncomingCallModule } from './incomingCall/incomingCall.module';
 @Module({
-  imports: [IncomingCallModule ,AuthModule, UsersModule, TypeOrmModule.forRoot(configService.getTypeOrmConfig())],
+  imports: [AuthModule, 
+            UsersModule, 
+            TypeOrmModule.forRoot(configService.getTypeOrmConfig()), 
+            FreeswitchCallConfigModule,
+            IncomingCallModule],
   controllers: [AppController],
   providers: [AppService],
 })

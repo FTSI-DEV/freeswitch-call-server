@@ -7,7 +7,6 @@ import { UsersModule } from 'src/users/users.module';
 import { UsersService } from 'src/users/users.service';
 import { AuthService } from './auth.service';
 import { jwtConstants } from './constants';
-import { FsCredsService } from './fs-creds.service';
 import { JwtStrategy } from './strategies/jwt-strategy';
 import { LocalStrategy } from './strategies/local.strategy';
 import { AuthenticationController } from './auth.controller';

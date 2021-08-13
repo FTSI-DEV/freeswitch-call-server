@@ -1,5 +1,5 @@
 import { Controller, Get } from "@nestjs/common";
-import { OriginateModel } from "src/helpers/fs-esl/models/originate.model";
+import { OriginationModel } from "src/helpers/fs-esl/models/originate.model";
 import { FsEslService } from "./fs-esl.service";
 
 @Controller('freeswitch')
@@ -9,7 +9,7 @@ export class FreeswitchController{
     ) {}
 
     @Get('clickToCall')
-    clickToCall(originateParam: OriginateModel){
+    clickToCall(originateParam: OriginationModel){
         this._freeswitchService.clickToCall(originateParam);
         return "Successfully triggered click-to-call";
     }

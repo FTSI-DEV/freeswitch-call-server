@@ -1,6 +1,6 @@
 import { Controller, Get, Query } from '@nestjs/common';
 import { IncomingCallService } from './incomingCall.service'
-import { processCallEnter, processCallVerify, waitingToConnect } from './IncomingCallWorker';
+import { callEnter, callVerify, waitingToConnect } from './IncomingCallWorker';
 @Controller('NewInboundCall')
 export class IncomingCallController {
   constructor(private incomingCallService: IncomingCallService) {}
@@ -9,14 +9,14 @@ export class IncomingCallController {
   getIncomingCallEnter(@Query('StoreId') StoreId:string,@Query('SystemId') SystemId:string): any {
     const callData = { StoreId, SystemId };
     if (StoreId && SystemId)
-      processCallEnter(callData)
+      callEnter(callData)
   }
 
   @Get('IncomingCallVerify')
   getIncomingCallVerify(@Query('StoreId') StoreId:string, @Query('SystemId') SystemId:string): any {
     const callData = { StoreId, SystemId };
     if (StoreId && SystemId)
-      processCallVerify(callData)
+      callVerify(callData)
   }
 
   @Get('WaitingToConnect')

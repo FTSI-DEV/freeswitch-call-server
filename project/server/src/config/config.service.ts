@@ -1,6 +1,8 @@
 import { Injectable } from "@nestjs/common";
 import { TypeOrmModuleOptions } from "@nestjs/typeorm";
 import { fscreds } from "src/entity/freeswitch.entity";
+import { FreeswitchCallConfig } from "src/entity/freeswitchCallConfig.entity";
+import { FreeswitchCallSystem } from "src/entity/freeswitchCallSystem.entity";
 import { ApiCredential } from "src/models/apiCredential.model";
 import { IConfigService } from "./iconfig.interface";
 require('dotenv').config();
@@ -39,7 +41,7 @@ export class ConfigService implements IConfigService{
             username: this.getValue('POSTGRES_USER'),
             password: this.getValue('POSTGRES_PASSWORD'),
             database: this.getValue('POSTGRES_DATABASE'),
-            entities: [fscreds],
+            entities: [fscreds,FreeswitchCallConfig,FreeswitchCallSystem],
             migrationsTableName: 'migration',
             migrations: ['src/migration/*.ts'],
             cli: {

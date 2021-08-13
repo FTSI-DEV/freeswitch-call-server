@@ -13,7 +13,7 @@ const incomingCallVerifyQueue = new Queue('incomingCallVerify', options);
 const waitingToConnectQueue = new Queue('waitingToConnect', options);
 
 // IncomingCallEnter
-export const processCallEnter = (order) => {
+export const callEnter = (order) => {
     return incomingCallEnterQueue.createJob(order).save();
 };
 incomingCallEnterQueue.process((job, done) => {
@@ -23,7 +23,7 @@ incomingCallEnterQueue.process((job, done) => {
 });
 
 // IncomingCallVerify
-export const processCallVerify = (order) => {
+export const callVerify = (order) => {
     return incomingCallVerifyQueue.createJob(order).save();
 };
 incomingCallVerifyQueue.process((job, done) => {
