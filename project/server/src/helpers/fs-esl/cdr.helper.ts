@@ -3,18 +3,6 @@ import { CDRModels } from "src/models/cdr.models";
 
 export class CDRHelper{
 
-    calculateDuration(start_epoch:any, end_epoch: any):any{
-        const answeredDate = new Date(start_epoch*1000);
-        const hangupDate = new Date(end_epoch*1000);
-
-        console.log('Answered Time -> ', answeredDate.toUTCString());
-        console.log('HangupTime ->' , hangupDate.toUTCString());
-
-        let duration = Math.abs(answeredDate.getTime() - hangupDate.getTime());
-
-        console.log('DURATION -> ', duration);
-    }
-
     getCallRecords(fsEvent):CDRModels{
 
         const eventName = fsEvent.getHeader('Event-Name');
@@ -34,11 +22,8 @@ export class CDRHelper{
         const answer_epoch = this.getHeader('variable_answer_epoch', fsEvent);
         const start_epoch = this.getHeader('variable_start_epoch', fsEvent);
         const end_epoch = this.getHeader('variable_end_epoch' , fsEvent);
-        // const duration = this.getHeader('variable_duration', fsEvent);
 
         const duration = this.calculateDuration(answer_epoch, end_epoch);
-
-        console.log('DURATION 2 -> ', duration);
 
         console.log(eventName);
         
@@ -58,8 +43,7 @@ export class CDRHelper{
                     Start_Epoch -> ${start_epoch} , 
                     End_Epoch -> ${end_epoch} , 
                     Answer_Epoch -> ${answer_epoch} , 
-                    Duration -> ${duration}`);
-
+                    Durations -> ${duration}`);
         return{
             UUID: uuid,
             CallerIdNumber: callerId,
@@ -81,5 +65,17 @@ export class CDRHelper{
 
     private getHeader(variableName: string, fsEvent):string{
         return fsEvent.getHeader(variableName);
+    }
+
+    private calculateDuration(start_epoch:any, end_epoch: any):any{
+        const answeredDate = new Date(start_epoch*1000);
+        const hangupDate = new Date(end_epoch*1000);
+
+        console.log('Answered Time -> ', answeredDate.toUTCString());
+        console.log('HangupTime ->' , hangupDate.toUTCString());
+
+        let duration = Math.abs(answeredDate.getTime() - hangupDate.getTime());
+
+        return duration;
     }
 }
