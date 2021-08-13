@@ -9,6 +9,9 @@ const Arena = require('bull-arena');
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
+  // Allow crossorigin
+  app.enableCors();
+
     // Swagger
     const config = new DocumentBuilder()
     .setTitle('Freeswitch Call Server')

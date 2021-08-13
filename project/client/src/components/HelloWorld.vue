@@ -4,7 +4,7 @@
       <a-menu-item key="mail">
          <span style="font-size: 1.3em">FREESWITCH</span>
       </a-menu-item>
-      <a-menu-item key="number">
+      <!-- <a-menu-item key="number">
         <template #icon>
           <phone-outlined />
         </template> Phone Numbers
@@ -16,16 +16,16 @@
       </a-menu-item>
       <a-menu-item key="alipay">
         <a href="https://antdv.com" target="_blank" rel="noopener noreferrer"> Navigation Four - Link </a>
-      </a-menu-item>
+      </a-menu-item> -->
     </a-menu>
     <div>
       <!-- <a-button type="primary" @click="toggleCollapsed" style="margin-bottom: 16px">
       <MenuUnfoldOutlined v-if="collapsed" />
       <MenuFoldOutlined v-else />
     </a-button> -->
-    <a-row style="background: gainsboro">
-      <a-col :span="1">
-          <a-menu class="menu-style" style="height: 100%" mode="inline" theme="dark" :inline-collapsed="true" v-model:openKeys="openKeys"
+    <div style="display: flex;">
+        <div style="width: 80px;">
+            <a-menu class="menu-style" style="height: 100%" mode="inline" theme="dark" :inline-collapsed="true" v-model:openKeys="openKeys"
         v-model:selectedKeys="selectedKeys">
         <a-menu-item key="1">
           <template #icon>
@@ -43,46 +43,34 @@
           <template #icon>
             <DesktopOutlined />
           </template>
-          <span>Option 2</span>
         </a-menu-item>
-        <a-sub-menu key="sub1">
+          <a-menu-item key="4">
           <template #icon>
             <UserOutlined />
           </template>
-          <template #title>Navigation One</template>
-          <a-menu-item key="5">Option 5</a-menu-item>
-          <a-menu-item key="6">Option 6</a-menu-item>
-          <a-menu-item key="7">Option 7</a-menu-item>
-          <a-menu-item key="8">Option 8</a-menu-item>
-        </a-sub-menu>
-        <a-sub-menu key="sub2">
+         </a-menu-item>
+    <a-menu-item key="5">
           <template #icon>
             <AppstoreOutlined />
           </template>
           <template #title>Navigation Two</template>
-          <a-menu-item key="9">Option 9</a-menu-item>
-          <a-menu-item key="10">Option 10</a-menu-item>
-          <a-sub-menu key="sub3" title="Submenu">
-            <a-menu-item key="11">Option 11</a-menu-item>
-            <a-menu-item key="12">Option 12</a-menu-item>
-          </a-sub-menu>
-        </a-sub-menu>
+         </a-menu-item>
       </a-menu>
+        </div>
+        <div style="flex: 1">
+          <Config />
+        </div>
+    </div>
+    <!-- <a-row style="background: gainsboro">
+      <a-col :span="2">
+        
       </a-col>
-      <a-col :span="23">
+      <a-col :span="22">
           <div style="height: 95vh">
-            <a-breadcrumb style="text-align: left; padding: 10px 10px">
-    <a-breadcrumb-item>Home</a-breadcrumb-item>
-    <a-breadcrumb-item><a href="">Application Center</a></a-breadcrumb-item>
-    <a-breadcrumb-item><a href="">Application List</a></a-breadcrumb-item>
-    <a-breadcrumb-item>An Application</a-breadcrumb-item>
-  </a-breadcrumb>
-  <div>
-    <label for="">Phone Numbers</label>
-  </div>
+  <Config />
           </div>
       </a-col>
-    </a-row>
+    </a-row> -->
      
     </div>
   </div>
@@ -110,9 +98,10 @@
     DesktopOutlined,
     NumberOutlined,
     AppstoreOutlined,
-     PhoneOutlined,
-     FileTextOutlined
+    //  PhoneOutlined,
+    //  FileTextOutlined
   } from '@ant-design/icons-vue';
+  import Config from './Config.vue';
   export default defineComponent({
     setup() {
       const state = reactive({
@@ -120,6 +109,7 @@
         selectedKeys: ['1'],
         openKeys: ['sub1'],
         preOpenKeys: ['sub1'],
+        friendlyName: "wtf"
       });
 
       watch(
@@ -140,13 +130,14 @@
       };
     },
     components: {
+      Config,
       HomeOutlined,
       UserOutlined,
       DesktopOutlined,
       NumberOutlined,
       AppstoreOutlined,
-       PhoneOutlined,
-       FileTextOutlined
+      //  PhoneOutlined,
+      //  FileTextOutlined
     },
   });
 </script>
