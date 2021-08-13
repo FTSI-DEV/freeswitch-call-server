@@ -1,10 +1,9 @@
-import { Controller, Get, Post } from "@nestjs/common";
-import { FreeswitchCallConfigModelParam } from "src/models/freeswitchCallConfigModel";
-import { FreeswitchCallConfigService } from "./freeswitch-call-config.service";
-import { IFreeswitchCallConfigService } from "./ifreeswitch-call-config.interface";
+import { Controller, Get, Post } from '@nestjs/common';
+import { FreeswitchCallConfigModelParam } from 'src/models/freeswitchCallConfigModel';
+import { FreeswitchCallConfigService } from '../services/freeswitch-call-config.service';
 
-@Controller()
-export class FreeswitchCallConfigController{
+@Controller('freeswitch-call-config')
+export class FreeswitchCallConfigController {
     constructor(
         private _freeswitchCallConfigService: FreeswitchCallConfigService
     ) {}
@@ -20,7 +19,7 @@ export class FreeswitchCallConfigController{
         return null;
     }
 
-    @Post()
+   @Post()
     saveRecord(callConfigParam: FreeswitchCallConfigModelParam){
         this._freeswitchCallConfigService.saveCallSettings(callConfigParam);
 
