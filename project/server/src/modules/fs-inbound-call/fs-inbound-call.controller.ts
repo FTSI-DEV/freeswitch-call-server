@@ -7,6 +7,7 @@ export class FsInboundCallController {
 
     inboundStatusCallBack(){
         //execute job here
+        //save the CDR in the job
     }
 
     incomingCallEnter(){

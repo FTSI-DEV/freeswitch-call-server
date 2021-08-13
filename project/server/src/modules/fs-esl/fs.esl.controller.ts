@@ -14,6 +14,13 @@ export class FreeswitchController{
         return "Successfully triggered click-to-call";
     }
 
+    @Get()
+    clickToCall2(phoneNumberTo: string, phoneNumberFrom: string):string{
+        let result = this._freeswitchService.clickToCall2(phoneNumberTo, phoneNumberFrom);
+
+        return result;
+    }
+
     // //proceed to ivr
     // dialVerify(){
 
