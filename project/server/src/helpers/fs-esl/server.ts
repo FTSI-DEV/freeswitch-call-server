@@ -63,6 +63,8 @@ export class EslServerHelper {
     );
 
     eslServerRes = esl_server;
+
+    this.incomingCallEnter();
   }
 
   incomingCallEnter(): any {
@@ -89,13 +91,13 @@ export class EslServerHelper {
       });
     });
 
-    return new Promise<any>((resolve, reject) => {
-      if (connData) {
-        resolve(connData);
-      } else {
-        reject('Connection Error')
-      }
-    });
+    // return new Promise<any>((resolve, reject) => {
+    //   if (connData) {
+    //     resolve(connData);
+    //   } else {
+    //     reject('Connection Error')
+    //   }
+    // });
   }
 
   private XmlConversionTaskValues(xmlParserResult: KeyValues[]): KeyValues[] {
