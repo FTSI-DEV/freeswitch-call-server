@@ -15,3 +15,8 @@ export function WebhookGetIncomingCallVerify(StoreId, SystemId) {
 export function WebhookGetWaitingToConnect(StoreId, SystemId) {
     return uriBuilder.getWaitingToConnectUri(StoreId, SystemId)
 }
+
+export function WebhookIncomingStatusCallBack(callData) {
+    console.log('webhook entered -> ', callData);
+    return uriBuilder.incomingStatusCallBack(callData)
+}

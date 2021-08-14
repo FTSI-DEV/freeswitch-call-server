@@ -22,4 +22,11 @@ export class IncomingCallController {
     const callData = { StoreId, SystemId };
     return this.incomingCallService.getWaitingToConnect(callData);
   }
+
+  @Get('IncomingStatusCallBack')
+  incomingStatusCallBack(callData:any){
+    console.log('CALL DATA' , callData);
+    const record = this.incomingCallService.incomingStatusCallBack(callData);
+
+  }
 }

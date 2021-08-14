@@ -1,7 +1,7 @@
 import { BaseEntity, Column, Entity, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity()
-export class FreeswitchCallSystem extends BaseEntity{
+export class FreeswitchCallSystem{
     @PrimaryGeneratedColumn()
     id: number;
 

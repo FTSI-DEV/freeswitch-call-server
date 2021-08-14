@@ -14,4 +14,7 @@ export class URIBuilder {
     getWaitingToConnectUri(StoreId, SystemId) {
         return `${this.baseUrl}/NewInboundCall/WaitingToConnect?StoreId=${StoreId}&SystemId=${SystemId}`;
     }
+    incomingStatusCallBack(callData) {
+        return `${this.baseUrl}/NewInboundCall/IncomingStatusCallBack?callData=${callData}`;
+    }
 }

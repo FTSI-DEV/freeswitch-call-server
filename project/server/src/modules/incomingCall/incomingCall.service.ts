@@ -1,8 +1,16 @@
 import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { FreeswitchCallSystem } from 'src/entity/freeswitchCallSystem.entity';
+import { Repository } from 'typeorm';
 import { callEnter, callVerify, waitingToConnect } from '../../jobs/IncomingCall';
+import { FreeswitchCallSystemService } from '../freeswitch-call-system/freeswitch-call-system.service';
 
 @Injectable()
 export class IncomingCallService {
+  constructor(
+    private readonly _freeswitchCallSystemService: FreeswitchCallSystemService
+    ) {}
+
   getIncomingCallEnter(callData): any {
     callEnter(callData).then(res => {
         return {
@@ -30,5 +38,29 @@ export class IncomingCallService {
       done: true,
       success: true
     }
+  }
+
+  incomingStatusCallBack(callData:any):any{
+
+    console.log('TEST INCOMING STATUS CALLBACK');
+
+    this._freeswitchCallSystemService.createRecord({
+      UUID: callData.UUID,
+      CallerIdNumber: callData.CallerIdNumber,
+      CallerName: callData.CallerName,
+      CallDirection : callData.CallDirection,
+      CallStatus: callData.CallStatus,
+      CalleeIdNumber: callData.CalleeIdNumber,
+      StartedDate: callData.StartedDate,
+      StartStamp: callData.StartStamp,
+      AnswerStamp: callData.AnswerStamp,
+      EndStamp: callData.EndStamp,
+      StartEpoch: callData.StartEpoch,
+      EndEpoch: callData.EndEpoch,
+      Duration: callData.Duration,
+      AnswerEpoch: callData.AnswerEpoch
+    }, callData.StoreId);
+
+    
   }
 }

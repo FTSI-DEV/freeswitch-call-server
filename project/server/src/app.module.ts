@@ -9,6 +9,8 @@ import { configService } from './config/config.service';
 import { FreeswitchCallConfigModule } from './modules/config/freeswitch-call-config/freeswitch-call-config.module';
 import { IvrModule } from './modules/ivr/ivr.module';
 import { IncomingCallModule } from './modules/incomingCall/incomingCall.module';
+import { FreeswitchCallSystemModule } from './modules/freeswitch-call-system/freeswitch-call-system.module';
+import { FreeswitchModule } from './modules/freeswitch/freeswitch.module';
 
 @Module({
   imports: [AuthModule, 
@@ -16,7 +18,9 @@ import { IncomingCallModule } from './modules/incomingCall/incomingCall.module';
             IvrModule,
             TypeOrmModule.forRoot(configService.getTypeOrmConfig()), 
             FreeswitchCallConfigModule,
-            IncomingCallModule],
+            IncomingCallModule,
+            FreeswitchModule,
+            FreeswitchCallSystemModule],
   controllers: [AppController],
   providers: [AppService],
 })

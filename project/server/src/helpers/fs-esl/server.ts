@@ -1,4 +1,5 @@
 import apiClient from 'src/utils/apiClient';
+import { WebhookIncomingStatusCallBack } from 'src/utils/webhooks';
 import { FS_DIALPLAN, FS_ESL } from '../constants/freeswitch.constants';
 import { TwiMLContants } from '../constants/twiml.constants';
 import { KeyValues, XMLParser } from '../parser/twimlXML.parser';
@@ -6,17 +7,27 @@ import { CDRHelper } from './cdr.helper';
 
 let eslServerRes = null;
 
+let CDR = null;
+
 export class EslServerHelper {
   private readonly _callRecords = new CDRHelper();
 
   private _onListen(conn: any): any {
     conn.on(FS_ESL.RECEIVED, (fsEvent) => {
       const eventName = fsEvent.getHeader('Event-Name');
-      console.log('LISTENING TO AN EVENT ->', eventName);
-      let call_record = this._callRecords.getCallRecords(fsEvent);
 
-      if (call_record != undefined) {
+      console.log('LISTENING TO AN EVENT ->', eventName);
+
+      if (eventName === 'CHANNEL_HANGUP_COMPLETE') {
+
+        let call_record = this._callRecords.getCallRecords(fsEvent);
+
+        console.log('CALL-RECORD', call_record);
+
+        CDR = call_record;
+
         return call_record;
+       
       }
     });
   }
@@ -73,21 +84,21 @@ export class EslServerHelper {
     eslServerRes.on('connection::ready', function (conn) {
       console.log('CONNECTION SERVER READY');
       connData = conn;
-      let call_record = self._onListen(conn);
 
-      console.log('CDR2 -> ', call_record);
+      self._onListen(conn);
 
       self._executeCrmApi(conn);
 
       conn.execute('bridge', 'sofia/gateway/fs-test3/1000');
 
       conn.on('esl::end', function (evt, body) {
+        console.log('TRIGGER WEBHOOK');
+
+        console.log('CDR', CDR);
+
+        WebhookIncomingStatusCallBack(CDR);
+
         // call webhook here
-        // if (call_record != undefined){
-        //   console.log('CDR -> ', call_record);
-        // }
-        // console.log('END CALL -> ', evt);
-        // console.log('END CALL BODY -> ', body);
       });
     });
 
