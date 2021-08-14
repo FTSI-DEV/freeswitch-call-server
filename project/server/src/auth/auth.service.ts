@@ -10,8 +10,8 @@ import { configService } from 'src/config/config.service';
 @Injectable()
 export class AuthService {
   constructor(
-     @InjectRepository(fscreds)
-    private freeswitchRepo: Repository<fscreds>,
+    //  @InjectRepository(fscreds)
+    // private freeswitchRepo: Repository<fscreds>,
       private usersService: UsersService,
       private jwtService: JwtService,
       ) {}
@@ -33,14 +33,14 @@ export class AuthService {
       }
   }
 
-  async getOneById(id: number): Promise<fscreds> {
-    try {
-      const vehicle = await this.freeswitchRepo.findOneOrFail(id);
-      return vehicle;
-    } catch (err) {
-      console.log('error loading vehicle - ', err);
-    }
-  }
+  // async getOneById(id: number): Promise<fscreds> {
+  //   try {
+  //     const vehicle = await this.freeswitchRepo.findOneOrFail(id);
+  //     return vehicle;
+  //   } catch (err) {
+  //     console.log('error loading vehicle - ', err);
+  //   }
+  // }
 
   validateApiCredential(apiKey:string, apiPassword: string):boolean
   {

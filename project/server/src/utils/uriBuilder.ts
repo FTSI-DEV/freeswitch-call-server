@@ -15,6 +15,10 @@ export class URIBuilder {
         return `${this.baseUrl}/NewInboundCall/WaitingToConnect?StoreId=${StoreId}&SystemId=${SystemId}`;
     }
     incomingStatusCallBack(callData) {
-        return `${this.baseUrl}/NewInboundCall/IncomingStatusCallBack?callData=${callData}`;
+        console.log('STATUSCALLBACKDATA' , callData);
+        // return `${this.baseUrl}/NewInboundCall/IncomingStatusCallBack?callData=${callData}`;
+        
+        return `${this.baseUrl}/NewInboundCall/IncomingStatusCallBack?UUID=${callData.UUID}&callData=${callData}`;
+    
     }
 }

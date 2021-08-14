@@ -13,7 +13,7 @@ import { AuthenticationController } from './auth.controller';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([fscreds]),
+    // TypeOrmModule.forFeature([fscreds]),
     UsersService,
     PassportModule,
     UsersModule,

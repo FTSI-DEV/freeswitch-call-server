@@ -4,6 +4,7 @@ import { FS_DIALPLAN, FS_ESL } from '../constants/freeswitch.constants';
 import { TwiMLContants } from '../constants/twiml.constants';
 import { KeyValues, XMLParser } from '../parser/twimlXML.parser';
 import { CDRHelper } from './cdr.helper';
+const http = require('http');
 
 let eslServerRes = null;
 
@@ -80,7 +81,7 @@ export class EslServerHelper {
 
   incomingCallEnter(): any {
     const self = this;
-    let connData = null;
+    let connData = null; 
     eslServerRes.on('connection::ready', function (conn) {
       console.log('CONNECTION SERVER READY');
       connData = conn;
@@ -96,7 +97,11 @@ export class EslServerHelper {
 
         console.log('CDR', CDR);
 
-        WebhookIncomingStatusCallBack(CDR);
+        // WebhookIncomingStatusCallBack(CDR);
+
+        http.get(WebhookIncomingStatusCallBack(CDR), function(res){
+          // console.log('ENTERED GET ', res);
+        })
 
         // call webhook here
       });

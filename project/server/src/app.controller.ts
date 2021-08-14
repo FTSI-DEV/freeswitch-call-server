@@ -34,13 +34,13 @@ export class AppController {
     return this.appService.getHello();
   }
 
-  @Get('fs')
-  async getfs(): Promise<fscreds>{
-    // await this.fsService.addVehicle();
+  // @Get('fs')
+  // async getfs(): Promise<fscreds>{
+  //   // await this.fsService.addVehicle();
 
-    // return this.fsService.getOne('freeswitch', 'machaik-fs2021');
-    return this.authService.getOneById(1);
-  }
+  //   // return this.fsService.getOne('freeswitch', 'machaik-fs2021');
+  //   return this.authService.getOneById(1);
+  // }
 
   // @Get('validateApi')
   // async validateApi(apiKey: string, apiPassword: string){

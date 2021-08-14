@@ -24,8 +24,8 @@ export class IncomingCallController {
   }
 
   @Get('IncomingStatusCallBack')
-  incomingStatusCallBack(callData:any){
-    console.log('CALL DATA' , callData);
+  incomingStatusCallBack(@Query('UUID') UUID:string, @Query('callData')callData:any){
+    console.log('IncomingStatusCallBack' , UUID);
     const record = this.incomingCallService.incomingStatusCallBack(callData);
 
   }

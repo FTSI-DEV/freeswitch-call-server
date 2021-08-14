@@ -1,20 +1,28 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { FreeswitchCallSystem } from 'src/entity/freeswitchCallSystem.entity';
+import { IPaginationOptions, paginate, Pagination } from 'nestjs-typeorm-paginate';
+import { FreeswitchCallSystemEntity } from 'src/entity/freeswitchCallSystem.entity';
+import { Vehicles } from 'src/entity/vehicles.entity';
 import { CDRModels } from 'src/models/cdr.models';
-import { Repository } from 'typeorm';
+import { createConnection, Repository } from 'typeorm';
 import { IFreeswitchCallSystemService } from './freeswitch-call-system.interface';
 
 @Injectable()
-export class FreeswitchCallSystemService implements IFreeswitchCallSystemService {
+export class FreeswitchCallSystemService {
     constructor(
-        @InjectRepository(FreeswitchCallSystem)
-        private freeswitchCallSystemRepo: Repository<FreeswitchCallSystem>) 
+        @InjectRepository(FreeswitchCallSystemEntity)
+        private freeswitchCallSystemRepo: Repository<FreeswitchCallSystemEntity>,
+        @InjectRepository(Vehicles)
+        private _vehicleRepo: Repository<Vehicles>)
     {}
 
-    async createRecord(cdrParam: CDRModels, storeId: number) : Promise<FreeswitchCallSystem>{
+    async createRecord(cdrParam: CDRModels, storeId: number) : Promise<FreeswitchCallSystemEntity>{
         
-        let fs = new FreeswitchCallSystem();
+        console.log('TRYING TO CREATE A RECORD');
+
+        let fs = new FreeswitchCallSystemEntity();
+
+        console.log('CDRPARAM ' , cdrParam);
 
         fs.CallStatus = cdrParam.CallStatus;
         fs.PhoneNumberTo = cdrParam.CalleeIdNumber;
@@ -26,12 +34,16 @@ export class FreeswitchCallSystemService implements IFreeswitchCallSystemService
         fs.RecordingUUID = cdrParam.UUID;
         fs.Duration = cdrParam.Duration;
 
+        console.log('FS2' , fs);
+
         await this.freeswitchCallSystemRepo.save(fs);
 
         return fs;
+
+        // return null;
     }
 
-    getByCallId(callUid:string): Promise<FreeswitchCallSystem>{
+    getByCallId(callUid:string): Promise<FreeswitchCallSystemEntity>{
 
         let result = this.freeswitchCallSystemRepo.find({
             where: {
@@ -49,7 +61,11 @@ export class FreeswitchCallSystemService implements IFreeswitchCallSystemService
 
     }
 
-    getById(id: number):Promise<FreeswitchCallSystem>{
+    getById(id: number):Promise<FreeswitchCallSystemEntity>{
         return this.freeswitchCallSystemRepo.findOneOrFail(id);
+    }
+
+    async getCallLogs(options: IPaginationOptions):Promise<Pagination<FreeswitchCallSystemEntity>>{
+        return paginate<FreeswitchCallSystemEntity>(this.freeswitchCallSystemRepo, options);
     }
 }

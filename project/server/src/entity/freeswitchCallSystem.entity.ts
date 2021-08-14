@@ -1,15 +1,15 @@
 import { BaseEntity, Column, Entity, PrimaryGeneratedColumn } from "typeorm";
 
-@Entity()
-export class FreeswitchCallSystem{
+@Entity('FreeswitchCallSystem')
+export class FreeswitchCallSystemEntity{
     @PrimaryGeneratedColumn()
     id: number;
 
     @Column()
-    PhoneNumberTo: string;
+    PhoneNumberTo?: string;
 
     @Column()
-    PhoneNumberFrom : string;
+    PhoneNumberFrom? : string;
 
     @Column()
     CallStatus: string;
@@ -27,7 +27,7 @@ export class FreeswitchCallSystem{
     Direction: string;
 
     @Column()
-    RecordingUUID: string;
+    RecordingUUID?: string;
 
     @Column()
     StoreId: number;

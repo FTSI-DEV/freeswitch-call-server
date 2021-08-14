@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { FreeswitchCallSystem } from 'src/entity/freeswitchCallSystem.entity';
+import { FreeswitchCallSystemEntity } from 'src/entity/freeswitchCallSystem.entity';
 import { Repository } from 'typeorm';
 import { callEnter, callVerify, waitingToConnect } from '../../beequeue/jobs/IncomingCall';
-import { FreeswitchCallSystemService } from '../freeswitch-call-system/freeswitch-call-system.service';
+import { FreeswitchCallSystemService } from '../freeswitch-call-system/services/freeswitch-call-system.service';
 
 @Injectable()
 export class IncomingCallService {
@@ -40,9 +40,11 @@ export class IncomingCallService {
     }
   }
 
-  incomingStatusCallBack(callData:any):any{
+  incomingStatusCallBack(callData):any{
 
-    console.log('TEST INCOMING STATUS CALLBACK');
+    console.log('TEST INCOMING STATUS CALLBACK', callData);
+
+    console.log('JSON CONVERT STIRNG', JSON.stringify(callData));
 
     this._freeswitchCallSystemService.createRecord({
       UUID: callData.UUID,

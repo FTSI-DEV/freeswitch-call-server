@@ -1,8 +1,8 @@
-import { FreeswitchCallSystem } from "src/entity/freeswitchCallSystem.entity";
+import { FreeswitchCallSystemEntity } from "src/entity/freeswitchCallSystem.entity";
 import { EntityRepository, Repository } from "typeorm";
 
-@EntityRepository(FreeswitchCallSystem)
-export class FreeswitchCallSystemRepository extends Repository<FreeswitchCallSystem>{
+@EntityRepository(FreeswitchCallSystemEntity)
+export class FreeswitchCallSystemRepository extends Repository<FreeswitchCallSystemEntity>{
 
     //create
 
