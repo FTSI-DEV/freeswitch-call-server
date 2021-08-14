@@ -3,7 +3,7 @@ import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { EslServerHelper } from './helpers/fs-esl/server';
 import { StartFreeswitchApplication } from './helpers/fs-esl/event-socket-monitor';
-import ArenaConfig from './beequeue/router';
+import ArenaConfig from './beequeue/arenaConfig';
 const Arena = require('bull-arena');
 
 async function bootstrap() {

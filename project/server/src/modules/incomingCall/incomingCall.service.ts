@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { FreeswitchCallSystem } from 'src/entity/freeswitchCallSystem.entity';
 import { Repository } from 'typeorm';
-import { callEnter, callVerify, waitingToConnect } from '../../jobs/IncomingCall';
+import { callEnter, callVerify, waitingToConnect } from '../../beequeue/jobs/IncomingCall';
 import { FreeswitchCallSystemService } from '../freeswitch-call-system/freeswitch-call-system.service';
 
 @Injectable()
