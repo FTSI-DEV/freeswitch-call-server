@@ -29,9 +29,10 @@ export class AppController {
     return req.user;
   }
 
-  @Get()
+  @Get('fs')
   getHello(): string {
-    return this.appService.getHello();
+    // return this.appService.getHello();
+    return 'Hello World';
   }
 
   // @Get('fs')
