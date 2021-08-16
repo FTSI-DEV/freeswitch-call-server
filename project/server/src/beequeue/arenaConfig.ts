@@ -8,15 +8,6 @@ export default {
       Bee,
       queues: [
         {
-          name: 'default',
-          hostId: 'default',
-          type: 'bee',
-          redis:{
-            host: '127.0.0.1',
-            port: REDIS_SERVER_PORT
-          }
-        },
-        {
           // Required for each queue definition.
           name: 'incomingCallEnter',
           // User-readable display name for the host. Required.
