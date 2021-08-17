@@ -18,7 +18,16 @@ export class URIBuilder {
         console.log('STATUSCALLBACKDATA' , callData);
         // return `${this.baseUrl}/NewInboundCall/IncomingStatusCallBack?callData=${callData}`;
         
-        return `${this.baseUrl}/NewInboundCall/IncomingStatusCallBack?UUID=${callData.UUID}&callData=${callData}`;
-    
+        // return `${this.baseUrl}/NewInboundCall/IncomingStatusCallBack?UUID=${callData.UUID}&callData=${callData}`;
+        
+        return `${this.baseUrl}/NewInboundCall/IncomingStatusCallBack?UUID=${callData.UUID}&
+                CallerIdNumber=${callData.CallerIdNumber},
+                CallerName=${callData.CallerName},
+                CalleeIdNumber=${callData.calleeIdNumber},
+                CallDirection=${callData.CallDirection},
+                CallStatus=${callData.CallStatus},
+                Duration=${callData.Duration},
+                StartedDate=${callData.StartedDate}`;
+
     }
 }

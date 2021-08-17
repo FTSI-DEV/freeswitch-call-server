@@ -21,11 +21,11 @@ export class FsEslService implements IFSEslService {
         this._callDispatchHelper.clickToCall(conn, originateParam);
     }
 
-    clickToCall2(phoneNumberTo: string, phoneNumberFrom: string):string{
+    clickToCall2(phoneNumberTo: string, phoneNumberFrom: string, callerId:string):string{
         
         let conn = this._fsConnection.startConnection();
 
-        let result = this._callDispatchHelper.clickToCall2(conn, phoneNumberFrom, phoneNumberTo);
+        let result = this._callDispatchHelper.clickToCall2(conn, phoneNumberFrom, phoneNumberTo,callerId);
 
         return result;
     }

@@ -10,6 +10,7 @@ import { ApiCredential } from './models/apiCredential.model';
 
 @Controller()
 export class AppController {
+  /*
   constructor(
     private readonly appService: AppService,
     private authService: AuthService) {}
@@ -29,9 +30,10 @@ export class AppController {
     return req.user;
   }
 
-  @Get()
+  @Get('fs')
   getHello(): string {
-    return this.appService.getHello();
+    // return this.appService.getHello();
+    return 'Hello World';
   }
 
   // @Get('fs')
@@ -46,4 +48,5 @@ export class AppController {
   // async validateApi(apiKey: string, apiPassword: string){
   //   return this.authService.validateApiCredential(apiKey, apiPassword);
   // }
+  */
 }

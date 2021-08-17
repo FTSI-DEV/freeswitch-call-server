@@ -15,8 +15,8 @@ export class FreeswitchController{
     }
 
     @Get()
-    clickToCall2(phoneNumberTo: string, phoneNumberFrom: string):string{
-        let result = this._freeswitchService.clickToCall2(phoneNumberTo, phoneNumberFrom);
+    clickToCall2(phoneNumberTo: string, phoneNumberFrom: string,callerId: string):string{
+        let result = this._freeswitchService.clickToCall2(phoneNumberTo, phoneNumberFrom,callerId);
 
         return result;
     }
