@@ -18,7 +18,7 @@ export class FreeswitchCallSystemController {
     private readonly _freeswitchCallSystemService: FreeswitchCallSystemService,
   ) {}
 
-  @Get()
+  @Get('getCdrLogs')
   getCallLogs(
     @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number = 1,
     @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number = 10,

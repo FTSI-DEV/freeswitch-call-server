@@ -8,7 +8,7 @@ export class FreeswitchCallConfigController {
         private _freeswitchCallConfigService: FreeswitchCallConfigService
     ) {}
 
-    @Get()
+    @Get('getCallConfigById')
     getCallConfigById(id: number):FreeswitchCallConfigModelParam{
         
         let fsCallConfig = this._freeswitchCallConfigService.getCallConfigById(id)
@@ -19,7 +19,7 @@ export class FreeswitchCallConfigController {
         return null;
     }
 
-   @Post()
+   @Post('saveRecord')
     saveRecord(callConfigParam: FreeswitchCallConfigModelParam){
         this._freeswitchCallConfigService.saveCallSettings(callConfigParam);
 
