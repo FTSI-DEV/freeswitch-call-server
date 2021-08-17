@@ -11,6 +11,7 @@ import { IvrModule } from './modules/ivr/ivr.module';
 import { IncomingCallModule } from './modules/incomingCall/incomingCall.module';
 import { FreeswitchCallSystemModule } from './modules/freeswitch-call-system/freeswitch-call-system.module';
 import { FreeswitchModule } from './modules/freeswitch/freeswitch.module';
+import { FsEslModule } from './modules/fs-esl/fs-esl.module';
 
 @Module({
   imports: [AuthModule, 
@@ -20,7 +21,8 @@ import { FreeswitchModule } from './modules/freeswitch/freeswitch.module';
             FreeswitchCallConfigModule,
             IncomingCallModule,
             FreeswitchModule,
-            FreeswitchCallSystemModule],
+            FreeswitchCallSystemModule,
+           FsEslModule],
   controllers: [AppController],
   providers: [AppService],
 })

@@ -5,7 +5,7 @@ export class FreeswitchConfigHelper{
     //put the ip,password,port to environment variables
     getFreeswitchConfig(): FreeswithConfigModel{
         return{
-            ip: '192.168.18.54',
+            ip: '192.168.18.61',
             password: 'ClueCon',
             port: 8021
         };

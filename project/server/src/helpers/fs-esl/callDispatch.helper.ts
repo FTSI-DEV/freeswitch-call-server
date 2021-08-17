@@ -25,16 +25,22 @@ export class CallDispatchHelper{
         }
     }
 
-    clickToCall2(conn, phoneNumberTo:string,phoneNumberFrom:string,callerId:string):string{
+    async clickToCall2(conn, phoneNumberTo:string,phoneNumberFrom:string,callerId:string):Promise<string>{
 
         try{
+
+
+            console.log('CLICK TO CALL SERVICE', conn);
+
             let app_args = 'sofia/gateway/fs-test2/1000';//destinationNumber;
             let arg1 = `{ignore_early_media=true,origination_caller_id_number=${phoneNumberFrom},hang_up_after_bridge=true}${app_args}`;
             let arg2 = `${arg1} &bridge(${phoneNumberTo})`;
 
-            conn.execute('set', `outbound_caller_id_number=${callerId}`);
+            // console.log('connection? ', conn);
 
-            conn.api('originate', arg2, function(res){
+            // conn.execute('set', `outbound_caller_id_number=${callerId}`);
+
+            await conn.api('originate', arg2, function(res){
 
                 let callUid = res.getBody();
 

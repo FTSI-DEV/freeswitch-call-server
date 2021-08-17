@@ -106,14 +106,6 @@ export class EslServerHelper {
         // call webhook here
       });
     });
-
-    // return new Promise<any>((resolve, reject) => {
-    //   if (connData) {
-    //     resolve(connData);
-    //   } else {
-    //     reject('Connection Error')
-    //   }
-    // });
   }
 
   private XmlConversionTaskValues(xmlParserResult: KeyValues[]): KeyValues[] {

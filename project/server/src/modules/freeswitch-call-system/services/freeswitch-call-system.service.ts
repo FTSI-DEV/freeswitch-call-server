@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { IPaginationOptions, paginate, Pagination } from 'nestjs-typeorm-paginate';
 import { FreeswitchCallSystemEntity } from 'src/entity/freeswitchCallSystem.entity';
-import { Vehicles } from 'src/entity/vehicles.entity';
 import { CDRModels } from 'src/models/cdr.models';
 import { createConnection, Repository } from 'typeorm';
 import { IFreeswitchCallSystemService } from './freeswitch-call-system.interface';
@@ -11,9 +10,7 @@ import { IFreeswitchCallSystemService } from './freeswitch-call-system.interface
 export class FreeswitchCallSystemService {
     constructor(
         @InjectRepository(FreeswitchCallSystemEntity)
-        private freeswitchCallSystemRepo: Repository<FreeswitchCallSystemEntity>,
-        @InjectRepository(Vehicles)
-        private _vehicleRepo: Repository<Vehicles>)
+        private freeswitchCallSystemRepo: Repository<FreeswitchCallSystemEntity>)
     {}
 
     async createRecord(cdrParam: CDRModels, storeId: number) : Promise<FreeswitchCallSystemEntity>{

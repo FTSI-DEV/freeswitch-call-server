@@ -3,6 +3,7 @@ import { TypeOrmModuleOptions } from "@nestjs/typeorm";
 import { fscreds } from "src/entity/freeswitch.entity";
 import { FreeswitchCallConfig } from "src/entity/freeswitchCallConfig.entity";
 import { FreeswitchCallSystemEntity } from "src/entity/freeswitchCallSystem.entity";
+import { FsCallConfig } from "src/entity/fsCallConfig.entity";
 import { Vehicles } from "src/entity/vehicles.entity";
 import { ApiCredential } from "src/models/apiCredential.model";
 import { IConfigService } from "./iconfig.interface";
@@ -42,7 +43,7 @@ export class ConfigService implements IConfigService{
             username: this.getValue('POSTGRES_USER'),
             password: this.getValue('POSTGRES_PASSWORD'),
             database: this.getValue('POSTGRES_DATABASE'),
-            entities: [FreeswitchCallConfig,FreeswitchCallSystemEntity,Vehicles],
+            entities: [FreeswitchCallConfig,FreeswitchCallSystemEntity,Vehicles,FsCallConfig],
             migrationsTableName: 'migration',
             migrations: ['src/migration/*.ts'],
             cli: {

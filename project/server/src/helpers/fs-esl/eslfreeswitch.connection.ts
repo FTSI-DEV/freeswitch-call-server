@@ -4,7 +4,7 @@ const esl = require('modesl');
 
 let connection: any = null;
 
-export const connect = (): any => {
+export const fsConnect = (): any => {
     return new Promise<any>((resolve,reject) => {
 
         if (connection !== null && connection.connected()) {
@@ -15,7 +15,9 @@ export const connect = (): any => {
             
             let fsConfig = new FreeswitchConfigHelper().getFreeswitchConfig();
 
-            connection = new esl.Connection(fsConfig.ip, fsConfig.port, fsConfig.password);
+            // connection = new esl.Connection(fsConfig.ip, fsConfig.port, fsConfig.password);
+
+            connection = new esl.Connection('192.168.18.58', 8021, 'ClueCon');
 
             connection.on(FS_ESL.CONNECTION.ERROR, () => {
                 console.log('TEST 1' );
@@ -37,5 +39,5 @@ export const connect = (): any => {
 
 export class FreeswitchConnectionHelper{
     startConnection = connection;
-    connect = connect;
+    connect = fsConnect;
 }

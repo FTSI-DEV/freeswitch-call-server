@@ -17,14 +17,14 @@ const apiClient = axios.create({
 
 export default {
     getCallConfigById(params: any) {
-        return apiClient.get('/freeswitch-call-config', {
+        return apiClient.get('/freeswitch-call-config/getCallConfigById', {
             params: params,
         });
     },
     saveRecord(params: any) {
-        return apiClient.post(`/freeswitch-call-config`, params);
+        return apiClient.post(`/freeswitch-call-config/saveRecord`, params);
     },
     clickToCall(params: any) {
-        return apiClient.post(`/freeswitch/clickToCall`, params);
+        return apiClient.post(`/freeswitch/clickToCall2`, params);
     }
 }

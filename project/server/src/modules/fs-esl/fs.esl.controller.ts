@@ -1,4 +1,4 @@
-import { Controller, Get } from "@nestjs/common";
+import { Controller, Get, Param } from "@nestjs/common";
 import { OriginationModel } from "src/helpers/fs-esl/models/originate.model";
 import { FsEslService } from "./fs-esl.service";
 
@@ -14,8 +14,10 @@ export class FreeswitchController{
         return "Successfully triggered click-to-call";
     }
 
-    @Get()
-    clickToCall2(phoneNumberTo: string, phoneNumberFrom: string,callerId: string):string{
+    @Get('clickToCall2')
+    clickToCall2(@Param('phoneNumberTo') phoneNumberTo: string, 
+                @Param('phoneNumberFrom') phoneNumberFrom: string,
+                @Param('callerId') callerId: string):string{
         let result = this._freeswitchService.clickToCall2(phoneNumberTo, phoneNumberFrom,callerId);
 
         return result;

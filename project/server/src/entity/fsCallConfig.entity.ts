@@ -1,13 +1,13 @@
 import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity()
-export class Vehicles{
+export class FsCallConfig{
     @PrimaryGeneratedColumn()
-    id: bigint;
+    id: number;
 
     @Column()
-    vin:string;
+    username: string;
 
     @Column()
-    stockNo: string;
+    password: string;
 }
