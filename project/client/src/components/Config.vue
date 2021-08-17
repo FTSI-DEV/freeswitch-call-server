@@ -36,11 +36,16 @@
                             </a-form-item>
                         </a-col>
                         <a-col :span="6">
-                            <a-form-item label="To">
+                            <a-form-item label="To" style="margin-right: 20px;">
                                 <input class="ant-input" v-model="to" />
                             </a-form-item>
                         </a-col>
-                        <a-col :span="4" style="position: relative;">
+                        <a-col :span="6" style="margin-right: 20px;">
+                            <a-form-item label="Caller Id">
+                                <input class="ant-input" v-model="callerId" />
+                            </a-form-item>
+                        </a-col>
+                        <a-col :span="3" style="position: relative;">
                             <a-button 
                                 type="danger" 
                                 @click="clickToCall" 
@@ -64,11 +69,13 @@
                 httpMethod: null,
                 webhookURL: null,
                 from: null,
-                to: null
+                to: null,
+                callerId: null,
             }
         },
         methods: {
             saveConfig() {
+                console.log('saveConfig: ')
                 const params = {
                     friendlyName: this.friendlyName,
                     phoneNumber: this.phoneNumber,
@@ -82,17 +89,13 @@
             },
             clickToCall() {
                 const params = {
-                    from: this.from,
-                    to: this.to,
+                    phoneNumberFrom: this.from,
+                    phoneNumberTo: this.to,
+                    callerId: this.callerId,
                 }
                 EventService.clickToCall(params);
                 console.log('params: ', params);
             }
-        },
-        created() {
-            EventService.getCallConfigById(1).then(res => {
-                console.log('getCallConfigById returnn: ', res)
-            })
         }
     }
 </script>
