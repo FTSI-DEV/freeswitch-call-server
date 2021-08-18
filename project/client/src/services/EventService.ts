@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const apiClient = axios.create({
-    baseURL: 'http://freeswitchcall.com/',
+    baseURL: 'http://www.freeswitchcallapp.com/',
     withCredentials: false,
     headers: {
         // crossdomain: true ,
