@@ -65,8 +65,8 @@ export class EslServerHelper {
 
     let esl_server = new esl.Server(
       {
-        port: 5000,
-        host: '192.168.18.3',
+        port: process.env.ESL_SERVER_PORT,
+        host: process.env.ESL_SERVER_HOST,
         myevents: true,
       },
       function () {
