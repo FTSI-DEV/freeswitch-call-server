@@ -5,9 +5,9 @@ export class FreeswitchConfigHelper{
     //put the ip,password,port to environment variables
     getFreeswitchConfig(): FreeswithConfigModel{
         return{
-            ip: '192.168.18.61',
-            password: 'ClueCon',
-            port: 8021
+            ip: process.env.ESL_CONNECTION_IP,
+            password: process.env.ESL_CONNECTION_PASSWORD,
+            port: process.env.ESL_CONNECTION_PORT
         };
     };
 }
