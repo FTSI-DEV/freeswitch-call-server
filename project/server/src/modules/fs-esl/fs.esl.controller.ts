@@ -1,4 +1,4 @@
-import { Controller, Get, Param } from "@nestjs/common";
+import { Controller, Get, Param, Post } from "@nestjs/common";
 import { OriginationModel } from "src/helpers/fs-esl/models/originate.model";
 import { FsEslService } from "./fs-esl.service";
 
@@ -8,38 +8,12 @@ export class FreeswitchController{
         private _freeswitchService: FsEslService
     ) {}
 
-    @Get('clickToCall')
-    clickToCall(originateParam: OriginationModel){
-        this._freeswitchService.clickToCall(originateParam);
-        return "Successfully triggered click-to-call";
-    }
-
-    @Get('clickToCall2')
-    clickToCall2(@Param('phoneNumberTo') phoneNumberTo: string, 
+    @Post('clickToCall')
+    clickToCall(@Param('phoneNumberTo') phoneNumberTo: string, 
                 @Param('phoneNumberFrom') phoneNumberFrom: string,
                 @Param('callerId') callerId: string):string{
-        let result = this._freeswitchService.clickToCall2(phoneNumberTo, phoneNumberFrom,callerId);
+        let result = this._freeswitchService.clickToCall(phoneNumberTo, phoneNumberFrom,callerId);
 
         return result;
     }
-
-    // //proceed to ivr
-    // dialVerify(){
-
-    // }
-
-    // //outbound call
-    // dialNumber(){
-
-    // }
-
-    // //completed - end call
-    // dialEnd(){
-
-    // }
-
-    // //incoming call to connect - ivr
-    // inboundCall(){
-        
-    // }
 }

@@ -15,9 +15,7 @@ export const fsConnect = (): any => {
             
             let fsConfig = new FreeswitchConfigHelper().getFreeswitchConfig();
 
-            // connection = new esl.Connection(fsConfig.ip, fsConfig.port, fsConfig.password);
-
-            connection = new esl.Connection('192.168.18.58', 8021, 'ClueCon');
+            connection = new esl.Connection(fsConfig.ip, fsConfig.port, fsConfig.password);
 
             connection.on(FS_ESL.CONNECTION.ERROR, () => {
                 console.log('TEST 1' );

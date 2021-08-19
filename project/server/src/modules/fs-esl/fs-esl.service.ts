@@ -8,32 +8,22 @@ import { IFSEslService } from './fs-esl.interface';
 
 @Injectable()
 export class FsEslService {
-  constructor() 
-  {}
+
+  constructor() {}
   private readonly _callDispatchHelper = new CallDispatchHelper();
   private readonly _fsConnection = new FreeswitchConnectionHelper();
 
-  clickToCall(originateParam: OriginationModel) {
-    let conn = this._fsConnection.connect(); //to be test
-
-    this._callDispatchHelper.clickToCall(conn, originateParam);
-  }
-
-  clickToCall2(
+  clickToCall(
     phoneNumberTo: string,
     phoneNumberFrom: string,
     callerId: string,
   ): string {
     let conn = new FreeswitchConnectionHelper().connect().then((connection) => {
-
       console.log('EXECUTING CLICK-TO-CALL');
 
       let app_args = 'sofia/gateway/fs-test1/1000'; //destinationNumber;
       let arg1 = `{ignore_early_media=true,origination_caller_id_number=${phoneNumberFrom}}${app_args}`;
-    //  let arg2 = `${arg1} &bridge(${phoneNumberTo})`;
-        let arg2 = `${arg1} &bridge(sofia/gateway/fs-test3/1000)`;
-
-        connection.execute('set',`outbound_caller_id_number=${callerId}`);
+      let arg2 = `${arg1} &bridge(sofia/gateway/fs-test3/1000)`;
 
       connection.api('originate', arg2, function (res) {
         let callUid = res.getBody();
