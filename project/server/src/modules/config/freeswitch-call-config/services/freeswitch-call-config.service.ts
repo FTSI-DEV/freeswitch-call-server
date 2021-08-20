@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { async } from 'rxjs';
 import { FreeswitchCallConfig, FreeswitchCallConfigRepository } from 'src/entity/freeswitchCallConfig.entity';
 import { FreeswitchCallConfigModel, FreeswitchCallConfigModelParam } from 'src/models/freeswitchCallConfigModel';
 import { Repository } from 'typeorm';
@@ -37,30 +38,46 @@ export class FreeswitchCallConfigService implements IFreeswitchCallConfigService
         this.freeswitchConfigRepo.saveUpdateRecord(fsCallConfig);
     }
 
-    async getCallConfigById(id: number):Promise<FreeswitchCallConfigModelParam>{
+    getCallConfigById(id: number): Promise<FreeswitchCallConfigModelParam>{
 
-        let fsCallConfig = await this.getById(id);
+        let retVal = null;
 
-        if (fsCallConfig != undefined){
+        let fsConfig = this.getById(id)
+            .then(result => {
 
-            var deserialize = JSON.parse(fsCallConfig.Value);
+                if (result != null){
 
-            if (deserialize != undefined){
-                return{
-                    friendlyName: deserialize.friendlyName,
-                    phoneNumber: deserialize.phoneNumber,
-                    httpMethod: deserialize.httpMethod,
-                    webhookUrl: deserialize.webhookUrl,
-                    id: fsCallConfig.Id
-                };
-            }
-        }
+                    var deserialize = JSON.parse(result.Value);
 
-        return null;
+                    if (deserialize != undefined){
+
+                        retVal = new FreeswitchCallConfigModelParam();
+
+                        retVal.friendlyName = deserialize.friendlyName;
+                        retVal.phoneNumber = deserialize.phoneNumber;
+                        retVal.httpMethod = deserialize.httpMethod;
+                        retVal.webhookUrl = deserialize.webhookUrl;
+                        retVal.id = result.Id;
+
+                        console.log('ret', retVal);
+
+                        return retVal;
+                    }
+                }
+
+            })
+            .catch((err) => {
+               let retVal = null
+            });
+
+        console.log('hell oworld');
+
+        console.log('ff', retVal);
+
+        return retVal;
     }
 
-    getById(id:number):Promise<FreeswitchCallConfig>{
-        
-        return this.freeswitchConfigRepo.getById(id);
+    getById  = async (id: number) => {
+        return await this.freeswitchConfigRepo.findOneOrFail(id);
     }
 }
