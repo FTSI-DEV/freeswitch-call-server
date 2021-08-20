@@ -9,18 +9,9 @@ export class FreeswitchCallConfigController {
     ) {}
 
     @Get('getCallConfigById/:id')
-    getCallConfigById(@Param('id')id: number):FreeswitchCallConfigModelParam{
+    async getCallConfigById(@Param('id')id: number):Promise<FreeswitchCallConfigModelParam>{
         
-        let retVal = null;
-
-        let record = this._freeswitchCallConfigService.getCallConfigById(id);
-
-        console.log('RECORD', record);
-
-        console.log('retva', retVal);
-
-        return retVal;
-
+        return await this._freeswitchCallConfigService.getCallConfigById(id);
     }
 
    @Post('saveRecord')
