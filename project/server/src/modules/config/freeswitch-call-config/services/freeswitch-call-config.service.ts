@@ -1,10 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { resolve } from 'path';
-import { async } from 'rxjs';
+import { IPaginationMeta, IPaginationOptions, paginate, Pagination } from 'nestjs-typeorm-paginate';
 import { FreeswitchCallConfig, FreeswitchCallConfigRepository } from 'src/entity/freeswitchCallConfig.entity';
 import { FreeswitchCallConfigModel, FreeswitchCallConfigModelParam } from 'src/models/freeswitchCallConfigModel';
-import { Repository } from 'typeorm';
 import { IFreeswitchCallConfigService } from './ifreeswitch-call-config.interface';
 
 const FREESWITCH_CALL_CONFIG = 'FREESWITCH_CALL_CONFIG';
@@ -94,4 +92,51 @@ export class FreeswitchCallConfigService implements IFreeswitchCallConfigService
             });
         }); 
     }
+
+    getAll(options:IPaginationOptions) :any{
+
+        return this.getCallConfigs(options);
+    }
+
+    private getCallConfigs(options: IPaginationOptions):Promise<any>{
+
+        return new Promise<Pagination<FreeswitchCallConfigModelParam>>((resolve, reject) => {
+
+            let pageRecords = paginate<FreeswitchCallConfig>(this.freeswitchConfigRepo, options);
+
+            pageRecords.then(result => {
+                let itemsObjs: FreeswitchCallConfigModelParam[] = [];
+
+                result.items.forEach(element => {
+                    
+                    let configModel = new FreeswitchCallConfigModelParam();
+
+                    let jsonObj = JSON.parse(element.Value);
+
+                    configModel.friendlyName = jsonObj.friendlyName;
+                    configModel.httpMethod = jsonObj.httpMethod;
+                    configModel.phoneNumber = jsonObj.phoneNumber;
+                    configModel.webhookUrl = jsonObj.webhookUrl;
+                    configModel.id = element.Id;
+
+                    itemsObjs.push(configModel);
+
+                });
+
+                resolve(new Pagination<FreeswitchCallConfigModelParam, IPaginationMeta>(itemsObjs, result.meta));
+
+            }).catch(err => {
+                reject(new Pagination<FreeswitchCallConfigModelParam, IPaginationMeta>(null, {
+                    itemCount: 0,
+                    itemsPerPage: 0,
+                    totalItems: 0,
+                    totalPages : 0,
+                    currentPage: 0
+                }));
+            })
+        }).catch(error => {
+            console.log('error', error);
+        })
+    }
 }
+    
