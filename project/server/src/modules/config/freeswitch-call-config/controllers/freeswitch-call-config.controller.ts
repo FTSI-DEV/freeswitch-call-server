@@ -1,4 +1,6 @@
-import { Body, Controller, Get, Post, Param } from '@nestjs/common';
+import { Body, Controller, Get, Post, Param, Query, ParseIntPipe, DefaultValuePipe } from '@nestjs/common';
+import { Pagination } from 'nestjs-typeorm-paginate';
+import { FreeswitchCallConfig } from 'src/entity/freeswitchCallConfig.entity';
 import { FreeswitchCallConfigModelParam } from 'src/models/freeswitchCallConfigModel';
 import { FreeswitchCallConfigService } from '../services/freeswitch-call-config.service';
 
@@ -9,16 +11,9 @@ export class FreeswitchCallConfigController {
     ) {}
 
     @Get('getCallConfigById/:id')
-    getCallConfigById(@Param('id')id: number):FreeswitchCallConfigModelParam{
+    getCallConfigById(@Param('id')id: number):Promise<FreeswitchCallConfigModelParam>{
         
-        let retVal = null;
-
-        let fsCallConfig = this._freeswitchCallConfigService.getCallConfigById(id)
-        .then((res) => {
-           retVal = res;
-        });
-
-        return retVal;
+        return this._freeswitchCallConfigService.getCallConfigById(id);
     }
 
    @Post('saveRecord')
@@ -30,4 +25,17 @@ export class FreeswitchCallConfigController {
 
         return "Successfully saved record";
     }
+
+    @Get('getCallConfigs')
+    getCallConfigs(
+    @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number = 1,
+    @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number = 10,
+  ): Promise<Pagination<FreeswitchCallConfigModelParam>> {
+    limit = limit > 100 ? 100 : limit;
+    return this._freeswitchCallConfigService.getAll({
+        page,
+        limit
+    });
+  }
+    
 }

@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { IPaginationMeta, IPaginationOptions, paginate, Pagination } from 'nestjs-typeorm-paginate';
 import { FreeswitchCallConfig, FreeswitchCallConfigRepository } from 'src/entity/freeswitchCallConfig.entity';
 import { FreeswitchCallConfigModel, FreeswitchCallConfigModelParam } from 'src/models/freeswitchCallConfigModel';
-import { Repository } from 'typeorm';
 import { IFreeswitchCallConfigService } from './ifreeswitch-call-config.interface';
 
 const FREESWITCH_CALL_CONFIG = 'FREESWITCH_CALL_CONFIG';
@@ -37,30 +37,138 @@ export class FreeswitchCallConfigService implements IFreeswitchCallConfigService
         this.freeswitchConfigRepo.saveUpdateRecord(fsCallConfig);
     }
 
-    async getCallConfigById(id: number):Promise<FreeswitchCallConfigModelParam>{
+    getCallConfigById(id: number): any{
+        return new Promise<FreeswitchCallConfigModelParam>((resolve, reject) => {
 
-        let fsCallConfig = await this.getById(id);
+            this.getById(id)
+                .then((result) => {
+                    
+                    if (result == null || result.Value == undefined) reject(null);
 
-        if (fsCallConfig != undefined){
+                    var deserialize = JSON.parse(result.Value);
 
-            var deserialize = JSON.parse(fsCallConfig.Value);
+                    if (deserialize != null){
 
-            if (deserialize != undefined){
-                return{
-                    friendlyName: deserialize.friendlyName,
-                    phoneNumber: deserialize.phoneNumber,
-                    httpMethod: deserialize.httpMethod,
-                    webhookUrl: deserialize.webhookUrl,
-                    id: fsCallConfig.Id
-                };
-            }
-        }
+                        let configModel: FreeswitchCallConfigModelParam = {
+                            friendlyName: deserialize.friendlyName,
+                            phoneNumber: deserialize.phoneNumber,
+                            httpMethod: deserialize.httpMethod,
+                            webhookUrl: deserialize.webhookUrl,
+                            id: result.Id
+                        };
 
-        return null;
+                        resolve(configModel);
+                    }
+                    else {
+                        reject(null);
+                    }
+
+                }).catch((err) => {
+                    reject(null);
+                });
+        })
     }
 
-    getById(id:number):Promise<FreeswitchCallConfig>{
+    // getCallConfigById(id: number): any {
+
+    //     return new Promise<any>((resolve, reject) => {
+    //         this.getById(id)
+    //             .then(result => {
+
+    //                 if (result != null){
+    //                     console.log('value', result.Value);
+    //                 }
+
+    //                 if (result == null || result.Value == undefined) resolve(null);
+
+    //                 var deserialize = JSON.parse(result.Value);
+
+    //                 if (deserialize != undefined){
+
+    //                     let retVal = new FreeswitchCallConfigModelParam();
+
+    //                     retVal.friendlyName = deserialize.friendlyName;
+    //                     retVal.phoneNumber = deserialize.phoneNumber;
+    //                     retVal.httpMethod = deserialize.httpMethod;
+    //                     retVal.webhookUrl = deserialize.webhookUrl;
+    //                     retVal.id = result.Id;
+
+    //                     console.log('ret', retVal);
+
+    //                     retVal = result;
+
+    //                      resolve(retVal);
+                        
+    //                 }else {
+    //                 reject(null);
+    //                 }
+    //             })
+    //             .catch(error => {
+    //                 reject(null);
+    //             });
+    //     }).catch(err => console.log(err));
+    // }
+
+    private getById = (id: number): any => {
+
+        return new Promise<FreeswitchCallConfig>((resolve,reject) => {
         
-        return this.freeswitchConfigRepo.getById(id);
+            let record = this.freeswitchConfigRepo.findOneOrFail(id)
+            .then(result => {
+                if (result == null){
+                    reject(null);
+                }
+                else{
+                    resolve(result);
+                }
+            });
+        }); 
+    }
+
+    getAll(options:IPaginationOptions) :any{
+
+        return this.getCallConfigs(options);
+    }
+
+    private getCallConfigs(options: IPaginationOptions):Promise<any>{
+
+        return new Promise<Pagination<FreeswitchCallConfigModelParam>>((resolve, reject) => {
+
+            let pageRecords = paginate<FreeswitchCallConfig>(this.freeswitchConfigRepo, options);
+
+            pageRecords.then(result => {
+                let itemsObjs: FreeswitchCallConfigModelParam[] = [];
+
+                result.items.forEach(element => {
+                    
+                    let configModel = new FreeswitchCallConfigModelParam();
+
+                    let jsonObj = JSON.parse(element.Value);
+
+                    configModel.friendlyName = jsonObj.friendlyName;
+                    configModel.httpMethod = jsonObj.httpMethod;
+                    configModel.phoneNumber = jsonObj.phoneNumber;
+                    configModel.webhookUrl = jsonObj.webhookUrl;
+                    configModel.id = element.Id;
+
+                    itemsObjs.push(configModel);
+
+                });
+
+                resolve(new Pagination<FreeswitchCallConfigModelParam, IPaginationMeta>(itemsObjs, result.meta));
+
+            }).catch(err => {
+                reject(new Pagination<FreeswitchCallConfigModelParam, IPaginationMeta>(null, {
+                    itemCount: 0,
+                    itemsPerPage: 0,
+                    totalItems: 0,
+                    totalPages : 0,
+                    currentPage: 0
+                }));
+            })
+        }).catch(error => {
+            console.log('error', error);
+        })
     }
 }
+    
