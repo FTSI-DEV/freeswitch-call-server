@@ -13,4 +13,6 @@ export class CDRModels{
     StartEpoch: any;
     EndEpoch: any;
     Duration: any;
+    Id?: number;
+    RecordingUUID: string;
 }

@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { FreeswitchCallSystemEntity } from 'src/entity/freeswitchCallSystem.entity';
+import { FsCallDetailRecordEntity, FsCallDetailRecordRepository } from 'src/entity/freeswitchCallDetailRecord.entity';
 import { FREESWITCH_SERVICE } from './freeswitch.interface';
 import { FreeswitchService } from './freeswitch.service';
 
@@ -19,6 +19,6 @@ import { FreeswitchService } from './freeswitch.service';
     useClass : FreeswitchService,
     provide: FREESWITCH_SERVICE
   }],
-  imports: [TypeOrmModule.forFeature([FreeswitchCallSystemEntity])]
+  imports: [TypeOrmModule.forFeature([FsCallDetailRecordEntity,FsCallDetailRecordRepository])]
 })
 export class FreeswitchModule {}

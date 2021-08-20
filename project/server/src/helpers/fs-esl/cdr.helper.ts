@@ -58,7 +58,9 @@ export class CDRHelper{
             AnswerEpoch: answer_epoch,
             StartEpoch: start_epoch,
             EndEpoch: end_epoch,
-            Duration: duration
+            Duration: duration,
+            Id: null,
+            RecordingUUID: uuid
         };
 
     }

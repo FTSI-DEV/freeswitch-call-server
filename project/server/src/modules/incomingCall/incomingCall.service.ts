@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { FreeswitchCallSystemEntity } from 'src/entity/freeswitchCallSystem.entity';
 import { Repository } from 'typeorm';
 import { callEnter, callVerify, waitingToConnect } from '../../beequeue/jobs/IncomingCall';
 import { FreeswitchCallSystemService } from '../freeswitch-call-system/services/freeswitch-call-system.service';
@@ -46,7 +45,7 @@ export class IncomingCallService {
 
     console.log('JSON CONVERT STIRNG', JSON.stringify(callData));
 
-    this._freeswitchCallSystemService.createRecord({
+    this._freeswitchCallSystemService.saveCDR({
       UUID: callData.UUID,
       CallerIdNumber: callData.CallerIdNumber,
       CallerName: callData.CallerName,
@@ -60,9 +59,8 @@ export class IncomingCallService {
       StartEpoch: callData.StartEpoch,
       EndEpoch: callData.EndEpoch,
       Duration: callData.Duration,
-      AnswerEpoch: callData.AnswerEpoch
+      AnswerEpoch: callData.AnswerEpoch,
+      RecordingUUID: callData.UUID
     }, callData.StoreId);
-
-    
   }
 }

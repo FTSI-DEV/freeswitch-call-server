@@ -1,7 +1,9 @@
-import { BaseEntity, Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { async } from "rxjs";
+import { FreeswitchCallConfigModel } from "src/models/freeswitchCallConfigModel";
+import { BaseEntity, Column, Entity, EntityRepository, PrimaryGeneratedColumn, Repository } from "typeorm";
 
-@Entity()
-export class FreeswitchCallConfig extends BaseEntity{
+@Entity('FreeswitchCallConfig')
+export class FreeswitchCallConfig{
     @PrimaryGeneratedColumn()
     Id: number;
 
@@ -10,4 +12,26 @@ export class FreeswitchCallConfig extends BaseEntity{
 
     @Column()
     Value: string;
+}
+
+@EntityRepository(FreeswitchCallConfig)
+export class FreeswitchCallConfigRepository extends Repository<FreeswitchCallConfig>{
+
+    saveUpdateRecord = async (fsCallConfig: FreeswitchCallConfig) => {
+        return await this.save(fsCallConfig);
+    }
+
+    getById = async (id:number) => {
+        
+        let retVal = null;
+        
+        let record = this.findOneOrFail(id)
+        .then(result => {
+            retVal = result;
+        }).catch((err) => {
+            retVal = null;
+        });
+
+        return retVal;
+    }
 }
