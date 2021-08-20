@@ -2,6 +2,7 @@ import {
   Controller,
   DefaultValuePipe,
   Get,
+  Param,
   ParseIntPipe,
   Query,
 } from '@nestjs/common';
@@ -25,5 +26,10 @@ export class FreeswitchCallSystemController {
       page,
       limit
     });
+  }
+
+  @Get('getCDRById/:id')
+  getCDRById(@Param('id') id: number): CallDetailRecordDTO{
+    return this._freeswitchCallSystemService.getById(id);
   }
 }

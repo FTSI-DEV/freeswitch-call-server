@@ -46,19 +46,39 @@ export class FreeswitchCallSystemService {
         return record;
     }
 
-    getById(id: number):Promise<FsCallDetailRecordEntity>{
+    getById(id: number): any{
+        return this.getCDRById(id);
+    }
 
-        let retVal = null;
+    private getCDRById(id:number): Promise<any>{
 
-        let record = this.freeswitchCallSystemRepo.findOneOrFail(id)
+        return new Promise<CallDetailRecordDTO>((resolve,reject) => {
+
+            let record = this.freeswitchCallSystemRepo.findOneOrFail(id)
             .then(result => {
-                retVal = result;
-            })
-            .catch((err) => {
-                retVal = null;
-            });
 
-        return retVal;
+                let cdrDTO: CallDetailRecordDTO = {
+                    Id: result.id,
+                    PhoneNumberTo: result.PhoneNumberTo,
+                    PhoneNumberFrom: result.PhoneNumberFrom,
+                    CallStatus: result.CallStatus,
+                    CallUUID: result.CallUUID,
+                    Duration: result.Duration,
+                    DateCreated: result.DateCreated,
+                    StoreId: result.StoreId,
+                    RecordingUUID: result.RecordingUUID,
+                    CallDirection: result.Direction
+                };
+
+                resolve(cdrDTO);
+            })
+            .catch(err => {
+                reject(null);
+            });
+        })
+        .catch(err => {
+            console.log('Error', err);
+        });
     }
 
     async getCallLogs2(options: IPaginationOptions):Promise<Pagination<FsCallDetailRecordEntity>>{
