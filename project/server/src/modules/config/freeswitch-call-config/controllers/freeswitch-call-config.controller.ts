@@ -8,7 +8,7 @@ export class FreeswitchCallConfigController {
         private _freeswitchCallConfigService: FreeswitchCallConfigService
     ) {}
 
-    @Get('getCallConfigById')
+    @Get('getCallConfigById/:id')
     getCallConfigById(@Param('id')id: number):FreeswitchCallConfigModelParam{
         
         let retVal = null;
