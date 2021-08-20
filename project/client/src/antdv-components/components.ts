@@ -15,7 +15,8 @@ import {
     Menu,
     Breadcrumb,
     PageHeader,
-    Input
+    Input,
+    Dropdown
 } from 'ant-design-vue';
 
 export default function AntdvUi(app: any) {
@@ -36,4 +37,5 @@ export default function AntdvUi(app: any) {
     app.use(Breadcrumb);
     app.use(PageHeader);
     app.use(Input);
+    app.use(Dropdown);
 }
