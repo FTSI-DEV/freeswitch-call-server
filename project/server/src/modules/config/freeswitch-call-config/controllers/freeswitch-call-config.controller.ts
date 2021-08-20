@@ -1,4 +1,4 @@
-import { Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post, Param } from '@nestjs/common';
 import { FreeswitchCallConfigModelParam } from 'src/models/freeswitchCallConfigModel';
 import { FreeswitchCallConfigService } from '../services/freeswitch-call-config.service';
 
@@ -9,19 +9,24 @@ export class FreeswitchCallConfigController {
     ) {}
 
     @Get('getCallConfigById')
-    getCallConfigById(id: number):FreeswitchCallConfigModelParam{
+    getCallConfigById(@Param('id')id: number):FreeswitchCallConfigModelParam{
         
+        let retVal = null;
+
         let fsCallConfig = this._freeswitchCallConfigService.getCallConfigById(id)
         .then((res) => {
-            return res;
+           retVal = res;
         });
 
-        return null;
+        return retVal;
     }
 
    @Post('saveRecord')
-    saveRecord(callConfigParam: FreeswitchCallConfigModelParam){
-        this._freeswitchCallConfigService.saveCallSettings(callConfigParam);
+    saveRecord(@Body() callConfigParam: FreeswitchCallConfigModelParam){
+
+        console.log('entered', callConfigParam);
+
+        this._freeswitchCallConfigService.saveUpdateCallConfig(callConfigParam);
 
         return "Successfully saved record";
     }

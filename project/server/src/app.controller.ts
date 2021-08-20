@@ -2,10 +2,8 @@ import { Controller, Get, Post, UseGuards, Request, UnauthorizedException } from
 import { AuthGuard } from '@nestjs/passport';
 import { AppService } from './app.service';
 import { AuthService } from './auth/auth.service';
-import { FsCredsService } from './auth/fs-creds.service';
 import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
 import { LocalAuthGuard } from './auth/guards/local-auth.guard';
-import { fscreds } from './entity/freeswitch.entity';
 import { ApiCredential } from './models/apiCredential.model';
 
 @Controller()

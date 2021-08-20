@@ -1,68 +1,67 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { IPaginationOptions, paginate, Pagination } from 'nestjs-typeorm-paginate';
-import { FreeswitchCallSystemEntity } from 'src/entity/freeswitchCallSystem.entity';
+import { FsCallDetailRecordEntity, FsCallDetailRecordRepository } from 'src/entity/freeswitchCallDetailRecord.entity';
 import { CDRModels } from 'src/models/cdr.models';
-import { createConnection, Repository } from 'typeorm';
-import { IFreeswitchCallSystemService } from './freeswitch-call-system.interface';
 
 @Injectable()
 export class FreeswitchCallSystemService {
     constructor(
-        @InjectRepository(FreeswitchCallSystemEntity)
-        private freeswitchCallSystemRepo: Repository<FreeswitchCallSystemEntity>)
+        @InjectRepository(FsCallDetailRecordRepository)
+        private freeswitchCallSystemRepo: FsCallDetailRecordRepository)
     {}
 
-    async createRecord(cdrParam: CDRModels, storeId: number) : Promise<FreeswitchCallSystemEntity>{
+    async saveCDR(cdrParam: CDRModels, storeId: number){
         
         console.log('TRYING TO CREATE A RECORD');
 
-        let fs = new FreeswitchCallSystemEntity();
+        let cdr = await this.getById(cdrParam.Id);
 
-        console.log('CDRPARAM ' , cdrParam);
+        if (cdr == null){
+            cdr = new FsCallDetailRecordEntity();
 
-        fs.CallStatus = cdrParam.CallStatus;
-        fs.PhoneNumberTo = cdrParam.CalleeIdNumber;
-        fs.PhoneNumberFrom = cdrParam.CallerIdNumber;
-        fs.DateCreated = cdrParam.StartedDate;
-        fs.StoreId = storeId;
-        fs.CallUUID = cdrParam.UUID;
-        fs.Direction = cdrParam.CallDirection;
-        fs.RecordingUUID = cdrParam.UUID;
-        fs.Duration = cdrParam.Duration;
+            cdr.CallUUID = cdrParam.UUID;
+        }
 
-        console.log('FS2' , fs);
+        cdr.CallStatus = cdrParam.CallStatus;
+        cdr.DateCreated = cdrParam.StartedDate;
+        cdr.StoreId = storeId;
+        cdr.RecordingUUID = cdrParam.RecordingUUID;
+        cdr.PhoneNumberFrom = cdrParam.CallerIdNumber;
+        cdr.PhoneNumberTo = cdrParam.CalleeIdNumber;
+        cdr.Duration = cdrParam.Duration;
+        cdr.Direction = cdrParam.Duration;
 
-        await this.freeswitchCallSystemRepo.save(fs);
-
-        return fs;
-
-        // return null;
+        this.freeswitchCallSystemRepo.saveCDR(cdr);
     }
 
-    getByCallId(callUid:string): Promise<FreeswitchCallSystemEntity>{
+    getByCallId(callUid:string): Promise<FsCallDetailRecordEntity>{
 
-        let result = this.freeswitchCallSystemRepo.find({
-            where: {
-                CallUUID: callUid
-            }
-        });
-
-        let record = this.freeswitchCallSystemRepo.createQueryBuilder("FreeswitchCallSystem")
-                    .where("FreeswitchCallSystem.CallUUID = :callUid", { callUid: callUid})
+        let record = this.freeswitchCallSystemRepo.createQueryBuilder("CallDetailRecord")
+                    .where("CallDetailRecord.CallUUID = :callUid", { callUid: callUid})
                     .getOne();
 
         console.log('RECORD' , record);
 
         return record;
-
     }
 
-    getById(id: number):Promise<FreeswitchCallSystemEntity>{
-        return this.freeswitchCallSystemRepo.findOneOrFail(id);
+    getById(id: number):Promise<FsCallDetailRecordEntity>{
+
+        let retVal = null;
+
+        let record = this.freeswitchCallSystemRepo.findOneOrFail(id)
+            .then(result => {
+                retVal = result;
+            })
+            .catch((err) => {
+                retVal = null;
+            });
+
+        return retVal;
     }
 
-    async getCallLogs(options: IPaginationOptions):Promise<Pagination<FreeswitchCallSystemEntity>>{
-        return paginate<FreeswitchCallSystemEntity>(this.freeswitchCallSystemRepo, options);
+    async getCallLogs(options: IPaginationOptions):Promise<Pagination<FsCallDetailRecordEntity>>{
+        return paginate<FsCallDetailRecordEntity>(this.freeswitchCallSystemRepo, options);
     }
 }

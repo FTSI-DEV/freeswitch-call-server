@@ -2,6 +2,6 @@ import { FreeswitchCallConfigModelParam } from "src/models/freeswitchCallConfigM
 
 //Use this interface in the controller
 export interface IFreeswitchCallConfigService{
-    saveCallSettings(callConfigParam: FreeswitchCallConfigModelParam);
+    saveUpdateCallConfig(callConfigParam: FreeswitchCallConfigModelParam);
     getCallConfigById(id: number):Promise<FreeswitchCallConfigModelParam>;
 }

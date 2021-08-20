@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
-import { fscreds } from '../entity/freeswitch.entity';
 import { UsersService } from 'src/users/users.service';
 import { Repository } from 'typeorm';
 import { ApiCredential } from 'src/models/apiCredential.model';
