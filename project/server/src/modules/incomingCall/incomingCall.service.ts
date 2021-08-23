@@ -40,11 +40,9 @@ export class IncomingCallService {
     }
   }
 
-  incomingStatusCallBack(callData:CDRModels):any{
+  incomingStatusCallBack(callData:CDRModels){
 
     console.log('service CDR VALUE', callData);
-
-    console.log('JSON CONVERT STIRNG', JSON.stringify(callData));
 
     this._freeswitchCallSystemService.saveCDR({
       UUID: callData.UUID,

@@ -16,25 +16,7 @@ export class URIBuilder {
   }
   incomingStatusCallBack(callData) {
     console.log('STATUSCALLBACKDATA - trying to trigger ', callData);
-
-    // return `${this.baseUrl}/NewInboundCall/IncomingStatusCallBack?UUID=${callData.UUID}&
-    //         CallerIdNumber=${callData.CallerIdNumber}&
-    //         CallerName=${callData.CallerName}&
-    //         CalleeIdNumber=${callData.calleeIdNumber},
-    //         CallDirection=${callData.CallDirection},
-    //         CallStatus=${callData.CallStatus},
-    //         Duration=${callData.Duration},
-    //         StartedDate=${callData.StartedDate}
-    //         StoreId=${callData.StoreId}`;
-
-    return `http://localhost:3000/NewInboundCall/IncomingStatusCallBack?UUID=${callData.UUID}&
-                CallerIdNumber=${callData.CallerIdNumber}&
-                CallerName=${callData.CallerName}&
-                CalleeIdNumber=${callData.calleeIdNumber},
-                CallDirection=${callData.CallDirection},
-                CallStatus=${callData.CallStatus},
-                Duration=${callData.Duration},
-                StartedDate=${callData.StartedDate}
-                StoreId=${callData.StoreId}`;
+    
+    return `${this.baseUrl}/NewInboundCall/IncomingStatusCallBack?UUID=${callData.UUID}&&CallerIdNumber=${callData.CallerIdNumber}&&CallerName=${callData.CallerName}&&CalleeIdNumber=${callData.calleeIdNumber}&&CallDirection=${callData.CallDirection}&&CallStatus=${callData.CallStatus}&&Duration=${callData.Duration}&&StartedDate=${callData.StartedDate}&&StoreId=${callData.StoreId}`;
   }
 }

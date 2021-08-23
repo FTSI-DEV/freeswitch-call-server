@@ -17,18 +17,9 @@ export class FreeswitchCallSystemService {
 
         console.log('cdparam', cdrParam);
 
-        /*
-        let cdr = this.getById(cdrParam.Id);
+        let cdr = new FsCallDetailRecordEntity();
 
-        console.log('EXISTING CDR', cdr);
-
-        if (cdr == null){
-
-            cdr = new FsCallDetailRecordEntity();
-
-            cdr.CallUUID = cdrParam.UUID;
-        }
-
+        cdr.CallUUID = cdrParam.UUID;
         cdr.CallStatus = cdrParam.CallStatus;
         cdr.DateCreated = cdrParam.StartedDate;
         cdr.StoreId = storeId;
@@ -39,7 +30,8 @@ export class FreeswitchCallSystemService {
         cdr.Direction = cdrParam.Duration;
 
         this.freeswitchCallSystemRepo.saveCDR(cdr);
-        */
+
+        console.log('fs', cdr);
     }
 
     getByCallId(callUid:string): Promise<FsCallDetailRecordEntity>{
@@ -57,7 +49,7 @@ export class FreeswitchCallSystemService {
         return this.getCDRById(id);
     }
 
-    private getCDRById(id:number): Promise<any>{
+    private getCDRById(id:number): any{
 
         return new Promise<CallDetailRecordDTO>((resolve,reject) => {
 
@@ -77,9 +69,11 @@ export class FreeswitchCallSystemService {
                     CallDirection: result.Direction
                 };
 
+                console.log('resolving ', cdrDTO);
                 resolve(cdrDTO);
             })
             .catch(err => {
+                console.log('REJECT ', err);
                 reject(null);
             });
         })

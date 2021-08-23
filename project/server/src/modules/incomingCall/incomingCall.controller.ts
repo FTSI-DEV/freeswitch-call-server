@@ -1,6 +1,6 @@
-import { Controller, Get, Query } from '@nestjs/common';
-import { IncomingCallService } from './incomingCall.service'
-import { callEnter, callVerify, waitingToConnect } from '../../beequeue/jobs/IncomingCall';
+import { Body, Controller, Get, Query } from '@nestjs/common';
+import { IncomingCallService } from './incomingCall.service';
+import { CDRModels } from 'src/models/cdr.models';
 @Controller('NewInboundCall')
 export class IncomingCallController {
   constructor(private incomingCallService: IncomingCallService) {}
@@ -24,10 +24,12 @@ export class IncomingCallController {
   }
 
   @Get('IncomingStatusCallBack')
-  incomingStatusCallBack(@Query() callData:any){
-    console.log('IncomingStatusCallBack ENTERED' , callData);
-    const record = this.incomingCallService.incomingStatusCallBack(callData);
-    console.log('record', record);
-    
+  incomingStatusCallBack(@Query() callData:CDRModels){
+
+    console.log('IncomingCall/IncomingStatusCallBack' , callData);
+
+    this.incomingCallService.incomingStatusCallBack(callData);
+
+    return "Successfully saved record";
   }
 }

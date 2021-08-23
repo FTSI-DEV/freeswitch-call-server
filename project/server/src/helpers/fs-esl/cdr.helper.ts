@@ -7,8 +7,6 @@ export class CDRHelper{
 
         const eventName = fsEvent.getHeader('Event-Name');
 
-        if (eventName != 'CHANNEL_HANGUP_COMPLETE') return;
-
         const uuid = this.getHeader('Unique-ID', fsEvent);
         const callerId = this.getHeader('Caller-Caller-ID-Number', fsEvent);
         const callerName = this.getHeader('Caller-Caller-ID-Name', fsEvent);

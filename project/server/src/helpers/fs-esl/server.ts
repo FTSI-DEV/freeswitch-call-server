@@ -21,7 +21,8 @@ export class EslServerHelper {
 
       console.log('LISTENING TO AN EVENT ->', eventName);
 
-      if (eventName === 'CHANNEL_HANGUP_COMPLETE') {
+      if (eventName === 'CHANNEL_HANGUP_COMPLETE' ||
+          eventName === 'CHANNEL_HANGUP') {
 
         let call_record = this._callRecords.getCallRecords(fsEvent);
 
@@ -37,6 +38,7 @@ export class EslServerHelper {
 
   private _executeCrmApi(conn: any) {
     console.log('EXECUTING CRM API -> ');
+
     apiClient
       .getIncomingCallEnter({
         StoreId: 60,
@@ -91,11 +93,13 @@ export class EslServerHelper {
 
       self._onListen(conn);
 
-      //self._executeCrmApi(conn);
+      // self._executeCrmApi(conn);
 
-      // conn.execute('bridge', 'sofia/gateway/fs-test3/1000');
+      conn.execute('set', 'effective_caller_id_number=+17132633133');
 
-      // conn.execute('bridge', 'sofia/gateway/sip_provider/+17132633133');
+      conn.execute('bridge', 'sofia/gateway/fs-test3/1000');
+
+
 
       conn.on('esl::end', function (evt, body) {
 
