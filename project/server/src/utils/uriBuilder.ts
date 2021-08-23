@@ -27,7 +27,7 @@ export class URIBuilder {
     //         StartedDate=${callData.StartedDate}
     //         StoreId=${callData.StoreId}`;
 
-    return `http://www.freeswitchcallapp.com/NewInboundCall/IncomingStatusCallBack?UUID=${callData.UUID}&
+    return `http://localhost:3000/NewInboundCall/IncomingStatusCallBack?UUID=${callData.UUID}&
                 CallerIdNumber=${callData.CallerIdNumber}&
                 CallerName=${callData.CallerName}&
                 CalleeIdNumber=${callData.calleeIdNumber},
