@@ -1,28 +1,11 @@
 <template>
   <div>
-    <a-menu v-model:selectedKeys="current" mode="horizontal" theme="dark">
-      <a-menu-item key="mail">
+    <a-menu  mode="horizontal" theme="dark">
+      <li style="padding: 0px 20px">
         <span style="font-size: 1.3em">FREESWITCH</span>
-      </a-menu-item>
-      <!-- <a-menu-item key="number">
-        <template #icon>
-          <phone-outlined />
-        </template> Phone Numbers
-      </a-menu-item>
-           <a-menu-item key="log" >
-        <template #icon>
-          <FileTextOutlined />
-        </template> Call Log
-      </a-menu-item>
-      <a-menu-item key="alipay">
-        <a href="https://antdv.com" target="_blank" rel="noopener noreferrer"> Navigation Four - Link </a>
-      </a-menu-item> -->
+      </li>
     </a-menu>
     <div>
-      <!-- <a-button type="primary" @click="toggleCollapsed" style="margin-bottom: 16px">
-      <MenuUnfoldOutlined v-if="collapsed" />
-      <MenuFoldOutlined v-else />
-    </a-button> -->
       <div style="display: flex">
         <div style="width: 80px">
           <a-menu
@@ -58,22 +41,6 @@
               </template>
               <span>Option 3</span>
             </a-menu-item>
-            <!-- <a-menu-item key="2">
-              <template #icon>
-                <DesktopOutlined />
-              </template>
-            </a-menu-item>
-            <a-menu-item key="4">
-              <template #icon>
-                <UserOutlined />
-              </template>
-            </a-menu-item>
-            <a-menu-item key="5">
-              <template #icon>
-                <AppstoreOutlined />
-              </template>
-              <template #title>Navigation Two</template>
-            </a-menu-item> -->
           </a-menu>
         </div>
         <div style="flex: 1">

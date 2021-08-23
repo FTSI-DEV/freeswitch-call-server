@@ -16,17 +16,23 @@
               <a-row>
                 <a-col :span="6" style="margin-right: 20px">
                   <a-form-item label="From">
-                    <input class="ant-input" v-model="from" />
+                    <input
+                      :class="['ant-input', isInvalid(from)]"
+                      v-model="from"
+                    />
                   </a-form-item>
                 </a-col>
                 <a-col :span="6">
                   <a-form-item label="To" style="margin-right: 20px">
-                    <input class="ant-input" v-model="to" />
+                    <input :class="['ant-input', isInvalid(to)]" v-model="to" />
                   </a-form-item>
                 </a-col>
                 <a-col :span="6" style="margin-right: 20px">
                   <a-form-item label="Caller Id">
-                    <input class="ant-input" v-model="callerId" />
+                    <input
+                      :class="['ant-input', isInvalid(callerId)]"
+                      v-model="callerId"
+                    />
                   </a-form-item>
                 </a-col>
                 <a-col :span="3" style="position: relative">
@@ -54,16 +60,25 @@ export default {
       from: null,
       to: null,
       callerId: null,
+      hasError: false,
     };
   },
-
   methods: {
+    isInvalid(value) {
+      return !value && this.hasError ? "invalid" : "";
+    },
     clickToCall() {
+      if (!this.from || !this.to || !this.callerId) {
+        this.hasError = true;
+        return;
+      }
+      this.hasError = false;
       const params = {
         phoneNumberFrom: this.from,
         phoneNumberTo: this.to,
         callerId: this.callerId,
       };
+      console.log("inbound call params: ", params);
       EventService.clickToCall(params);
     },
   },
@@ -75,5 +90,8 @@ export default {
   font-size: 2em;
   border-bottom: 1px solid #eaeaea;
   margin-bottom: 20px;
+}
+.invalid {
+  border: 1px solid red;
 }
 </style>
