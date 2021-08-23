@@ -4,7 +4,7 @@ import { FreeswitchCallConfig } from 'src/entity/freeswitchCallConfig.entity';
 import { FreeswitchCallConfigModelParam } from 'src/models/freeswitchCallConfigModel';
 import { FreeswitchCallConfigService } from '../services/freeswitch-call-config.service';
 
-@Controller('freeswitch-call-config')
+@Controller('/api/freeswitch-call-config')
 export class FreeswitchCallConfigController {
     constructor(
         private _freeswitchCallConfigService: FreeswitchCallConfigService

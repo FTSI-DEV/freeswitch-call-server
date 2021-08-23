@@ -27,23 +27,23 @@ export class CDRHelper{
 
         console.log(eventName);
         
-        console.log('JSON',JSON.stringify(fsEvent));
+        // console.log('JSON',JSON.stringify(fsEvent));
 
-        console.log(`Name -> ${eventName}, 
-                    UUID -> ${uuid} ,
-                    CallerId -> ${callerId} ,
-                    CallerName -> ${callerName} ,
-                    calleIdNumber -> ${calleeIdNumber} ,
-                    callDirection -> ${callDirection} ,
-                    Hangup_Cause -> ${hangup_cause} ,
-                    StartedDate -> ${started_date} , 
-                    StartedStamp -> ${start_stamp} , 
-                    AnswerStamp -> ${answer_stamp},
-                    End_Stamp -> ${end_stamp} , 
-                    Start_Epoch -> ${start_epoch} , 
-                    End_Epoch -> ${end_epoch} , 
-                    Answer_Epoch -> ${answer_epoch} , 
-                    Durations -> ${duration}`);
+        // console.log(`Name -> ${eventName}, 
+        //             UUID -> ${uuid} ,
+        //             CallerId -> ${callerId} ,
+        //             CallerName -> ${callerName} ,
+        //             calleIdNumber -> ${calleeIdNumber} ,
+        //             callDirection -> ${callDirection} ,
+        //             Hangup_Cause -> ${hangup_cause} ,
+        //             StartedDate -> ${started_date} , 
+        //             StartedStamp -> ${start_stamp} , 
+        //             AnswerStamp -> ${answer_stamp},
+        //             End_Stamp -> ${end_stamp} , 
+        //             Start_Epoch -> ${start_epoch} , 
+        //             End_Epoch -> ${end_epoch} , 
+        //             Answer_Epoch -> ${answer_epoch} , 
+        //             Durations -> ${duration}`);
         return{
             UUID: uuid,
             CallerIdNumber: callerId,

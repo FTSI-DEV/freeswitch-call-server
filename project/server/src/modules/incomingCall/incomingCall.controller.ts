@@ -27,6 +27,7 @@ export class IncomingCallController {
   incomingStatusCallBack(@Query() callData:any){
     console.log('IncomingStatusCallBack ENTERED' , callData);
     const record = this.incomingCallService.incomingStatusCallBack(callData);
-
+    console.log('record', record);
+    
   }
 }

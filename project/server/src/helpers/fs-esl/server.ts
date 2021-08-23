@@ -14,7 +14,9 @@ export class EslServerHelper {
   private readonly _callRecords = new CDRHelper();
 
   private _onListen(conn: any): any {
+
     conn.on(FS_ESL.RECEIVED, (fsEvent) => {
+
       const eventName = fsEvent.getHeader('Event-Name');
 
       console.log('LISTENING TO AN EVENT ->', eventName);
@@ -69,6 +71,7 @@ export class EslServerHelper {
         host: process.env.ESL_SERVER_HOST,
         myevents: true,
       },
+
       function () {
         console.log('esl server is up');
       },
@@ -88,16 +91,17 @@ export class EslServerHelper {
 
       self._onListen(conn);
 
-      self._executeCrmApi(conn);
+      //self._executeCrmApi(conn);
 
-      conn.execute('bridge', 'sofia/gateway/fs-test3/1000');
+      // conn.execute('bridge', 'sofia/gateway/fs-test3/1000');
+
+      // conn.execute('bridge', 'sofia/gateway/sip_provider/+17132633133');
 
       conn.on('esl::end', function (evt, body) {
+
         console.log('TRIGGER WEBHOOK');
 
-        console.log('CDR', CDR);
-
-        // WebhookIncomingStatusCallBack(CDR);
+        console.log('CDR - end', CDR);
 
         http.get(WebhookIncomingStatusCallBack(CDR), function(res){
           // console.log('ENTERED GET ', res);

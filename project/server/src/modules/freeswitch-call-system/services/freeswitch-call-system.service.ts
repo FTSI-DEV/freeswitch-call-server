@@ -11,13 +11,18 @@ export class FreeswitchCallSystemService {
         private freeswitchCallSystemRepo: FsCallDetailRecordRepository)
     {}
 
-    async saveCDR(cdrParam: CDRModels, storeId: number){
+    saveCDR(cdrParam: CDRModels, storeId: number){
         
         console.log('TRYING TO CREATE A RECORD');
 
-        let cdr = await this.getById(cdrParam.Id);
+        console.log('cdparam', cdrParam);
+
+        let cdr = this.getById(cdrParam.Id);
+
+        console.log('EXISTING CDR', cdr);
 
         if (cdr == null){
+
             cdr = new FsCallDetailRecordEntity();
 
             cdr.CallUUID = cdrParam.UUID;

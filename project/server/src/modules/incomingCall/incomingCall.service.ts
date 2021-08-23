@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { CDRModels } from 'src/models/cdr.models';
 import { Repository } from 'typeorm';
 import { callEnter, callVerify, waitingToConnect } from '../../beequeue/jobs/IncomingCall';
 import { FreeswitchCallSystemService } from '../freeswitch-call-system/services/freeswitch-call-system.service';
@@ -39,7 +40,7 @@ export class IncomingCallService {
     }
   }
 
-  incomingStatusCallBack(callData):any{
+  incomingStatusCallBack(callData:CDRModels):any{
 
     console.log('TEST INCOMING STATUS CALLBACK', callData);
 
@@ -61,6 +62,6 @@ export class IncomingCallService {
       Duration: callData.Duration,
       AnswerEpoch: callData.AnswerEpoch,
       RecordingUUID: callData.UUID
-    }, callData.StoreId);
+    }, 60);
   }
 }
