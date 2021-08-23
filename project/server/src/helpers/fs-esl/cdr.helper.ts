@@ -52,12 +52,6 @@ export class CDRHelper{
             CallDirection: callDirection,
             CallStatus: hangup_cause,
             StartedDate: started_date,
-            StartStamp: start_stamp,
-            AnswerStamp: answer_stamp,
-            EndStamp: end_stamp,
-            AnswerEpoch: answer_epoch,
-            StartEpoch: start_epoch,
-            EndEpoch: end_epoch,
             Duration: duration,
             Id: null,
             RecordingUUID: uuid

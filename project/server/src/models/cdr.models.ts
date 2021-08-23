@@ -6,12 +6,6 @@ export class CDRModels{
     CallDirection: string;
     CallStatus: string;
     StartedDate: any;
-    StartStamp: any;
-    AnswerStamp: any;
-    EndStamp: any;
-    AnswerEpoch: any;
-    StartEpoch: any;
-    EndEpoch: any;
     Duration: any;
     Id?: number;
     RecordingUUID: string;

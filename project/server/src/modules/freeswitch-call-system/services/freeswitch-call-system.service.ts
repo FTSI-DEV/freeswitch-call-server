@@ -17,6 +17,7 @@ export class FreeswitchCallSystemService {
 
         console.log('cdparam', cdrParam);
 
+        /*
         let cdr = this.getById(cdrParam.Id);
 
         console.log('EXISTING CDR', cdr);
@@ -38,6 +39,7 @@ export class FreeswitchCallSystemService {
         cdr.Direction = cdrParam.Duration;
 
         this.freeswitchCallSystemRepo.saveCDR(cdr);
+        */
     }
 
     getByCallId(callUid:string): Promise<FsCallDetailRecordEntity>{

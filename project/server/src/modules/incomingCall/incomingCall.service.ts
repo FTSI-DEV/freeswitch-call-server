@@ -42,7 +42,7 @@ export class IncomingCallService {
 
   incomingStatusCallBack(callData:CDRModels):any{
 
-    console.log('TEST INCOMING STATUS CALLBACK', callData);
+    console.log('service CDR VALUE', callData);
 
     console.log('JSON CONVERT STIRNG', JSON.stringify(callData));
 
@@ -54,14 +54,8 @@ export class IncomingCallService {
       CallStatus: callData.CallStatus,
       CalleeIdNumber: callData.CalleeIdNumber,
       StartedDate: callData.StartedDate,
-      StartStamp: callData.StartStamp,
-      AnswerStamp: callData.AnswerStamp,
-      EndStamp: callData.EndStamp,
-      StartEpoch: callData.StartEpoch,
-      EndEpoch: callData.EndEpoch,
+      RecordingUUID: callData.UUID,
       Duration: callData.Duration,
-      AnswerEpoch: callData.AnswerEpoch,
-      RecordingUUID: callData.UUID
     }, 60);
   }
 }
