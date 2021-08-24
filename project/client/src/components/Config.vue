@@ -12,21 +12,21 @@
         <a-row>
           <a-col :span="10">
             <div style="background: white; padding: 20px">
-              <div class="call-config">Config</div>
-              <a-form-item label="Friendly Name">
+              <div class="call-config">Phone Number Config</div>
+              <a-form-item label="Friendly Name"  style="display: block; text-align: left">
                 <input
                   :class="['ant-input', isInvalid(friendlyName)]"
                   v-model="friendlyName"
                 />
               </a-form-item>
-              <a-form-item label="Phone Number">
+              <a-form-item label="Phone Number"  style="display: block; text-align: left">
                 <!-- <a-input-number v-model="phoneNumber" style="width: 100%" /> -->
                 <input
                   :class="['ant-input', isInvalid(phoneNumber)]"
                   v-model="phoneNumber"
                 />
               </a-form-item>
-              <a-form-item label="HTTP Method">
+              <a-form-item label="HTTP Method"  style="display: block; text-align: left">
                 <!-- <a-input v-model="httpMethod" /> -->
                 <!-- <input class="ant-input" v-model="httpMethod" /> -->
                 <a-dropdown>
@@ -46,7 +46,7 @@
                   </a-button>
                 </a-dropdown>
               </a-form-item>
-              <a-form-item label="Webhook URL">
+              <a-form-item label="Webhook URL"  style="display: block; text-align: left">
                 <!-- <a-input v-model="webhookURL" /> -->
                 <input
                   :class="['ant-input', isInvalid(webhookURL)]"

@@ -12,39 +12,28 @@
         <a-row>
           <a-col :span="10">
             <div style="padding: 20px">
-              <div class="call-config">Inbound Call</div>
-              <a-row>
-                <a-col :span="6" style="margin-right: 20px">
-                  <a-form-item label="From">
-                    <input
-                      :class="['ant-input', isInvalid(from)]"
-                      v-model="from"
-                    />
-                  </a-form-item>
-                </a-col>
-                <a-col :span="6">
-                  <a-form-item label="To" style="margin-right: 20px">
-                    <input :class="['ant-input', isInvalid(to)]" v-model="to" />
-                  </a-form-item>
-                </a-col>
-                <a-col :span="6" style="margin-right: 20px">
-                  <a-form-item label="Caller Id">
-                    <input
-                      :class="['ant-input', isInvalid(callerId)]"
-                      v-model="callerId"
-                    />
-                  </a-form-item>
-                </a-col>
-                <a-col :span="3" style="position: relative">
-                  <a-button
-                    type="danger"
-                    @click="clickToCall"
-                    style="position: absolute; right: 0px; top: 32px"
-                  >
-                    Call
-                  </a-button>
-                </a-col>
-              </a-row>
+              <div class="call-config">Inbound Call Config</div>
+              <a-form-item label="Caller Id" style="display: block; text-align: left">
+                <input
+                  :class="['ant-input', isInvalid(callerId)]"
+                  v-model="callerId"
+                />
+              </a-form-item>
+              <a-form-item label="Phone # To" style="display: block; text-align: left">
+                <input
+                  :class="['ant-input', isInvalid(phoneNumberTo)]"
+                  v-model="phoneNumberTo"
+                />
+              </a-form-item>
+              <a-form-item label="Call Forwarding #" style="display: block; text-align: left">
+                <input
+                  :class="['ant-input', isInvalid(callForwardingNumber)]"
+                  v-model="callForwardingNumber"
+                />
+              </a-form-item>
+              <a-form-item style="text-align: left">
+                <a-button type="primary" @click="saveConfig"> Save </a-button>
+              </a-form-item>
             </div>
           </a-col>
         </a-row>
@@ -61,25 +50,27 @@ export default {
       to: null,
       callerId: null,
       hasError: false,
+      phoneNumberTo: null,
+      callForwardingNumber: null,
     };
   },
   methods: {
     isInvalid(value) {
       return !value && this.hasError ? "invalid" : "";
     },
-    clickToCall() {
-      if (!this.from || !this.to || !this.callerId) {
+    saveConfig() {
+      if (!this.phoneNumberTo || !this.callerId || !this.callForwardingNumber) {
         this.hasError = true;
         return;
       }
       this.hasError = false;
       const params = {
-        phoneNumberFrom: this.from,
-        phoneNumberTo: this.to,
+        phoneNumberTo: this.phoneNumberTo,
         callerId: this.callerId,
+        callForwardingNumber: this.callForwardingNumber,
       };
       console.log("inbound call params: ", params);
-      EventService.clickToCall(params);
+      EventService.addInboundCallConfig(params);
     },
   },
 };
