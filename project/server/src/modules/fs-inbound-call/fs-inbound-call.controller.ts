@@ -12,7 +12,7 @@ export class FsInboundCallController {
 
     incomingCallEnter(){
 
-        new EslServerHelper().incomingCallEnter();
+        // new EslServerHelper().incomingCallEnter();
 
         //webhook here..
     }

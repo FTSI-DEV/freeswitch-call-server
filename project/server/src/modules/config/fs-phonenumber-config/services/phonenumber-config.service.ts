@@ -2,30 +2,31 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { IPaginationMeta, IPaginationOptions, paginate, Pagination } from 'nestjs-typeorm-paginate';
 import { FreeswitchCallConfig, FreeswitchCallConfigRepository } from 'src/entity/freeswitchCallConfig.entity';
-import { FreeswitchCallConfigModel, FreeswitchCallConfigModelParam } from 'src/models/freeswitchCallConfigModel';
-import { IFreeswitchCallConfigService } from './ifreeswitch-call-config.interface';
-
-const FREESWITCH_CALL_CONFIG = 'FREESWITCH_CALL_CONFIG';
+import { FS_PHONENUMBER_CONFIG } from 'src/helpers/constants/call-config.constants';
+import { FreeswitchPhoneNumberConfigModel, FreeswitchPhoneNumberConfigParam } from 'src/models/freeswitchCallConfigModel';
+import { IFreeswitchPhoneNumberConfigService as IFreeswitchPhoneNumberConfigService } from './iphonenumber-config.interface';
 
 @Injectable()
-export class FreeswitchCallConfigService implements IFreeswitchCallConfigService {
+export class FreeswitchPhoneNumberConfigService implements IFreeswitchPhoneNumberConfigService {
     constructor(
         @InjectRepository(FreeswitchCallConfigRepository)
         private freeswitchConfigRepo: FreeswitchCallConfigRepository
     ) {}
 
-    async saveUpdateCallConfig(callConfigParam: FreeswitchCallConfigModelParam){
+    saveUpdatePhoneNumberConfig(callConfigParam: FreeswitchPhoneNumberConfigParam){
         
-        let fsCallConfig = await this.getById(callConfigParam.id);
+        // let fsCallConfig = await this.getById(callConfigParam.id);
+
+        let fsCallConfig = this.getPhoneNumberConfigById(callConfigParam.id);
 
         if (fsCallConfig == null){
 
             fsCallConfig = new FreeswitchCallConfig();
 
-            fsCallConfig.Name = FREESWITCH_CALL_CONFIG;
+            fsCallConfig.Name = FS_PHONENUMBER_CONFIG;
         }
 
-        let configModel: FreeswitchCallConfigModel = {
+        let configModel: FreeswitchPhoneNumberConfigModel = {
             friendlyName: callConfigParam.friendlyName,
             httpMethod: callConfigParam.httpMethod,
             phoneNumber: callConfigParam.phoneNumber,
@@ -37,8 +38,8 @@ export class FreeswitchCallConfigService implements IFreeswitchCallConfigService
         this.freeswitchConfigRepo.saveUpdateRecord(fsCallConfig);
     }
 
-    getCallConfigById(id: number): any{
-        return new Promise<FreeswitchCallConfigModelParam>((resolve, reject) => {
+    getPhoneNumberConfigById(id: number): any{
+        return new Promise<FreeswitchPhoneNumberConfigParam>((resolve, reject) => {
 
             this.getById(id)
                 .then((result) => {
@@ -49,7 +50,7 @@ export class FreeswitchCallConfigService implements IFreeswitchCallConfigService
 
                     if (deserialize != null){
 
-                        let configModel: FreeswitchCallConfigModelParam = {
+                        let configModel: FreeswitchPhoneNumberConfigParam = {
                             friendlyName: deserialize.friendlyName,
                             phoneNumber: deserialize.phoneNumber,
                             httpMethod: deserialize.httpMethod,
@@ -127,21 +128,21 @@ export class FreeswitchCallConfigService implements IFreeswitchCallConfigService
 
     getAll(options:IPaginationOptions) :any{
 
-        return this.getCallConfigs(options);
+        return this.getPhoneNumberConfigs(options);
     }
 
-    private getCallConfigs(options: IPaginationOptions):Promise<any>{
+    private getPhoneNumberConfigs(options: IPaginationOptions):Promise<any>{
 
-        return new Promise<Pagination<FreeswitchCallConfigModelParam>>((resolve, reject) => {
+        return new Promise<Pagination<FreeswitchPhoneNumberConfigParam>>((resolve, reject) => {
 
             let pageRecords = paginate<FreeswitchCallConfig>(this.freeswitchConfigRepo, options);
 
             pageRecords.then(result => {
-                let itemsObjs: FreeswitchCallConfigModelParam[] = [];
+                let itemsObjs: FreeswitchPhoneNumberConfigParam[] = [];
 
                 result.items.forEach(element => {
                     
-                    let configModel = new FreeswitchCallConfigModelParam();
+                    let configModel = new FreeswitchPhoneNumberConfigParam();
 
                     let jsonObj = JSON.parse(element.Value);
 
@@ -155,10 +156,10 @@ export class FreeswitchCallConfigService implements IFreeswitchCallConfigService
 
                 });
 
-                resolve(new Pagination<FreeswitchCallConfigModelParam, IPaginationMeta>(itemsObjs, result.meta));
+                resolve(new Pagination<FreeswitchPhoneNumberConfigParam, IPaginationMeta>(itemsObjs, result.meta));
 
             }).catch(err => {
-                reject(new Pagination<FreeswitchCallConfigModelParam, IPaginationMeta>(null, {
+                reject(new Pagination<FreeswitchPhoneNumberConfigParam, IPaginationMeta>(null, {
                     itemCount: 0,
                     itemsPerPage: 0,
                     totalItems: 0,

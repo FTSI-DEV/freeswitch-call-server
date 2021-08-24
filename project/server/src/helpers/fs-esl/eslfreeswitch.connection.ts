@@ -1,4 +1,4 @@
-import { FS_ESL } from "../constants/freeswitch.constants";
+import { FS_ESL } from "../constants/fs-esl.constants";
 import { FreeswitchConfigHelper } from "./freeswitchConfig.helper";
 const esl = require('modesl');
 
@@ -14,9 +14,9 @@ export const fsConnect = (): any => {
         else {
             
             let fsConfig = new FreeswitchConfigHelper().getFreeswitchConfig();
-
+            
             connection = new esl.Connection(fsConfig.ip, fsConfig.port, fsConfig.password);
-
+            
             connection.on(FS_ESL.CONNECTION.ERROR, () => {
                 console.log('TEST 1' );
                 reject('Connection Error');

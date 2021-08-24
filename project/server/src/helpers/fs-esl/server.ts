@@ -1,6 +1,8 @@
+import { Injectable } from '@nestjs/common';
+import { InboundCallConfigService } from 'src/modules/config/inbound-call-config/services/inbound-call-config.service';
 import apiClient from 'src/utils/apiClient';
 import { WebhookIncomingStatusCallBack } from 'src/utils/webhooks';
-import { FS_DIALPLAN, FS_ESL } from '../constants/freeswitch.constants';
+import { FS_DIALPLAN, FS_ESL } from '../constants/fs-esl.constants';
 import { TwiMLContants } from '../constants/twiml.constants';
 import { KeyValues, XMLParser } from '../parser/twimlXML.parser';
 import { CDRHelper } from './cdr.helper';
@@ -9,9 +11,14 @@ const http = require('http');
 let eslServerRes = null;
 
 let CDR = null;
+let callerId = null;
 
 export class EslServerHelper {
-  private readonly _callRecords = new CDRHelper();
+
+  constructor(
+    private readonly _inboundCallConfig: InboundCallConfigService,
+    private readonly _callRecords = new CDRHelper()
+  ) {}
 
   private _onListen(conn: any): any {
 
@@ -20,6 +27,10 @@ export class EslServerHelper {
       const eventName = fsEvent.getHeader('Event-Name');
 
       console.log('LISTENING TO AN EVENT ->', eventName);
+
+      if (eventName === 'CHANNEL_CREATE'){
+        callerId = this._callRecords.getCallerId(fsEvent);
+      }
 
       if (eventName === 'CHANNEL_HANGUP_COMPLETE' ||
           eventName === 'CHANNEL_HANGUP') {
@@ -66,7 +77,7 @@ export class EslServerHelper {
   //for InboundCall
   startEslServer() {
     let esl = require('modesl');
-
+    
     let esl_server = new esl.Server(
       {
         port: process.env.ESL_SERVER_PORT,
@@ -81,17 +92,58 @@ export class EslServerHelper {
 
     eslServerRes = esl_server;
 
-    this.incomingCallEnter();
+    this.inboundCallEnter();
   }
 
-  incomingCallEnter(): any {
-    const self = this;
+  private inboundCallEnter():any{
+    let self = this;
+
+    eslServerRes.on('connection::ready', function(conn) {
+      console.log('CONNECTION SERVER READY');
+
+      self._onListen(conn);
+
+      let inboundConfig = null;
+
+      if (callerId != null){
+        inboundConfig = self._inboundCallConfig.getInboundCallByPhoneNumber(callerId);
+      }
+
+      if (inboundConfig != null){
+
+        let value = JSON.parse(inboundConfig.Value);
+
+        if (value != null){
+
+          conn.execute('set', `effective_caller_id_number=+1${value.callerId}`);
+
+          conn.execute('bridge', `sofia/gateway/sip_provider/+1${value.phoneNumberTo}`);
+        }
+
+        conn.on('esl::end', function(evt,body) {
+
+          console.log('ESL END');
+          console.log('CDR - END' ,CDR);
+
+          http.get(WebhookIncomingStatusCallBack(CDR), function(res){
+          })
+        })
+        
+      }
+
+      conn.execute('set', 'effective_caller_id_number=')
+    })
+  }
+
+  private incomingCallEnter(): any {
+    // const self = this;
     let connData = null; 
     eslServerRes.on('connection::ready', function (conn) {
       console.log('CONNECTION SERVER READY');
       connData = conn;
 
-      self._onListen(conn);
+
+      // self._onListen(conn);
 
       // self._executeCrmApi(conn);
 
@@ -137,4 +189,5 @@ export class EslServerHelper {
 
     return freeswitchTaskListKeyValues;
   }
+
 }

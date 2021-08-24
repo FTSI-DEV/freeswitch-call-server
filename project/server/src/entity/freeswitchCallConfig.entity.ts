@@ -1,5 +1,3 @@
-import { async } from "rxjs";
-import { FreeswitchCallConfigModel } from "src/models/freeswitchCallConfigModel";
 import { BaseEntity, Column, Entity, EntityRepository, PrimaryGeneratedColumn, Repository } from "typeorm";
 
 @Entity('FreeswitchCallConfig')

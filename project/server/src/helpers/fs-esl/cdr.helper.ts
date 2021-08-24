@@ -3,6 +3,10 @@ import { CDRModels } from "src/models/cdr.models";
 
 export class CDRHelper{
 
+    getCallerId(fsEvent):string{
+        return this.getHeader('Caller-Caller-ID-Number', fsEvent);
+    }
+
     getCallRecords(fsEvent):CDRModels{
 
         const eventName = fsEvent.getHeader('Event-Name');

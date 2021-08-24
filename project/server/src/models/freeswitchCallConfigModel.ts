@@ -1,4 +1,4 @@
-export class FreeswitchCallConfigModelParam{
+export class FreeswitchPhoneNumberConfigParam{
     friendlyName: string;
     phoneNumber: string;
     httpMethod: string;
@@ -6,7 +6,7 @@ export class FreeswitchCallConfigModelParam{
     id?: number;
 }
 
-export class FreeswitchCallConfigModel{
+export class FreeswitchPhoneNumberConfigModel{
     friendlyName: string;
     phoneNumber: string;
     httpMethod: string;

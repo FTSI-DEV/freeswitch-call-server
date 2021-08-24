@@ -9,24 +9,19 @@ const Arena = require('bull-arena');
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  // Allow crossorigin
+  // // Allow crossorigin
   app.enableCors();
 
-    // Swagger
-    const config = new DocumentBuilder()
+  // Swagger
+  const config = new DocumentBuilder()
     .setTitle('Freeswitch Call Server')
     .setVersion('1.0')
-    .build()
-    const document = SwaggerModule.createDocument(app, config);
-    SwaggerModule.setup('/', app, document);
-    
-    // Beequeue Arena initialization
-    Arena(ArenaConfig);
-    
-    // new StartFreeswitchApplication().startFS();
-    //starting esl-server
-    
-    new EslServerHelper().startEslServer()
+    .build();
+  const document = SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('api', app, document);
+
+  // Beequeue Arena initialization
+  Arena(ArenaConfig);
 
   await app.listen(3000);
 }
