@@ -20,3 +20,8 @@ export function WebhookIncomingStatusCallBack(callData) {
     console.log('webhook entered -> ', callData);
     return uriBuilder.incomingStatusCallBack(callData)
 }
+
+export function WebhookClickToCallStatusCallBack(callData){
+    console.log('webhook entered', callData);
+    return uriBuilder.clickToCallStatusCallBack(callData);
+}

@@ -1,3 +1,4 @@
+import { IncomingPhoneCallJob } from "src/beequeue/jobs/IncomingCall/incomingPhoneCallJob";
 import { OriginationModel } from "./models/originate.model";
 
 export class CallDispatchHelper{
@@ -29,6 +30,12 @@ export class CallDispatchHelper{
                     'https://crm.dealerownedsoftware.com/hosted-files/audio/ConvertedSalesService.wav',
                     callUid
                   );
+
+                  console.log('calluid', callUid);
+
+                //   incomingPhoneCallJob(callUid);
+
+                new IncomingPhoneCallJob(null).trigger(callUid);
             })
 
             //call webhook

@@ -8,7 +8,7 @@ import { FreeswitchPhoneNumberConfigService } from './services/phonenumber-confi
 @Module({
   providers: [FreeswitchPhoneNumberConfigService],
   imports: [TypeOrmModule.forFeature([FreeswitchCallConfig, FreeswitchCallConfigRepository])],
-  exports: [FreeswitchPhoneNumberConfigService, ],
+  exports: [FreeswitchPhoneNumberConfigService],
   controllers: [FreeswitchPhoneNumberConfigController]
 })
 export class PhoneNumberConfigModule {}
