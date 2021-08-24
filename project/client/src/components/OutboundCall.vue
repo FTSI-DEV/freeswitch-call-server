@@ -13,38 +13,27 @@
           <a-col :span="10">
             <div style="padding: 20px">
               <div class="call-config">Outbound Call</div>
-              <a-row>
-                <a-col :span="6" style="margin-right: 20px">
-                  <a-form-item label="From">
-                    <input
-                      :class="['ant-input', isInvalid(from)]"
-                      v-model="from"
-                    />
-                  </a-form-item>
-                </a-col>
-                <a-col :span="6">
-                  <a-form-item label="To" style="margin-right: 20px">
-                    <input :class="['ant-input', isInvalid(to)]" v-model="to" />
-                  </a-form-item>
-                </a-col>
-                <a-col :span="6" style="margin-right: 20px">
-                  <a-form-item label="Caller Id">
-                    <input
-                      :class="['ant-input', isInvalid(callerId)]"
-                      v-model="callerId"
-                    />
-                  </a-form-item>
-                </a-col>
-                <a-col :span="3" style="position: relative">
-                  <a-button
-                    type="danger"
-                    @click="clickToCall"
-                    style="position: absolute; right: 0px; top: 32px"
-                  >
-                    Call
-                  </a-button>
-                </a-col>
-              </a-row>
+              <a-form-item
+                label="From"
+                style="display: block; text-align: left"
+              >
+                <input :class="['ant-input', isInvalid(from)]" v-model="from" />
+              </a-form-item>
+              <a-form-item label="To" style="display: block; text-align: left">
+                <input :class="['ant-input', isInvalid(to)]" v-model="to" />
+              </a-form-item>
+              <a-form-item
+                label="Caller Id"
+                style="display: block; text-align: left"
+              >
+                <input
+                  :class="['ant-input', isInvalid(callerId)]"
+                  v-model="callerId"
+                />
+              </a-form-item>
+              <a-form-item style="text-align: left">
+                <a-button type="danger" @click="clickToCall"> Call </a-button>
+              </a-form-item>
             </div>
           </a-col>
         </a-row>
