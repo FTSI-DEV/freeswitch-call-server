@@ -7,6 +7,10 @@ export class CDRHelper{
         return this.getHeader('Caller-Caller-ID-Number', fsEvent);
     }
 
+    getCallerDestinationNumber(fsEvent):string{
+        return this.getHeader('Caller-Destination-Number',fsEvent);
+    }
+
     getCallRecords(fsEvent):CDRModels{
 
         const eventName = fsEvent.getHeader('Event-Name');
