@@ -17,7 +17,9 @@ export class FreeswitchPhoneNumberConfigService implements IFreeswitchPhoneNumbe
         
         // let fsCallConfig = await this.getById(callConfigParam.id);
 
-        let fsCallConfig = this.getPhoneNumberConfigById(callConfigParam.id);
+        let fsCallConfig = this.getRecordById(callConfigParam.id);
+
+        console.log('fscall', fsCallConfig);
 
         if (fsCallConfig == null){
 
@@ -91,6 +93,21 @@ export class FreeswitchPhoneNumberConfigService implements IFreeswitchPhoneNumbe
            webhookUrl: value.webhook,
            httpMethod: value.httpMethod
         };
+    }
+
+    private getRecordById(id:number):any{
+
+        this.getPhoneNumberConfigById(id)
+        .then((result) => {
+            if (result == null){
+                return null;
+            }
+            else{
+                return result;
+            }
+        }).catch((err) => {
+            return null;
+        });
     }
 
     private getName(phoneNumber:string):string{
