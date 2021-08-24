@@ -11,7 +11,6 @@ const http = require('http');
 let eslServerRes = null;
 
 let CDR = null;
-let callerId = null;
 let callerDesinationNumber = null;
 
 export class EslServerHelper {
@@ -22,19 +21,14 @@ export class EslServerHelper {
 
   private _onListen(conn: any): any {
     conn.on(FS_ESL.RECEIVED, (fsEvent) => {
-
       const eventName = fsEvent.getHeader('Event-Name');
 
       console.log('LISTENING TO AN EVENT ->', eventName);
-      console.log('FS-EVENT', fsEvent);
-
+      
       if (eventName === 'CHANNEL_EXECUTE' || eventName === 'CHANNE_CREATE') {
-        // callerId = this._callRecords.getCallerId(fsEvent);
-        // console.log('CALLERID ', callerId);
-
-        callerDesinationNumber = this._callRecords.getCallerDestinationNumber(fsEvent);
-        console.log('CALLER_DESINATION_NUMBER' , callerDesinationNumber);
-
+        callerDesinationNumber =
+          this._callRecords.getCallerDestinationNumber(fsEvent);
+        console.log('CALLER_DESINATION_NUMBER', callerDesinationNumber);
       }
 
       if (
@@ -108,79 +102,78 @@ export class EslServerHelper {
 
       self._onListen(conn);
 
-      let inboundConfig = null;
+      let eslInfo = conn.getInfo();
 
-      if (callerId != null) {
-        inboundConfig =
-          self._inboundCallConfig.getInboundCallByPhoneNumber(callerId);
-      }
+      let destinationNumber = eslInfo.getHeader('Caller-Destination-Number');
 
-      console.log('INBOUND CALL', inboundConfig);
+      console.log('dest', destinationNumber);
 
-      // conn.execute('set', `effective_caller_id_number=+17132633132`);
-
-      // conn.execute('bridge', `sofia/gateway/fs-test1/1000`);
-
-      // conn.on('esl::end', function (evt, body) {
-
-      //   console.log('ESL END');
-      //   console.log('CDR - END', CDR);
-
-      //   http.get(WebhookIncomingStatusCallBack(CDR), function (res) {});
-      // });
-
-      // if (inboundConfig != null){
-
-      //   let value = JSON.parse(inboundConfig.Value);
-
-      //   if (value != null){
-
-      //     conn.execute('set', `effective_caller_id_number=+1${value.callerId}`);
-
-      //     conn.execute('bridge', `sofia/gateway/sip_provider/+1${value.phoneNumberTo}`);
-      //   }
-
-      //   conn.on('esl::end', function(evt,body) {
-
-      //     console.log('ESL END');
-      //     console.log('CDR - END' ,CDR);
-
-      //     http.get(WebhookIncomingStatusCallBack(CDR), function(res){
-      //     })
-      //   })
-
-      // }
-    });
-  }
-
-  private incomingCallEnter(): any {
-    // const self = this;
-    let connData = null;
-    eslServerRes.on('connection::ready', function (conn) {
-      console.log('CONNECTION SERVER READY');
-      connData = conn;
-
-      // self._onListen(conn);
-
-      // self._executeCrmApi(conn);
-
-      conn.execute('set', 'effective_caller_id_number=+17132633133');
-
-      conn.execute('bridge', 'sofia/gateway/fs-test3/1000');
+      self.inboundCallExecute(conn, destinationNumber);
 
       conn.on('esl::end', function (evt, body) {
-        console.log('TRIGGER WEBHOOK');
+        console.log('ESL END');
+        console.log('CDR - END', CDR);
 
-        console.log('CDR - end', CDR);
-
-        http.get(WebhookIncomingStatusCallBack(CDR), function (res) {
-          // console.log('ENTERED GET ', res);
-        });
-
-        // call webhook here
+        http.get(WebhookIncomingStatusCallBack(CDR), function (res) {});
       });
     });
   }
+
+  private inboundCallExecute(conn, destinationNumber: string) {
+    let self = this;
+
+    self._inboundCallConfig
+      .getInboundCallByPhoneNumber(destinationNumber)
+      .then((result) => {
+        if (result == null || result == undefined) {
+          conn.execute(
+            'playback',
+            'ivr/ivr-call_cannot_be_completed_as_dialed',
+          );
+        }
+
+        conn.execute('set', `effective_caller_id_number=${result.callerId}`);
+
+        conn.execute(
+          'bridge',
+          `sofia/gateway/fs-test3/${result.phoneNumberTo}`,
+        );
+
+        // conn.execute('bridge', `sofia/gateway/sip_provider/+1${value.phoneNumberTo}`);
+      })
+      .catch((err) => {
+        conn.execute('playback', 'ivr/ivr-call_cannot_be_completed_as_dialed');
+      });
+  }
+
+  // private incomingCallEnter(): any {
+  //   // const self = this;
+  //   let connData = null;
+  //   eslServerRes.on('connection::ready', function (conn) {
+  //     console.log('CONNECTION SERVER READY');
+  //     connData = conn;
+
+  //     // self._onListen(conn);
+
+  //     // self._executeCrmApi(conn);
+
+  //     conn.execute('set', 'effective_caller_id_number=+17132633133');
+
+  //     conn.execute('bridge', 'sofia/gateway/fs-test3/1000');
+
+  //     conn.on('esl::end', function (evt, body) {
+  //       console.log('TRIGGER WEBHOOK');
+
+  //       console.log('CDR - end', CDR);
+
+  //       http.get(WebhookIncomingStatusCallBack(CDR), function (res) {
+  //         // console.log('ENTERED GET ', res);
+  //       });
+
+  //       // call webhook here
+  //     });
+  //   });
+  // }
 
   private XmlConversionTaskValues(xmlParserResult: KeyValues[]): KeyValues[] {
     let freeswitchTaskListKeyValues: KeyValues[] = [];

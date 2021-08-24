@@ -17,14 +17,14 @@ export class InboundCallConfigService {
         let inboundConfig = new FreeswitchCallConfig();
 
         inboundConfig.Value = JSON.stringify(inboundCallConfig);
-        inboundConfig.Name = `${INBOUND_CALL_CONFIG}:${inboundCallConfig.phoneNumberTo}`;
+        inboundConfig.Name = `${INBOUND_CALL_CONFIG}:${inboundCallConfig.callForwardingNumber}`;
 
         this._freeswitchConfigRepo.saveUpdateRecord(inboundConfig);
     }
 
     update(inboundCallConfig: InboundCallConfigParam):boolean{
         
-        let inboundConfig = this.getRecordByPhoneNumber(inboundCallConfig.phoneNumberTo);
+        let inboundConfig = this.getRecordByPhoneNumber(inboundCallConfig.callForwardingNumber);
 
         if (inboundCallConfig == null) return false;
 
@@ -43,31 +43,35 @@ export class InboundCallConfigService {
         this._freeswitchConfigRepo.saveUpdateRecord(inboundConfig);
     }
 
-    getInboundCallByPhoneNumber(phoneNumberFrom: string):InboundCallConfigModel{
-        let record =  this.getRecordByPhoneNumber(phoneNumberFrom);
+    getInboundCallByPhoneNumber(callForwardingNumber:string) :any {
 
-        if (record == null) return null;
+        return new Promise<InboundCallConfigModel>((resolve, reject) => {
+            let record = this.getRecordByPhoneNumber(callForwardingNumber)
+                .then((result) => {
 
-        let value = JSON.parse(record.Value);
+                    if (result == null) reject(null);
 
-        if (value == null) return null;
+                    let value = JSON.parse(result.Value);
 
-        return{
-            callForwardingNumber: value.callForwardingNumber,
-            phoneNumberTo: value.phoneNumberTo,
-            callerId: value.callerId,
-        };
+                    if (value == null) reject(null);
+
+                    let retVal = new InboundCallConfigModel();
+                    retVal.callForwardingNumber = value.callForwardingNumber;
+                    retVal.callerId = value.callerId;
+                    retVal.phoneNumberTo = value.phoneNumberTo;
+
+                    resolve(retVal);
+                }).catch((err) => {
+                    reject(null);
+                });
+        })
     }
-    
-    private getRecord() {
-        
-        let record = this._freeswitchConfigRepo.findOne()
-    }
 
-    private getRecordByPhoneNumber = (phoneNumberTo:string): any => {
+    private getRecordByPhoneNumber = (callForwardingNumber:string): any => {
+
         return new Promise<FreeswitchCallConfig>((resolve,reject) => {
            
-            let name = `${INBOUND_CALL_CONFIG}:${phoneNumberTo}`;
+            let name = `${INBOUND_CALL_CONFIG}:${callForwardingNumber}`;
 
             let record = this._freeswitchConfigRepo.createQueryBuilder("public.FreeswitchCallConfig")
                 .where("public.FreeswitchCallConfig.Name = :name", { name : name })
@@ -77,6 +81,7 @@ export class InboundCallConfigService {
                        reject(null);
                    }
                    else {
+                       console.log('data', result);
                        resolve(result);
                    }
                 })
