@@ -35,11 +35,11 @@ export class FsEslService {
         connection.api('originate', arg2, function (res) {
           let callUid = res.getBody().toString().replace('+OK ', '');
 
-          connection.execute(
-            'playback',
-            'https://crm.dealerownedsoftware.com/hosted-files/audio/ConvertedSalesService.wav',
-            callUid,
-          );
+          // connection.execute(
+          //   'playback',
+          //   'https://crm.dealerownedsoftware.com/hosted-files/audio/ConvertedSalesService.wav',
+          //   callUid,
+          // );
 
           uid = callUid;
         });
@@ -51,11 +51,12 @@ export class FsEslService {
 
           console.log('LISTENING TO AN EVENT - CLICK-TO-CALL', eventName);
 
-          if (eventName === 'CHANNEL_HANGUP_COMPLETE' ||
-              eventName === 'CHANNEL_HANGUP'){
+          if (eventName === 'CHANNEL_EXECUTE_COMPLETE'){
 
                let cdr =  new CDRHelper().getCallRecords(fsEvent);
                 
+              console.log('CDR CLICKTOCALL' , cdr);
+
                 callrecord = cdr;
               }
         });
@@ -63,6 +64,8 @@ export class FsEslService {
         connection.on('esl::end', function(evt,body) {
 
             //call webhook click-to-call status callback
+
+            console.log('ESL ENDING');
 
             http.get(WebhookClickToCallStatusCallBack(callrecord), function(res){
               // console.log('ENTERED GET ', res);

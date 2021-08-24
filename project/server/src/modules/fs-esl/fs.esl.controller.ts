@@ -50,7 +50,7 @@ export class FreeswitchController {
     //   RecordingUUID: callData.RecordingUUID
     // },60)
 
-    new ClickToCallJob(this._freeswitchCallConfigService, this._freeswitchCallSystemService).trigger(callData);
+    // new ClickToCallJob(this._freeswitchCallConfigService, this._freeswitchCallSystemService).trigger(callData);
 
     return "Successfully submitted to job queue";
   }
