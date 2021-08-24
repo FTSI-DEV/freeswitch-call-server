@@ -13,6 +13,8 @@
           <a-col :span="10">
             <div style="background: white; padding: 20px">
               <div class="call-config">Phone Number Config</div>
+                            <a-alert v-if="isSaved && !hasError" message="Successfully saved" type="success" style="text-align: left; margin-bottom: 5px;"/>
+              <a-aler v-if="isServerError" message="Error" type="error" style="text-align: left; margin-bottom: 5px;"/>
               <a-form-item label="Friendly Name"  style="display: block; text-align: left">
                 <input
                   :class="['ant-input', isInvalid(friendlyName)]"
@@ -78,6 +80,8 @@ export default {
       to: null,
       callerId: null,
       hasError: false,
+      isSaved: false,
+      isServerError: false
     };
   },
   computed: {
@@ -113,8 +117,16 @@ export default {
       };
       console.log("saveConfig params:", params);
       EventService.saveRecord(params).then((res) => {
-        console.log("Save config return: ", res);
-      });
+        console.log('RESPONSE: ', res)
+         if (res.status === 201) {
+           this.friendlyName = null;
+           this.phoneNumber = null;
+           this.webhookURL = null;
+           this.isSaved = true;
+         } else {
+            this.isServerError = true;
+         }
+      })
     }
   },
   components: { DownOutlined },

@@ -13,6 +13,8 @@
           <a-col :span="10">
             <div style="padding: 20px">
               <div class="call-config">Inbound Call Config</div>
+              <a-alert v-if="isSaved && !hasError" message="Successfully saved" type="success" style="text-align: left; margin-bottom: 5px;"/>
+              <a-aler v-if="isServerError" message="Error" type="error" style="text-align: left; margin-bottom: 5px;"/>
               <a-form-item label="Caller Id" style="display: block; text-align: left">
                 <input
                   :class="['ant-input', isInvalid(callerId)]"
@@ -52,6 +54,8 @@ export default {
       hasError: false,
       phoneNumberTo: null,
       callForwardingNumber: null,
+      isSaved: false,
+      isServerError: false
     };
   },
   methods: {
@@ -70,7 +74,17 @@ export default {
         callForwardingNumber: this.callForwardingNumber,
       };
       console.log("inbound call params: ", params);
-      EventService.addInboundCallConfig(params);
+      EventService.addInboundCallConfig(params).then((res) => {
+        console.log('RESPONSE: ', res)
+        if (res.status === 201) {
+          this.phoneNumberTo = null;
+          this.callerId = null;
+          this.callForwardingNumber = null;
+          this.isSaved = true;
+        } else {
+          this.isServerError = true;
+        }
+      })
     },
   },
 };
