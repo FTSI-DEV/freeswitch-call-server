@@ -12,7 +12,7 @@
         <a-row>
           <a-col :span="10">
             <div style="padding: 20px">
-              <div class="call-config">Outbound Call</div>
+              <div class="call-config">Click To Call</div>
               <a-form-item
                 label="From"
                 style="display: block; text-align: left"

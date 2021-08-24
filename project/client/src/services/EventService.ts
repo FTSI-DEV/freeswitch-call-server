@@ -18,24 +18,25 @@ const apiClient = axios.create({
 
 export default {
     getCallConfigById(params: any) {
-        return apiClient.get('/api/freeswitch-call-config/getCallConfigById', {
+        return apiClient.get('/freeswitch-call-config/getCallConfigById', {
             params: params,
         });
     },
     saveRecord(params: any) {
-        return apiClient.post(`/api/freeswitch-call-config/saveRecord`, params);
+        return apiClient.post(`/freeswitch-call-config/saveRecord`, params);
     },
     clickToCall(params: any) {
         console.log('params: ', params);
-        return apiClient.post(`/api/freeswitch/clickToCall`, params);
+        return apiClient.post(`/freeswitch/clickToCall/${params.phoneNumberFrom}/${params.phoneNumberTo}/${params.callerId}`, );
     },
     getInboundCallConfig(params: any) {
-        return apiClient.get(`/api/freeswitch/getInboundCallConfig`, { params: params });
+        return apiClient.get(`/inbound-call-config/getInboundCallConfig`, { params: params });
     },
     addInboundCallConfig(params: any) {
-        return apiClient.post(`/api/freeswitch/add`, params);
+        console.log('params: ', params)
+        return apiClient.post(`/inbound-call-config/add/${params.phoneNumberTo}/${params.callerId}/${params.callForwardingNumber}`);
     },
     updateInboundCallConfig(params: any) {
-        return apiClient.post(`/api/freeswitch/update`, params);
+        return apiClient.post(`/inbound-call-config/${params.phoneNumberTo}/${params.callerId}/${params.callForwardingNumber}`);
     }
 }
