@@ -25,6 +25,7 @@ export default {
         return apiClient.post(`/freeswitch-call-config/saveRecord`, params);
     },
     clickToCall(params: any) {
-        return apiClient.post(`/freeswitch/clickToCall`, params);
+        console.log('params: ', params);
+        return apiClient.post(`/freeswitch/clickToCall?phoneNumberFrom=${params.phoneNumberFrom}&phoneNumberTo=${params.phoneNumberTo}&callerId=${params.callerId}`);
     }
 }
