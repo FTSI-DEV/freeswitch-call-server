@@ -2,15 +2,15 @@ import { Controller, Get, Param, Post } from '@nestjs/common';
 import { InboundCallConfigModel } from '../models/inbound-call-config.model';
 import { InboundCallConfigService } from '../services/inbound-call-config.service';
 
-@Controller('/inbound-call-config')
+@Controller('/api/inbound-call-config')
 export class InboundCallConfigController {
   constructor(private _inboundCallConfig: InboundCallConfigService) {}
 
-  @Get('getInboundCallConfig/:phoneNumberTo')
+  @Get('getInboundCallConfig/:callForwardingNumber')
   getInboundCallConfig(
-    @Param('/phoneNumberTo') phoneNumberTo: string,
+    @Param('callForwardingNumber') callForwardingNumber: string,
   ): InboundCallConfigModel {
-    return this._inboundCallConfig.getInboundCallByPhoneNumber(phoneNumberTo);
+    return this._inboundCallConfig.getInboundCallByPhoneNumber(callForwardingNumber);
   }
 
   @Post('add/:phoneNumberTo/:callerId/:callForwardingNumber')
