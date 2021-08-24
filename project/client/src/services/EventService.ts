@@ -1,8 +1,8 @@
 import axios from 'axios';
 
 const apiClient = axios.create({
-    baseURL: 'http://www.freeswitchcallapp.com/api',
-    //baseURL: 'http://localhost:3000/',
+    baseURL: 'http://www.freeswitchcallapp.com',
+    //baseURL: 'http://localhost:3000',
     withCredentials: false,
     headers: {
         // crossdomain: true ,
@@ -23,7 +23,7 @@ export default {
         });
     },
     saveRecord(params: any) {
-        return apiClient.post(`/freeswitch-call-config/saveRecord`, params);
+        return apiClient.post(`/freeswitch-phonenumber-config/saveRecord`, params);
     },
     clickToCall(params: any) {
         console.log('params: ', params);
