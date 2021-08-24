@@ -1,7 +1,7 @@
 import axios from 'axios';
 const https = require('https');
 
-const apiClient = axios.create({
+export const apiClient = axios.create({
     baseURL: "http://localhost:8080",
     headers: {
         Accept: "application/json",

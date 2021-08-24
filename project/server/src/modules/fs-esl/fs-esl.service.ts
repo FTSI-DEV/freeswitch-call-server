@@ -1,16 +1,18 @@
-import { Injectable } from '@nestjs/common';
+import { HttpCode, Injectable } from '@nestjs/common';
 import { connect } from 'http2';
 import { stringify } from 'querystring';
+import { FS_ESL } from 'src/helpers/constants/fs-esl.constants';
 import { CallDispatchHelper } from 'src/helpers/fs-esl/callDispatch.helper';
+import { CDRHelper } from 'src/helpers/fs-esl/cdr.helper';
 import { FreeswitchConnectionHelper } from 'src/helpers/fs-esl/eslfreeswitch.connection';
 import { OriginationModel } from 'src/helpers/fs-esl/models/originate.model';
+import { WebhookClickToCallStatusCallBack } from 'src/utils/webhooks';
 import { IFSEslService } from './fs-esl.interface';
-
+const http = require('http');
 @Injectable()
 export class FsEslService {
-
   constructor() {}
-  
+
   private readonly _callDispatchHelper = new CallDispatchHelper();
   private readonly _fsConnection = new FreeswitchConnectionHelper();
 
@@ -19,44 +21,63 @@ export class FsEslService {
     phoneNumberFrom: string,
     callerId: string,
   ): string {
+    let uid: string;
 
-    console.log(`PARAMATERS phoneNumberTo: ${phoneNumberTo} , phoneNumberFrom: ${phoneNumberFrom}, callerId: ${callerId}`);
+    this._fsConnection
+      .connect()
+      .then((connection) => {
+        console.log('EXECUTING CLICK-TO-CALL');
 
-    
-    let conn = this._fsConnection.connect().then((connection) => {
+        let app_args = `sofia/gateway/fs-test3/${phoneNumberTo}`;
+        let arg1 = `{ignore_early_media=true,origination_caller_id_number=${callerId}}${app_args}`;
+        let arg2 = `${arg1} &bridge(sofia/gateway/fs-test1/${phoneNumberFrom})`;
 
-      console.log('EXECUTING CLICK-TO-CALL');
+        connection.api('originate', arg2, function (res) {
+          let callUid = res.getBody().toString().replace('+OK ', '');
 
-      console.log(`PARAMATERS phoneNumberTo: ${phoneNumberTo} , phoneNumberFrom: ${phoneNumberFrom}, callerId: ${callerId}`);
+          connection.execute(
+            'playback',
+            'https://crm.dealerownedsoftware.com/hosted-files/audio/ConvertedSalesService.wav',
+            callUid,
+          );
 
-      let app_args = `sofia/gateway/sip_provider/${phoneNumberTo}`; //destinationNumber;
-      let arg1 = `{ignore_early_media=true,origination_caller_id_number=${callerId}}${app_args}`;
-      // let arg2 = `${arg1} &bridge(sofia/gateway/fs-test3/1000)`;
-      let arg2 = `${arg1} &bridge(sofia/gateway/sip_provider/${phoneNumberFrom})`
+          uid = callUid;
+        });
 
-      connection.execute('playback', 'ivr/ivr-recording_started.wav');
+        let callrecord = null;
 
-      let uid = null;
+        connection.on(FS_ESL.RECEIVED, (fsEvent) => {
+          const eventName = fsEvent.getHeader('Event-Name');
 
-      connection.api('originate', arg2, function (res) {
+          console.log('LISTENING TO AN EVENT - CLICK-TO-CALL', eventName);
 
-        let callUid = res.getBody().toString().replace('+OK ', '');
+          if (eventName === 'CHANNEL_HANGUP_COMPLETE' ||
+              eventName === 'CHANNEL_HANGUP'){
 
-        connection.execute(
-          'playback',
-          'https://crm.dealerownedsoftware.com/hosted-files/audio/ConvertedSalesService.wav',
-          callUid
-        );
+               let cdr =  new CDRHelper().getCallRecords(fsEvent);
+                
+                callrecord = cdr;
+              }
+        });
 
-        uid = callUid
-        
-        return callUid;
+        connection.on('esl::end', function(evt,body) {
+
+            //call webhook click-to-call status callback
+
+            http.get(WebhookClickToCallStatusCallBack(callrecord), function(res){
+              // console.log('ENTERED GET ', res);
+            });
+        })
+
+        console.log('UID', uid);
+      })
+      .catch((err) => {
+        let errMessage = 'Error click to call ' + err;
+
+        console.log(errMessage);
+        return errMessage;
       });
 
-      connection.execute('playback', 'ivr/ivr-recording_started.wav', uid);
-
-      // connection.execute('set', '$${recordings_dir}/${strftime(%Y-%m-%d-%H-%M-%S)}_${destination_number}_${caller_id_number}.wav', uid);
-    });
-    return 'Error click to call';
+    return uid;
   }
 }

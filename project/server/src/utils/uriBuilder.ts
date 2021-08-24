@@ -19,4 +19,9 @@ export class URIBuilder {
     
     return `${this.baseUrl}/NewInboundCall/IncomingStatusCallBack?UUID=${callData.UUID}&&CallerIdNumber=${callData.CallerIdNumber}&&CallerName=${callData.CallerName}&&CalleeIdNumber=${callData.calleeIdNumber}&&CallDirection=${callData.CallDirection}&&CallStatus=${callData.CallStatus}&&Duration=${callData.Duration}&&StartedDate=${callData.StartedDate}&&StoreId=${callData.StoreId}`;
   }
+  clickToCallStatusCallBack(callData){
+    console.log('trying to trigger webhoook api', callData);
+    
+    return `${this.baseUrl}/freeswitch/clickToCallStatusCallback?UUID=${callData}`;
+  }
 }

@@ -3,7 +3,7 @@ import { Pagination } from 'nestjs-typeorm-paginate';
 import { FreeswitchPhoneNumberConfigParam } from 'src/models/freeswitchCallConfigModel';
 import { FreeswitchPhoneNumberConfigService } from '../services/phonenumber-config.service';
 
-@Controller('/api/freeswitch-phonenumber-config')
+@Controller('/freeswitch-phonenumber-config')
 export class FreeswitchPhoneNumberConfigController {
     constructor(
         private _freeswitchCallConfigService: FreeswitchPhoneNumberConfigService

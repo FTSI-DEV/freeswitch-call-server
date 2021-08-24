@@ -23,7 +23,7 @@ export class FreeswitchPhoneNumberConfigService implements IFreeswitchPhoneNumbe
 
             fsCallConfig = new FreeswitchCallConfig();
 
-            fsCallConfig.Name = FS_PHONENUMBER_CONFIG;
+            fsCallConfig.Name = this.getName(callConfigParam.phoneNumber);
         }
 
         let configModel: FreeswitchPhoneNumberConfigModel = {
@@ -68,6 +68,33 @@ export class FreeswitchPhoneNumberConfigService implements IFreeswitchPhoneNumbe
                     reject(null);
                 });
         })
+    }
+
+    getAll(options:IPaginationOptions) :any{
+
+        return this.getPhoneNumberConfigs(options);
+    }
+
+    getConfigByPhoneNumber(phoneNumber:string):FreeswitchPhoneNumberConfigModel{
+
+        let config = this.getRecordByPhoneNumber(phoneNumber);
+
+        if (config == null) return null;
+
+        let value = JSON.parse(config.Value);
+
+        if (value == null) return null;
+
+        return{
+           phoneNumber: value.phoneNumber,
+           friendlyName: value.friendlyName,
+           webhookUrl: value.webhook,
+           httpMethod: value.httpMethod
+        };
+    }
+
+    private getName(phoneNumber:string):string{
+        return `${FS_PHONENUMBER_CONFIG}:${phoneNumber}`;
     }
 
     // getCallConfigById(id: number): any {
@@ -126,9 +153,28 @@ export class FreeswitchPhoneNumberConfigService implements IFreeswitchPhoneNumbe
         }); 
     }
 
-    getAll(options:IPaginationOptions) :any{
+    private getRecordByPhoneNumber(phoneNumber: string):any{
+        return new Promise<FreeswitchCallConfig>((resolve,reject) => {
 
-        return this.getPhoneNumberConfigs(options);
+            let name = this.getName(phoneNumber);
+
+            let record = this.freeswitchConfigRepo.createQueryBuilder("public.FreeswitchCallConfig")
+                .where("public.FreeswitchCallConfig.Name = :name", { name: name })
+                .getOneOrFail()
+                .then(result => {
+                    if (result == null){
+                        reject(null);
+                    }
+                    else {
+                        resolve(result);
+                    }
+                })
+                .catch(error => {
+                    reject(null);
+                });
+
+            
+        })
     }
 
     private getPhoneNumberConfigs(options: IPaginationOptions):Promise<any>{

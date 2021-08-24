@@ -2,7 +2,7 @@ import { Controller, Get, Param, Post } from '@nestjs/common';
 import { InboundCallConfigModel } from '../models/inbound-call-config.model';
 import { InboundCallConfigService } from '../services/inbound-call-config.service';
 
-@Controller('/api/inbound-call-config')
+@Controller('/inbound-call-config')
 export class InboundCallConfigController {
   constructor(private _inboundCallConfig: InboundCallConfigService) {}
 
