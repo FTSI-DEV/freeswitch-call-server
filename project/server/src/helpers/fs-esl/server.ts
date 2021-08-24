@@ -12,6 +12,7 @@ let eslServerRes = null;
 
 let CDR = null;
 let callerId = null;
+let callerDesinationNumber = null;
 
 export class EslServerHelper {
   constructor(
@@ -21,13 +22,19 @@ export class EslServerHelper {
 
   private _onListen(conn: any): any {
     conn.on(FS_ESL.RECEIVED, (fsEvent) => {
+
       const eventName = fsEvent.getHeader('Event-Name');
 
       console.log('LISTENING TO AN EVENT ->', eventName);
+      console.log('FS-EVENT', fsEvent);
 
       if (eventName === 'CHANNEL_EXECUTE' || eventName === 'CHANNE_CREATE') {
-        callerId = this._callRecords.getCallerId(fsEvent);
-        console.log('CALLERID ', callerId);
+        // callerId = this._callRecords.getCallerId(fsEvent);
+        // console.log('CALLERID ', callerId);
+
+        callerDesinationNumber = this._callRecords.getCallerDestinationNumber(fsEvent);
+        console.log('CALLER_DESINATION_NUMBER' , callerDesinationNumber);
+
       }
 
       if (
@@ -122,27 +129,27 @@ export class EslServerHelper {
       //   http.get(WebhookIncomingStatusCallBack(CDR), function (res) {});
       // });
 
-      if (inboundConfig != null){
+      // if (inboundConfig != null){
 
-        let value = JSON.parse(inboundConfig.Value);
+      //   let value = JSON.parse(inboundConfig.Value);
 
-        if (value != null){
+      //   if (value != null){
 
-          conn.execute('set', `effective_caller_id_number=+1${value.callerId}`);
+      //     conn.execute('set', `effective_caller_id_number=+1${value.callerId}`);
 
-          conn.execute('bridge', `sofia/gateway/sip_provider/+1${value.phoneNumberTo}`);
-        }
+      //     conn.execute('bridge', `sofia/gateway/sip_provider/+1${value.phoneNumberTo}`);
+      //   }
 
-        conn.on('esl::end', function(evt,body) {
+      //   conn.on('esl::end', function(evt,body) {
 
-          console.log('ESL END');
-          console.log('CDR - END' ,CDR);
+      //     console.log('ESL END');
+      //     console.log('CDR - END' ,CDR);
 
-          http.get(WebhookIncomingStatusCallBack(CDR), function(res){
-          })
-        })
+      //     http.get(WebhookIncomingStatusCallBack(CDR), function(res){
+      //     })
+      //   })
 
-      }
+      // }
     });
   }
 
