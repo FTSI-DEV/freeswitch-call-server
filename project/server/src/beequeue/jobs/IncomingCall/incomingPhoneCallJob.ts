@@ -13,21 +13,21 @@ export class IncomingPhoneCallJob{
     trigger(data){
         console.log('TRIGGER JOB', data);
 
-        let config = this._freeswitchCallConfig
-            .getConfigByPhoneNumber(data.CallerIdNumber);
+        // let config = this._freeswitchCallConfig
+        //     .getConfigByPhoneNumber(data.CallerIdNumber);
         
-        if (config != null){
-            let webhook = config.webhookUrl;
+        // if (config != null){
+        //     let webhook = config.webhookUrl;
 
-            let httpMethod = config.httpMethod;
+        //     let httpMethod = config.httpMethod;
 
-            if (httpMethod === "HTTP GET"){
-                apiClient.get(webhook);
-            }
-            else if (httpMethod === "HTTP POST") {
-                apiClient.post(webhook);
-            }
-        }
+        //     if (httpMethod === "HTTP GET"){
+        //         apiClient.get(webhook);
+        //     }
+        //     else if (httpMethod === "HTTP POST") {
+        //         apiClient.post(webhook);
+        //     }
+        // }
 
         return jobQueue.createJob(data).save();
     }
@@ -42,5 +42,5 @@ jobQueue.process((job,done) => {
     console.log(`CallUUID -> ${job.data.CallUid}`);
 
     console.log('JOB PROCESS', job.data);
-    return done(job.data);
+    return done();
 })

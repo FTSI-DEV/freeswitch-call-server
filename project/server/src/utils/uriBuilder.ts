@@ -17,7 +17,8 @@ export class URIBuilder {
   incomingStatusCallBack(callData) {
     console.log('STATUSCALLBACKDATA - trying to trigger ', callData);
     
-    return `${this.baseUrl}/NewInboundCall/IncomingStatusCallBack?UUID=${callData.UUID}&&CallerIdNumber=${callData.CallerIdNumber}&&CallerName=${callData.CallerName}&&CalleeIdNumber=${callData.calleeIdNumber}&&CallDirection=${callData.CallDirection}&&CallStatus=${callData.CallStatus}&&Duration=${callData.Duration}&&StartedDate=${callData.StartedDate}&&StoreId=${callData.StoreId}`;
+    console.log('calleeid number: ', callData.CalleeIdNumber);
+    return `${this.baseUrl}/NewInboundCall/IncomingStatusCallBack?UUID=${callData.UUID}&CallerIdNumber=${callData.CallerIdNumber}&CallerName=${callData.CallerName}&CallDirection=${callData.CallDirection}&CallStatus=${callData.CallStatus}&Duration=${callData.Duration}&StartedDate=${callData.StartedDate}&StoreId=60&CalleeIdNumber=${callData.CalleeIdNumber}`;
   }
   clickToCallStatusCallBack(callData){
     console.log('trying to trigger webhoook api', callData);

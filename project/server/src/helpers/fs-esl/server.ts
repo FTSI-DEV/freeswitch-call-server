@@ -14,27 +14,26 @@ let CDR = null;
 let callerId = null;
 
 export class EslServerHelper {
-
   constructor(
     private readonly _inboundCallConfig: InboundCallConfigService,
-    private readonly _callRecords = new CDRHelper()
+    private readonly _callRecords = new CDRHelper(),
   ) {}
 
   private _onListen(conn: any): any {
-
     conn.on(FS_ESL.RECEIVED, (fsEvent) => {
-
       const eventName = fsEvent.getHeader('Event-Name');
 
       console.log('LISTENING TO AN EVENT ->', eventName);
 
-      if (eventName === 'CHANNEL_CREATE'){
+      if (eventName === 'CHANNEL_EXECUTE' || eventName === 'CHANNE_CREATE') {
         callerId = this._callRecords.getCallerId(fsEvent);
+        console.log('CALLERID ', callerId);
       }
 
-      if (eventName === 'CHANNEL_HANGUP_COMPLETE' ||
-          eventName === 'CHANNEL_HANGUP') {
-
+      if (
+        eventName === 'CHANNEL_HANGUP_COMPLETE' ||
+        eventName === 'CHANNEL_HANGUP'
+      ) {
         let call_record = this._callRecords.getCallRecords(fsEvent);
 
         console.log('CALL-RECORD', call_record);
@@ -42,7 +41,6 @@ export class EslServerHelper {
         CDR = call_record;
 
         return call_record;
-       
       }
     });
   }
@@ -77,7 +75,7 @@ export class EslServerHelper {
   //for InboundCall
   startEslServer() {
     let esl = require('modesl');
-    
+
     let esl_server = new esl.Server(
       {
         port: process.env.ESL_SERVER_PORT,
@@ -95,19 +93,34 @@ export class EslServerHelper {
     this.inboundCallEnter();
   }
 
-  private inboundCallEnter():any{
+  private inboundCallEnter(): any {
     let self = this;
 
-    eslServerRes.on('connection::ready', function(conn) {
+    eslServerRes.on('connection::ready', function (conn) {
       console.log('CONNECTION SERVER READY');
 
       self._onListen(conn);
 
       let inboundConfig = null;
 
-      if (callerId != null){
-        inboundConfig = self._inboundCallConfig.getInboundCallByPhoneNumber(callerId);
+      if (callerId != null) {
+        inboundConfig =
+          self._inboundCallConfig.getInboundCallByPhoneNumber(callerId);
       }
+
+      console.log('INBOUND CALL', inboundConfig);
+
+      // conn.execute('set', `effective_caller_id_number=+17132633132`);
+
+      // conn.execute('bridge', `sofia/gateway/fs-test1/1000`);
+
+      // conn.on('esl::end', function (evt, body) {
+
+      //   console.log('ESL END');
+      //   console.log('CDR - END', CDR);
+
+      //   http.get(WebhookIncomingStatusCallBack(CDR), function (res) {});
+      // });
 
       if (inboundConfig != null){
 
@@ -128,20 +141,17 @@ export class EslServerHelper {
           http.get(WebhookIncomingStatusCallBack(CDR), function(res){
           })
         })
-        
-      }
 
-      conn.execute('set', 'effective_caller_id_number=')
-    })
+      }
+    });
   }
 
   private incomingCallEnter(): any {
     // const self = this;
-    let connData = null; 
+    let connData = null;
     eslServerRes.on('connection::ready', function (conn) {
       console.log('CONNECTION SERVER READY');
       connData = conn;
-
 
       // self._onListen(conn);
 
@@ -151,17 +161,14 @@ export class EslServerHelper {
 
       conn.execute('bridge', 'sofia/gateway/fs-test3/1000');
 
-
-
       conn.on('esl::end', function (evt, body) {
-
         console.log('TRIGGER WEBHOOK');
 
         console.log('CDR - end', CDR);
 
-        http.get(WebhookIncomingStatusCallBack(CDR), function(res){
+        http.get(WebhookIncomingStatusCallBack(CDR), function (res) {
           // console.log('ENTERED GET ', res);
-        })
+        });
 
         // call webhook here
       });
@@ -189,5 +196,4 @@ export class EslServerHelper {
 
     return freeswitchTaskListKeyValues;
   }
-
 }
