@@ -3,7 +3,7 @@ import axios from 'axios';
 
 const apiClient = axios.create({
     baseURL: 'http://www.freeswitchcallapp.com',
-    // baseURL: 'http://localhost:3000',
+    //baseURL: 'http://localhost:3000',
     withCredentials: false,
     headers: {
         // crossdomain: true ,
@@ -29,12 +29,21 @@ export default {
     updatePhoneNumberConfig(params:any){
         return apiClient.post('/api/freeswitch-phonenumber-config/update', params);
     },
+    getPhoneNumberConfigs(params:any){
+        return apiClient.get('/api/freeswitch-phonenumber-config/getPhonenumberConfigs');
+    }, 
+    getPhoneNumberConfigById(params:any){
+        return apiClient.get('/api/freeswitch-phonenumber-config/getPhoneNumberConfigById', { params: params });
+    },
     clickToCall(params: any) {
         console.log('params: ', params);
         return apiClient.post(`/api/freeswitch/clickToCall/${params.phoneNumberFrom}/${params.phoneNumberTo}/${params.callerId}`, );
     },
-    getInboundCallConfig(params: any) {
-        return apiClient.get(`/api/inbound-call-config/getInboundCallConfig`, { params: params });
+    getInboundCallConfigs(params: any) {
+        return apiClient.get(`/api/inbound-call-config/getInboundCallConfigs`);
+    },
+    getInboundCallConfigById(params: any) {
+        return apiClient.get(`/api/inbound-call-config/getInboundCallConfigById`, { params: params });
     },
     addInboundCallConfig(params: any) {
         console.log('params: ', params)
