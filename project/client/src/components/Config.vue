@@ -153,7 +153,7 @@
             label="Webhook URL"
             style="display: block; text-align: left"
           >
-            <input :class="['ant-input']" v-model="selectedConfig.httpMethod"/>
+            <input :class="['ant-input']" v-model="selectedConfig.webhookUrl"/>
           </a-form-item>
         </a-modal>
       </a-layout-content>
