@@ -1,6 +1,5 @@
 import { queueDefault } from "src/beequeue/config/beeQueueInstance.config";
 import { FreeswitchPhoneNumberConfigService } from "src/modules/config/fs-phonenumber-config/services/phonenumber-config.service";
-import { apiClient } from "src/utils/apiClient";
 
 const jobQueue = queueDefault;
 

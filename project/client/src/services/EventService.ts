@@ -1,8 +1,9 @@
+import api from 'ant-design-vue/lib/notification';
 import axios from 'axios';
 
 const apiClient = axios.create({
     baseURL: 'http://www.freeswitchcallapp.com',
-    //baseURL: 'http://localhost:3000',
+    // baseURL: 'http://localhost:3000',
     withCredentials: false,
     headers: {
         // crossdomain: true ,
@@ -22,8 +23,11 @@ export default {
             params: params,
         });
     },
-    saveRecord(params: any) {
-        return apiClient.post(`/freeswitch-phonenumber-config/saveRecord`, params);
+    addPhoneNumberConfig(params:any){
+        return apiClient.post('/freeswitch-phonenumber-config/add', params);
+    },
+    updatePhoneNumberConfig(params:any){
+        return apiClient.post('/freeswitch-phonenumber-config/update', params);
     },
     clickToCall(params: any) {
         console.log('params: ', params);

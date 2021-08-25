@@ -116,7 +116,8 @@ export default {
         webhookUrl: this.webhookURL,
       };
       console.log("saveConfig params:", params);
-      EventService.saveRecord(params).then((res) => {
+
+      EventService.addPhoneNumberConfig(params).then((res) => {
         console.log('RESPONSE: ', res)
          if (res.status === 201) {
            this.friendlyName = null;
