@@ -1,12 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { rejects } from 'assert';
 import { IPaginationMeta, IPaginationOptions, paginate, Pagination } from 'nestjs-typeorm-paginate';
 import { PhoneNumberConfig, PhoneNumberConfigRepository } from 'src/entity/phoneNumberConfig.entity';
 import { FreeswitchPhoneNumberConfigParam } from 'src/models/freeswitchCallConfigModel';
 import { IFreeswitchPhoneNumberConfigService as IFreeswitchPhoneNumberConfigService } from './iphonenumber-config.interface';
 
 @Injectable()
-export class FreeswitchPhoneNumberConfigService implements IFreeswitchPhoneNumberConfigService {
+export class FreeswitchPhoneNumberConfigService{
     constructor(
         @InjectRepository(PhoneNumberConfigRepository)
         private _phoneNumberConfigRepo: PhoneNumberConfigRepository,
@@ -46,13 +47,25 @@ export class FreeswitchPhoneNumberConfigService implements IFreeswitchPhoneNumbe
 
     }
 
-    getPhoneNumberConfigById(id: number): any{
-        return new Promise<FreeswitchPhoneNumberConfigParam>((resolve, reject) => {
+    getPhone(id:number):any{
 
+        this.getPhoneNumberConfigById(id)
+        .then((result) => {
+            return result;
+        }).catch((err) => {
+            return err;
+        });
+    }
+
+    getPhoneNumberConfigById(id: number): any{
+
+        return new Promise<FreeswitchPhoneNumberConfigParam>((resolve, reject) => {
             this.getById(id)
                 .then((result) => {
                     
-                    if (result == null || result.Value == undefined) reject(null);
+                    if (result == null || result == undefined){
+                        reject(null);
+                    }
 
                     let configModel: FreeswitchPhoneNumberConfigParam = {
                         friendlyName: result.FriendlyName,
@@ -61,13 +74,15 @@ export class FreeswitchPhoneNumberConfigService implements IFreeswitchPhoneNumbe
                         webhookUrl: result.WebhookUrl,
                         id: result.Id
                     };
-
                     resolve(configModel);
 
                 }).catch((err) => {
                     reject(null);
                 });
         })
+        .catch(err => {
+            return null;
+        });
     }
 
     getAll(options:IPaginationOptions) :any{
@@ -99,12 +114,16 @@ export class FreeswitchPhoneNumberConfigService implements IFreeswitchPhoneNumbe
                     reject(null);
                 }
                 else {
+                    console.log('getbyId:resolve', result);
                     resolve(result);
                 }
             })
             .catch(err => {
                 reject(null);
             });
+        })
+        .catch(err => {
+            console.log('err', err);
         });
     }
 
