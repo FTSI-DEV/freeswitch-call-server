@@ -43,7 +43,7 @@ export default {
         return apiClient.get(`/api/inbound-call-config/getInboundCallConfigs`);
     },
     getInboundCallConfigById(params: any) {
-        return apiClient.get(`/api/inbound-call-config/getInboundCallConfigById`, { params: params });
+        return apiClient.get('/api/inbound-call-config/getInboundCallConfigById', { params: params });
     },
     addInboundCallConfig(params: any) {
         console.log('params: ', params)

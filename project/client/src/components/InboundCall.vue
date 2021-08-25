@@ -90,6 +90,7 @@
           title="Edit Config"
           @ok="handleOk"
         >
+        <div>{{ selectedConfig }}</div>
           <a-form-item
             label="Caller Id"
             style="display: block; text-align: left"
@@ -158,13 +159,12 @@ export default {
   methods: {
     editConfig(val) {
       this.selectedConfig = null;
-      this.modleVisibility = true;
-      EventService.getInboundCallConfigById({ id: val.id }).then((res) => {
-        //  if (res.status === 200) {
-        this.selectedConfig = res.data;
-        //}
+      EventService.getInboundCallConfigById(val.id).then((res) => {
+        if (res.status === 200) {
+          this.modleVisibility = true;
+          this.selectedConfig = res.data;
+        }
       });
-      console.log("val: ", val.id);
     },
     handleOk() {
       this.modleVisibility = false;
