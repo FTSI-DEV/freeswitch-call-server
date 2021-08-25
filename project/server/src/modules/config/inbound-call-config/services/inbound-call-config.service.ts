@@ -1,10 +1,8 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { IPaginationMeta, IPaginationOptions, paginate, Pagination } from 'nestjs-typeorm-paginate';
 import { resolve } from 'path';
-import { FreeswitchCallConfig, FreeswitchCallConfigRepository } from 'src/entity/freeswitchCallConfig.entity';
 import { InboundCallConfig, InboundCallConfigRepository } from 'src/entity/inboundCallConfig.entity';
-import { INBOUND_CALL_CONFIG } from 'src/helpers/constants/call-config.constants';
 import { InboundCallConfigModel, InboundCallConfigParam } from '../models/inbound-call-config.model';
 
 @Injectable()

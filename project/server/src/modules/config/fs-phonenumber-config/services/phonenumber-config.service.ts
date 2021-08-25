@@ -1,11 +1,8 @@
-import { Injectable, Res } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { rejects } from 'assert';
 import { IPaginationMeta, IPaginationOptions, paginate, Pagination } from 'nestjs-typeorm-paginate';
-import { FreeswitchCallConfig, FreeswitchCallConfigRepository } from 'src/entity/freeswitchCallConfig.entity';
 import { PhoneNumberConfig, PhoneNumberConfigRepository } from 'src/entity/phoneNumberConfig.entity';
-import { FS_PHONENUMBER_CONFIG } from 'src/helpers/constants/call-config.constants';
-import { FreeswitchPhoneNumberConfigModel, FreeswitchPhoneNumberConfigParam } from 'src/models/freeswitchCallConfigModel';
+import { FreeswitchPhoneNumberConfigParam } from 'src/models/freeswitchCallConfigModel';
 import { IFreeswitchPhoneNumberConfigService as IFreeswitchPhoneNumberConfigService } from './iphonenumber-config.interface';
 
 @Injectable()

@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { FreeswitchPhoneNumberConfigService } from './phonenumber-config.service';
 
-describe('FreeswitchCallConfigService', () => {
+describe('FreeswitchPhoneNumberConfigService', () => {
   let service: FreeswitchPhoneNumberConfigService;
 
   beforeEach(async () => {

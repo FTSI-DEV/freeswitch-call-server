@@ -49,43 +49,6 @@ export class FreeswitchCallSystemService {
         return this.getCDRById(id);
     }
 
-    private getCDRById(id:number): any{
-
-        return new Promise<CallDetailRecordDTO>((resolve,reject) => {
-
-            let record = this.freeswitchCallSystemRepo.findOneOrFail(id)
-            .then(result => {
-
-                let cdrDTO: CallDetailRecordDTO = {
-                    Id: result.id,
-                    PhoneNumberTo: result.PhoneNumberTo,
-                    PhoneNumberFrom: result.PhoneNumberFrom,
-                    CallStatus: result.CallStatus,
-                    CallUUID: result.CallUUID,
-                    Duration: result.Duration,
-                    DateCreated: result.DateCreated,
-                    StoreId: result.StoreId,
-                    RecordingUUID: result.RecordingUUID,
-                    CallDirection: result.Direction
-                };
-
-                console.log('resolving ', cdrDTO);
-                resolve(cdrDTO);
-            })
-            .catch(err => {
-                console.log('REJECT ', err);
-                reject(null);
-            });
-        })
-        .catch(err => {
-            console.log('Error', err);
-        });
-    }
-
-    async getCallLogs2(options: IPaginationOptions):Promise<Pagination<FsCallDetailRecordEntity>>{
-        return paginate<FsCallDetailRecordEntity>(this.freeswitchCallSystemRepo, options);
-    }
-
     getCallLogs(options: IPaginationOptions): any {
 
         return this.getCallConfigRecords(options);
@@ -132,6 +95,39 @@ export class FreeswitchCallSystemService {
         })
         .catch(error => {
             console.log('Error', error);
+        });
+    }
+
+    private getCDRById(id:number): any{
+
+        return new Promise<CallDetailRecordDTO>((resolve,reject) => {
+
+            this.freeswitchCallSystemRepo.findOneOrFail(id)
+            .then(result => {
+
+                let cdrDTO: CallDetailRecordDTO = {
+                    Id: result.id,
+                    PhoneNumberTo: result.PhoneNumberTo,
+                    PhoneNumberFrom: result.PhoneNumberFrom,
+                    CallStatus: result.CallStatus,
+                    CallUUID: result.CallUUID,
+                    Duration: result.Duration,
+                    DateCreated: result.DateCreated,
+                    StoreId: result.StoreId,
+                    RecordingUUID: result.RecordingUUID,
+                    CallDirection: result.Direction
+                };
+
+                console.log('resolving ', cdrDTO);
+                resolve(cdrDTO);
+            })
+            .catch(err => {
+                console.log('REJECT ', err);
+                reject(null);
+            });
+        })
+        .catch(err => {
+            console.log('Error', err);
         });
     }
 }
