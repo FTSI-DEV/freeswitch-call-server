@@ -79,8 +79,11 @@
             <a-table :dataSource="configList.list" :columns="columns">
               <template #action="{ record }">
                 <a title="Edit" @click="editConfig(record)"
-                  ><EditOutlined style="font-size: 1.2em"
+                  ><EditOutlined style="font-size: 1.2em; margin-right: 15px"
                 /></a>
+                 <a title="Delete" @click="deleteConfig(record)">
+                  <DeleteOutlined style="font-size: 1.2em" />
+                </a>
               </template>
             </a-table>
           </b-col>
@@ -116,10 +119,10 @@
 </template>
 <script>
 import EventService from "../services/EventService.ts";
-import { EditOutlined } from "@ant-design/icons-vue";
+import { EditOutlined, DeleteOutlined } from "@ant-design/icons-vue";
 
 export default {
-  components: { EditOutlined },
+  components: { EditOutlined, DeleteOutlined },
   data() {
     return {
       from: null,
@@ -161,6 +164,15 @@ export default {
     };
   },
   methods: {
+    deleteConfig(val) {
+      if (confirm("Are you sure you want to delete this config?")) {
+        EventService.deleteInboundCallConfig(val.id).then((res) => {
+          if (res.status === 201) {
+            this.getInboundCallConfigs();
+          }
+        });
+      }
+    },
     editConfig(val) {
       this.selectedConfig.callerId = null;
       this.selectedConfig.phoneNumberTo = null;
