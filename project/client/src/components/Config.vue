@@ -88,7 +88,11 @@
                 </a-col>
                 <a-col>
                   <a-form-item style="text-align: left">
-                    <a-button type="primary" @click="saveConfig" style="margin-top: 32px">
+                    <a-button
+                      type="primary"
+                      @click="saveConfig"
+                      style="margin-top: 32px"
+                    >
                       Save
                     </a-button>
                   </a-form-item>
@@ -99,16 +103,31 @@
         </a-row>
         <b-row v-if="configList">
           <b-col>
-            <a-table :dataSource="configList.list" :columns="columns" />
+            <a-table :data-source="configList.list" :columns="columns">
+              <template #action={record}>
+                <a title="Edit" @click="editConfig(record)"
+                  ><EditOutlined style="font-size: 1.2em"
+                /></a>
+              </template>
+            </a-table>
           </b-col>
         </b-row>
+        <a-modal
+          v-model:visible="modleVisibility"
+          title="Edit Config"
+          @ok="handleOk"
+        >
+          <p>Some contents...</p>
+          <p>Some contents...</p>
+          <p>Some contents...</p>
+        </a-modal>
       </a-layout-content>
     </a-layout>
   </a-layout>
 </template>
 <script>
 import EventService from "../services/EventService.ts";
-import { DownOutlined } from "@ant-design/icons-vue";
+import { DownOutlined, EditOutlined } from "@ant-design/icons-vue";
 // import OutboundCall from './OutboundCall.vue';
 export default {
   data() {
@@ -140,12 +159,19 @@ export default {
           dataIndex: "phoneNumber",
           key: "phoneNumber",
         },
-         {
+        {
           title: "Weebhook URL",
           dataIndex: "webhookUrl",
           key: "webhookUrl",
         },
+        {
+          title: "Action",
+          slots: { customRender: "action" },
+          dataIndex: "webhookUrl",
+        },
       ],
+      modleVisibility: false,
+      selectedConfig: null
     };
   },
   computed: {
@@ -154,6 +180,19 @@ export default {
     },
   },
   methods: {
+    editConfig(val) {
+      this.selectedConfig = null;
+      this.modleVisibility = true;
+      EventService.getPhoneNumberConfigById({ id: val.id }).then(res => {
+      //  if (res.status === 200) {
+          this.selectedConfig = res.data
+        //}
+      })
+      console.log('val: ', val.id);
+    },
+    handleOk() {
+      this.modleVisibility = false;
+    },
     isInvalid(value) {
       return !value && this.hasError ? "invalid" : "";
     },
@@ -197,7 +236,6 @@ export default {
     getPhoneNumberConfigs() {
       EventService.getPhoneNumberConfigs().then((res) => {
         if (res.status === 200) {
-          
           this.configList = {
             list: res.data.items,
             pager: res.data.meta,
@@ -210,7 +248,7 @@ export default {
   created() {
     this.getPhoneNumberConfigs();
   },
-  components: { DownOutlined },
+  components: { DownOutlined, EditOutlined },
 };
 </script>
 <style scoped>

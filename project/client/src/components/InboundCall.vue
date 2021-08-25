@@ -61,7 +61,11 @@
                 </a-col>
                 <a-col>
                   <a-form-item style="text-align: left">
-                    <a-button type="primary" @click="saveConfig" style="margin-top: 32px">
+                    <a-button
+                      type="primary"
+                      @click="saveConfig"
+                      style="margin-top: 32px"
+                    >
                       Save
                     </a-button>
                   </a-form-item>
@@ -72,16 +76,34 @@
         </a-row>
         <b-row v-if="configList">
           <b-col>
-            <a-table :dataSource="configList.list" :columns="columns" />
+            <a-table :dataSource="configList.list" :columns="columns">
+              <template #action="{ record }">
+                <a title="Edit" @click="editConfig(record)"
+                  ><EditOutlined style="font-size: 1.2em"
+                /></a>
+              </template>
+            </a-table>
           </b-col>
         </b-row>
+        <a-modal
+          v-model:visible="modleVisibility"
+          title="Edit Config"
+          @ok="handleOk"
+        >
+          <p>Some contents...</p>
+          <p>Some contents...</p>
+          <p>Some contents...</p>
+        </a-modal>
       </a-layout-content>
     </a-layout>
   </a-layout>
 </template>
 <script>
 import EventService from "../services/EventService.ts";
+import { EditOutlined } from "@ant-design/icons-vue";
+
 export default {
+  components: { EditOutlined },
   data() {
     return {
       from: null,
@@ -109,10 +131,29 @@ export default {
           dataIndex: "callForwardingNumber",
           key: "callForwardingNumber",
         },
+        {
+          title: "Action",
+          slots: { customRender: "action" },
+        },
       ],
+      modleVisibility: false,
+      selectedConfig: null,
     };
   },
   methods: {
+    editConfig(val) {
+      this.selectedConfig = null;
+      this.modleVisibility = true;
+      EventService.getInboundCallConfigById({ id: val.id }).then((res) => {
+        //  if (res.status === 200) {
+        this.selectedConfig = res.data;
+        //}
+      });
+      console.log("val: ", val.id);
+    },
+    handleOk() {
+      this.modleVisibility = false;
+    },
     isInvalid(value) {
       return !value && this.hasError ? "invalid" : "";
     },

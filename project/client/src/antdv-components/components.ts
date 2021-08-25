@@ -17,7 +17,8 @@ import {
     PageHeader,
     Input,
     Dropdown,
-    Alert
+    Alert,
+    Modal
 } from 'ant-design-vue';
 
 export default function AntdvUi(app: any) {
@@ -40,4 +41,5 @@ export default function AntdvUi(app: any) {
     app.use(Input);
     app.use(Dropdown);
     app.use(Alert);
+    app.use(Modal);
 }
