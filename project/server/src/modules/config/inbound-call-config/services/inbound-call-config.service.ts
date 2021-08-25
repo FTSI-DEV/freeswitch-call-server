@@ -1,5 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { IPaginationMeta, IPaginationOptions, paginate, Pagination } from 'nestjs-typeorm-paginate';
+import { resolve } from 'path';
 import { FreeswitchCallConfig, FreeswitchCallConfigRepository } from 'src/entity/freeswitchCallConfig.entity';
 import { InboundCallConfig, InboundCallConfigRepository } from 'src/entity/inboundCallConfig.entity';
 import { INBOUND_CALL_CONFIG } from 'src/helpers/constants/call-config.constants';
@@ -60,6 +62,71 @@ export class InboundCallConfigService {
 
             }).catch((err) => {
                 reject(null);
+            });
+        })
+    }
+
+    getInboundCallConfigById(id:number):any{
+        return new Promise<InboundCallConfigModel>((resolve,reject) => {
+            this.getRecordById(id)
+                .then((result) => {
+                    if (result == null || result == undefined) reject(null);
+
+                    let configModel: InboundCallConfigModel = {
+                        phoneNumberTo: result.PhoneNumberTo,
+                        callForwardingNumber: result.CallForwardingNumber,
+                        callerId: result.CallForwardingNumber,
+                        id: result.Id
+                    };
+
+                    resolve(configModel);
+                })
+                .catch((err) => {
+                    reject(null);
+                })
+        })
+    }
+
+    getInboundCallConfigs(options: IPaginationOptions): Promise<any>{
+        return new Promise<Pagination<InboundCallConfigModel>>((resolve,reject) => {
+
+            let pageRecords = paginate<InboundCallConfig>(this._inboundCallConfigRepo, options);
+
+            pageRecords.then(result => {
+
+                let itemsObjs: InboundCallConfigModel[] = [];
+
+                result.items.forEach(element => {
+
+                    let configModel = new InboundCallConfigModel();
+
+                    configModel.callForwardingNumber = element.CallForwardingNumber;
+                    configModel.callerId = element.CallerId;
+                    configModel.phoneNumberTo = element.PhoneNumberTo;
+                    configModel.id = element.Id;
+
+                    itemsObjs.push(configModel);
+                });
+
+                resolve(new Pagination<InboundCallConfigModel, IPaginationMeta>(itemsObjs, result.meta));
+            })
+            .catch(err => {
+                reject(new Pagination<InboundCallConfigModel, IPaginationMeta>(null, {
+                    itemCount: 0,
+                    itemsPerPage: 0,
+                    totalItems: 0,
+                    totalPages: 0,
+                    currentPage: 0
+                }));
+            })
+            .catch(err => {
+                reject(new Pagination<InboundCallConfigModel, IPaginationMeta>(null, {
+                    itemCount: 0,
+                    itemsPerPage: 0,
+                    totalItems: 0,
+                    totalPages: 0,
+                    currentPage: 0
+                }));
             });
         })
     }

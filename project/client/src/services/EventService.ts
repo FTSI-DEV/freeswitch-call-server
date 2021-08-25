@@ -19,19 +19,19 @@ const apiClient = axios.create({
 
 export default {
     getCallConfigById(params: any) {
-        return apiClient.get('/freeswitch-call-config/getCallConfigById', {
+        return apiClient.get('/api/freeswitch-call-config/getCallConfigById', {
             params: params,
         });
     },
     addPhoneNumberConfig(params:any){
-        return apiClient.post('/freeswitch-phonenumber-config/add', params);
+        return apiClient.post('/api/freeswitch-phonenumber-config/add', params);
     },
     updatePhoneNumberConfig(params:any){
-        return apiClient.post('/freeswitch-phonenumber-config/update', params);
+        return apiClient.post('/api/freeswitch-phonenumber-config/update', params);
     },
     clickToCall(params: any) {
         console.log('params: ', params);
-        return apiClient.post(`/freeswitch/clickToCall/${params.phoneNumberFrom}/${params.phoneNumberTo}/${params.callerId}`, );
+        return apiClient.post(`/api/freeswitch/clickToCall/${params.phoneNumberFrom}/${params.phoneNumberTo}/${params.callerId}`, );
     },
     getInboundCallConfig(params: any) {
         return apiClient.get(`/api/inbound-call-config/getInboundCallConfig`, { params: params });

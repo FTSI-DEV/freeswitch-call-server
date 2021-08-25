@@ -7,7 +7,7 @@ import { FreeswitchCallSystemService } from '../freeswitch-call-system/services/
 import { FsEslService } from './fs-esl.service';
 const http = require('http');
 
-@Controller('/freeswitch')
+@Controller('/api/freeswitch')
 export class FreeswitchController {
   constructor(private _freeswitchService: FsEslService,
               private _freeswitchCallSystemService: FreeswitchCallSystemService,

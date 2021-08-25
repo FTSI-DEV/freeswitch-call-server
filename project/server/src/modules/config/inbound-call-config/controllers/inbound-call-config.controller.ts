@@ -1,4 +1,5 @@
-import { Controller, Get, Param, Post } from '@nestjs/common';
+import { Controller, DefaultValuePipe, Get, Param, ParseIntPipe, Post, Query } from '@nestjs/common';
+import { Pagination } from 'nestjs-typeorm-paginate';
 import { InboundCallConfigModel } from '../models/inbound-call-config.model';
 import { InboundCallConfigService } from '../services/inbound-call-config.service';
 
@@ -6,12 +7,9 @@ import { InboundCallConfigService } from '../services/inbound-call-config.servic
 export class InboundCallConfigController {
   constructor(private _inboundCallConfig: InboundCallConfigService) {}
 
-  @Get('getInboundCallConfig/:callForwardingNumber')
-  getInboundCallConfig(
-    @Param('callForwardingNumber') callForwardingNumber: string,
-  ): any {
-
-    this._inboundCallConfig.getInboundCallConfigByCallForwardingNo(callForwardingNumber);
+  @Get('getInboundCallConfigById:/id')
+  getInboundCallConfigById(@Param('id')id: number):Promise<InboundCallConfigModel>{
+    return this._inboundCallConfig.getInboundCallConfigById(id);
   }
 
   @Post('add/:phoneNumberTo/:callerId/:callForwardingNumber')
@@ -44,5 +42,17 @@ export class InboundCallConfigController {
     });
 
     return 'Successfully updated config';
+  }
+
+  @Get('getInboundCallConfigs')
+  getInboundCallConfigs(
+    @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number = 1,
+    @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number = 10,
+  ): Promise<Pagination<InboundCallConfigModel>> {
+    limit = limit > 100 ? 100 : limit;
+    return this._inboundCallConfig.getInboundCallConfigs({
+        page,
+        limit
+    });
   }
 }
