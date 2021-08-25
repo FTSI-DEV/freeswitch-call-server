@@ -39,7 +39,7 @@
                 </a-col>
                 <a-col style="margin-right: 15px">
                   <a-form-item
-                    label="Phone # To"
+                    label="Phone Number To"
                     style="display: block; text-align: left"
                   >
                     <input
@@ -90,9 +90,24 @@
           title="Edit Config"
           @ok="handleOk"
         >
-          <p>Some contents...</p>
-          <p>Some contents...</p>
-          <p>Some contents...</p>
+          <a-form-item
+            label="Caller Id"
+            style="display: block; text-align: left"
+          >
+            <input :class="['ant-input']" />
+          </a-form-item>
+          <a-form-item
+            label="Phone Number To"
+            style="display: block; text-align: left"
+          >
+            <input :class="['ant-input']" />
+          </a-form-item>
+          <a-form-item
+            label="Call Forwarding Number"
+            style="display: block; text-align: left"
+          >
+            <input :class="['ant-input']" />
+          </a-form-item>
         </a-modal>
       </a-layout-content>
     </a-layout>

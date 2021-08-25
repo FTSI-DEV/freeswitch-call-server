@@ -21,25 +21,25 @@
               <template #icon>
                 <HomeOutlined />
               </template>
-              <span>Option 1</span>
+              <span>Home</span>
             </a-menu-item>
             <a-menu-item key="2" @click="setCurrentCompnent('OutboundCall')">
               <template #icon>
                 <NumberOutlined />
               </template>
-              <span>Option 3</span>
+              <span>Click To Call</span>
             </a-menu-item>
             <a-menu-item key="3" @click="setCurrentCompnent('InboundCall')">
               <template #icon>
                 <PhoneOutlined />
               </template>
-              <span>Option 3</span>
+              <span>Inbound Call Config</span>
             </a-menu-item>
             <a-menu-item key="4" @click="setCurrentCompnent('Config')">
               <template #icon>
                 <SettingOutlined />
               </template>
-              <span>Option 3</span>
+              <span>Phone Number Config</span>
             </a-menu-item>
           </a-menu>
         </div>

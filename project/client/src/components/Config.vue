@@ -104,7 +104,7 @@
         <b-row v-if="configList">
           <b-col>
             <a-table :data-source="configList.list" :columns="columns">
-              <template #action={record}>
+              <template #action="{ record }">
                 <a title="Edit" @click="editConfig(record)"
                   ><EditOutlined style="font-size: 1.2em"
                 /></a>
@@ -117,9 +117,30 @@
           title="Edit Config"
           @ok="handleOk"
         >
-          <p>Some contents...</p>
-          <p>Some contents...</p>
-          <p>Some contents...</p>
+          <a-form-item
+            label="Friendly Name"
+            style="display: block; text-align: left"
+          >
+            <input :class="['ant-input']" />
+          </a-form-item>
+          <a-form-item
+            label="Phone Number"
+            style="display: block; text-align: left"
+          >
+            <input :class="['ant-input']" />
+          </a-form-item>
+          <a-form-item
+            label="HTTP Method"
+            style="display: block; text-align: left"
+          >
+            <input :class="['ant-input']" />
+          </a-form-item>
+          <a-form-item
+            label="Webhook URL"
+            style="display: block; text-align: left"
+          >
+            <input :class="['ant-input']" />
+          </a-form-item>
         </a-modal>
       </a-layout-content>
     </a-layout>
@@ -171,7 +192,7 @@ export default {
         },
       ],
       modleVisibility: false,
-      selectedConfig: null
+      selectedConfig: null,
     };
   },
   computed: {
@@ -183,12 +204,12 @@ export default {
     editConfig(val) {
       this.selectedConfig = null;
       this.modleVisibility = true;
-      EventService.getPhoneNumberConfigById({ id: val.id }).then(res => {
-      //  if (res.status === 200) {
-          this.selectedConfig = res.data
+      EventService.getPhoneNumberConfigById({ id: val.id }).then((res) => {
+        //  if (res.status === 200) {
+        this.selectedConfig = res.data;
         //}
-      })
-      console.log('val: ', val.id);
+      });
+      console.log("val: ", val.id);
     },
     handleOk() {
       this.modleVisibility = false;
