@@ -34,13 +34,13 @@ export default {
         return apiClient.post(`/freeswitch/clickToCall/${params.phoneNumberFrom}/${params.phoneNumberTo}/${params.callerId}`, );
     },
     getInboundCallConfig(params: any) {
-        return apiClient.get(`/inbound-call-config/getInboundCallConfig`, { params: params });
+        return apiClient.get(`/api/inbound-call-config/getInboundCallConfig`, { params: params });
     },
     addInboundCallConfig(params: any) {
         console.log('params: ', params)
-        return apiClient.post(`/inbound-call-config/add/${params.phoneNumberTo}/${params.callerId}/${params.callForwardingNumber}`);
+        return apiClient.post(`/api/inbound-call-config/add/${params.phoneNumberTo}/${params.callerId}/${params.callForwardingNumber}`);
     },
     updateInboundCallConfig(params: any) {
-        return apiClient.post(`/inbound-call-config/${params.phoneNumberTo}/${params.callerId}/${params.callForwardingNumber}`);
+        return apiClient.post(`/api/inbound-call-config/${params.phoneNumberTo}/${params.callerId}/${params.callForwardingNumber}`);
     }
 }
