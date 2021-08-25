@@ -7,7 +7,7 @@ import { InboundCallConfigService } from '../services/inbound-call-config.servic
 export class InboundCallConfigController {
   constructor(private _inboundCallConfig: InboundCallConfigService) {}
 
-  @Get('getInboundCallConfigById:/id')
+  @Get('getInboundCallConfigById/:id')
   getInboundCallConfigById(@Param('id')id: number):Promise<InboundCallConfigModel>{
     return this._inboundCallConfig.getInboundCallConfigById(id);
   }

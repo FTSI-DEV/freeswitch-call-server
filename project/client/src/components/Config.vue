@@ -54,8 +54,6 @@
                     label="HTTP Method"
                     style="display: block; text-align: left"
                   >
-                    <!-- <a-input v-model="httpMethod" /> -->
-                    <!-- <input class="ant-input" v-model="httpMethod" /> -->
                     <a-dropdown>
                       <template #overlay>
                         <a-menu>
@@ -115,31 +113,47 @@
         <a-modal
           v-model:visible="modleVisibility"
           title="Edit Config"
+          ok-text="Save"
           @ok="handleOk"
         >
           <a-form-item
             label="Friendly Name"
             style="display: block; text-align: left"
           >
-            <input :class="['ant-input']" />
+            <input :class="['ant-input']" v-model="selectedConfig.friendlyName" />
           </a-form-item>
           <a-form-item
             label="Phone Number"
             style="display: block; text-align: left"
           >
-            <input :class="['ant-input']" />
+            <input :class="['ant-input']"  v-model="selectedConfig.phoneNumber"/>
           </a-form-item>
-          <a-form-item
-            label="HTTP Method"
-            style="display: block; text-align: left"
-          >
-            <input :class="['ant-input']" />
-          </a-form-item>
+       <a-form-item
+                    label="HTTP Method"
+                    style="display: block; text-align: left"
+                  >
+                    <a-dropdown>
+                      <template #overlay>
+                        <a-menu>
+                          <a-menu-item key="1" @click="setMethodUpdate('POST')">
+                            HTTP POST
+                          </a-menu-item>
+                          <a-menu-item key="2" @click="setMethodUpdate('GET')">
+                            HTTP GET
+                          </a-menu-item>
+                        </a-menu>
+                      </template>
+                      <a-button style="width: 100%; text-align: left">
+                        {{ selectedConfig.httpMethod }}
+                        <DownOutlined style="float: right; margin-top: 5px" />
+                      </a-button>
+                    </a-dropdown>
+                  </a-form-item>
           <a-form-item
             label="Webhook URL"
             style="display: block; text-align: left"
           >
-            <input :class="['ant-input']" />
+            <input :class="['ant-input']" v-model="selectedConfig.httpMethod"/>
           </a-form-item>
         </a-modal>
       </a-layout-content>
@@ -192,7 +206,12 @@ export default {
         },
       ],
       modleVisibility: false,
-      selectedConfig: null,
+      selectedConfig: {
+          friendlyName: null,
+          phoneNumber: null,
+          httpMethod: "GET",
+          webhookUrl: null,
+      },
     };
   },
   computed: {
@@ -201,18 +220,32 @@ export default {
     },
   },
   methods: {
+    setMethodUpdate(val) {
+      this.selectedConfig.httpMethod = val;
+    },
     editConfig(val) {
-      this.selectedConfig = null;
-      this.modleVisibility = true;
+      this.selectedConfig.friendlyName = null;
+      this.selectedConfig.phoneNumber = null;
+      this.selectedConfig.webhookUrl = null;
       EventService.getPhoneNumberConfigById({ id: val.id }).then((res) => {
-        //  if (res.status === 200) {
-        this.selectedConfig = res.data;
-        //}
+        if (res.status === 200) {
+          const { friendlyName, phoneNumber, httpMethod, webhookUrl } = res.data;
+          this.modleVisibility = true;
+          this.selectedConfig.friendlyName = friendlyName;
+          this.selectedConfig.phoneNumber = phoneNumber;
+          this.selectedConfig.httpMethod = httpMethod || "GET";
+          this.selectedConfig.webhookUrl = webhookUrl;
+        }
       });
       console.log("val: ", val.id);
     },
     handleOk() {
-      this.modleVisibility = false;
+      EventService.updatePhoneNumberConfig(this.selectedConfig).then(res => {
+        if (res.status === 201) {
+          this.getPhoneNumberConfigs();
+          this.modleVisibility = false;
+        }
+      })
     },
     isInvalid(value) {
       return !value && this.hasError ? "invalid" : "";

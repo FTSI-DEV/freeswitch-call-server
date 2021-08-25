@@ -88,26 +88,26 @@
         <a-modal
           v-model:visible="modleVisibility"
           title="Edit Config"
+          ok-text="Save"
           @ok="handleOk"
         >
-        <div>{{ selectedConfig }}</div>
           <a-form-item
             label="Caller Id"
             style="display: block; text-align: left"
           >
-            <input :class="['ant-input']" />
+            <input :class="['ant-input']" v-model="selectedConfig.callerId"/>
           </a-form-item>
           <a-form-item
             label="Phone Number To"
             style="display: block; text-align: left"
           >
-            <input :class="['ant-input']" />
+            <input :class="['ant-input']" v-model="selectedConfig.phoneNumberTo" />
           </a-form-item>
           <a-form-item
             label="Call Forwarding Number"
             style="display: block; text-align: left"
           >
-            <input :class="['ant-input']" />
+            <input :class="['ant-input']" v-model="selectedConfig.callForwardingNumber" />
           </a-form-item>
         </a-modal>
       </a-layout-content>
@@ -124,8 +124,8 @@ export default {
     return {
       from: null,
       to: null,
-      callerId: null,
       hasError: false,
+      callerId: null,
       phoneNumberTo: null,
       callForwardingNumber: null,
       isSaved: false,
@@ -153,21 +153,35 @@ export default {
         },
       ],
       modleVisibility: false,
-      selectedConfig: null,
+      selectedConfig: {
+        callerId: null,
+        phoneNumberTo: null,
+        callForwardingNumber: null,
+      },
     };
   },
   methods: {
     editConfig(val) {
-      this.selectedConfig = null;
+      this.selectedConfig.callerId = null;
+      this.selectedConfig.phoneNumberTo = null;
+      this.selectedConfig.callForwardingNumber = null;
       EventService.getInboundCallConfigById(val.id).then((res) => {
         if (res.status === 200) {
           this.modleVisibility = true;
-          this.selectedConfig = res.data;
+          const { callerId, phoneNumberTo, callForwardingNumber } = res.data;
+          this.selectedConfig.callerId = callerId;
+          this.selectedConfig.phoneNumberTo = phoneNumberTo;
+          this.selectedConfig.callForwardingNumber = callForwardingNumber;
         }
       });
     },
     handleOk() {
-      this.modleVisibility = false;
+      EventService.updateInboundCallConfig(this.selectedConfig).then(res => {
+        if (res.status === 201) {
+          this.getInboundCallConfigs();
+          this.modleVisibility = false;
+        }
+      });
     },
     isInvalid(value) {
       return !value && this.hasError ? "invalid" : "";
