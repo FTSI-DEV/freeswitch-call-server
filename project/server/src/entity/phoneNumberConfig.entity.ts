@@ -13,6 +13,9 @@ export class PhoneNumberConfig{
 
     @Column()
     WebhookUrl: string;
+
+    @Column()
+    PhoneNumber: string;
 }
 
 @EntityRepository(PhoneNumberConfig)

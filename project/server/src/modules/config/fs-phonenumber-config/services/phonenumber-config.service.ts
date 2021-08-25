@@ -1,8 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Res } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { rejects } from 'assert';
 import { IPaginationMeta, IPaginationOptions, paginate, Pagination } from 'nestjs-typeorm-paginate';
 import { FreeswitchCallConfig, FreeswitchCallConfigRepository } from 'src/entity/freeswitchCallConfig.entity';
-import { PhoneNumberConfigRepository } from 'src/entity/phoneNumberConfig.entity';
+import { PhoneNumberConfig, PhoneNumberConfigRepository } from 'src/entity/phoneNumberConfig.entity';
 import { FS_PHONENUMBER_CONFIG } from 'src/helpers/constants/call-config.constants';
 import { FreeswitchPhoneNumberConfigModel, FreeswitchPhoneNumberConfigParam } from 'src/models/freeswitchCallConfigModel';
 import { IFreeswitchPhoneNumberConfigService as IFreeswitchPhoneNumberConfigService } from './iphonenumber-config.interface';
@@ -12,35 +13,40 @@ export class FreeswitchPhoneNumberConfigService implements IFreeswitchPhoneNumbe
     constructor(
         @InjectRepository(PhoneNumberConfigRepository)
         private _phoneNumberConfigRepo: PhoneNumberConfigRepository,
-        @InjectRepository(FreeswitchCallConfigRepository)
-        private freeswitchConfigRepo: FreeswitchCallConfigRepository
     ) {}
 
-    saveUpdatePhoneNumberConfig(callConfigParam: FreeswitchPhoneNumberConfigParam){
-        
-        // let fsCallConfig = await this.getById(callConfigParam.id);
+    add(param: FreeswitchPhoneNumberConfigParam){
 
-        let fsCallConfig = this.getRecordById(callConfigParam.id);
+        let phoneNumberConfig = new PhoneNumberConfig();
 
-        console.log('fscall', fsCallConfig);
+        phoneNumberConfig.FriendlyName = param.friendlyName;
+        phoneNumberConfig.HttpMethod = param.httpMethod;
+        phoneNumberConfig.WebhookUrl = param.webhookUrl;
+        phoneNumberConfig.PhoneNumber = param.phoneNumber;
 
-        if (fsCallConfig == null){
+        this._phoneNumberConfigRepo.saveUpdateRecord(phoneNumberConfig);
+    }
 
-            fsCallConfig = new FreeswitchCallConfig();
+    update(param: FreeswitchPhoneNumberConfigParam):boolean{
 
-            fsCallConfig.Name = this.getName(callConfigParam.phoneNumber);
-        }
+        this.getRecordById(param.id)
+        .then((result) => {
 
-        let configModel: FreeswitchPhoneNumberConfigModel = {
-            friendlyName: callConfigParam.friendlyName,
-            httpMethod: callConfigParam.httpMethod,
-            phoneNumber: callConfigParam.phoneNumber,
-            webhookUrl: callConfigParam.webhookUrl
-        };
+            if (result == null || result == undefined) return false;
 
-        fsCallConfig.Value = JSON.stringify(configModel);
+            result.FriendlyName = param.friendlyName;
+            result.HttpMethod = param.httpMethod;
+            result.WebhookUrl = param.webhookUrl;
+            result.PhoneNumber = param.phoneNumber
 
-        this.freeswitchConfigRepo.saveUpdateRecord(fsCallConfig);
+            this._phoneNumberConfigRepo.saveUpdateRecord(result);
+
+        }).catch((err) => {
+            return false;
+        });
+
+        return true;
+
     }
 
     getPhoneNumberConfigById(id: number): any{
@@ -51,23 +57,15 @@ export class FreeswitchPhoneNumberConfigService implements IFreeswitchPhoneNumbe
                     
                     if (result == null || result.Value == undefined) reject(null);
 
-                    var deserialize = JSON.parse(result.Value);
+                    let configModel: FreeswitchPhoneNumberConfigParam = {
+                        friendlyName: result.FriendlyName,
+                        phoneNumber: result.PhoneNumber,
+                        httpMethod: result.HttpMethod,
+                        webhookUrl: result.WebhookUrl,
+                        id: result.Id
+                    };
 
-                    if (deserialize != null){
-
-                        let configModel: FreeswitchPhoneNumberConfigParam = {
-                            friendlyName: deserialize.friendlyName,
-                            phoneNumber: deserialize.phoneNumber,
-                            httpMethod: deserialize.httpMethod,
-                            webhookUrl: deserialize.webhookUrl,
-                            id: result.Id
-                        };
-
-                        resolve(configModel);
-                    }
-                    else {
-                        reject(null);
-                    }
+                    resolve(configModel);
 
                 }).catch((err) => {
                     reject(null);
@@ -78,26 +76,6 @@ export class FreeswitchPhoneNumberConfigService implements IFreeswitchPhoneNumbe
     getAll(options:IPaginationOptions) :any{
 
         return this.getPhoneNumberConfigs(options);
-    }
-
-    getConfigByPhoneNumber(phoneNumber:string):FreeswitchPhoneNumberConfigModel{
-
-        let config = this.getRecordByPhoneNumber(phoneNumber);
-
-        console.log('configs', config);
-
-        if (config == null) return null;
-
-        let value = JSON.parse(config.Value);
-
-        if (value == null) return null;
-
-        return{
-           phoneNumber: value.phoneNumber,
-           friendlyName: value.friendlyName,
-           webhookUrl: value.webhook,
-           httpMethod: value.httpMethod
-        };
     }
 
     private getRecordById(id:number):any{
@@ -115,95 +93,29 @@ export class FreeswitchPhoneNumberConfigService implements IFreeswitchPhoneNumbe
         });
     }
 
-    private getName(phoneNumber:string):string{
-        return `${FS_PHONENUMBER_CONFIG}:${phoneNumber}`;
-    }
-
-    // getCallConfigById(id: number): any {
-
-    //     return new Promise<any>((resolve, reject) => {
-    //         this.getById(id)
-    //             .then(result => {
-
-    //                 if (result != null){
-    //                     console.log('value', result.Value);
-    //                 }
-
-    //                 if (result == null || result.Value == undefined) resolve(null);
-
-    //                 var deserialize = JSON.parse(result.Value);
-
-    //                 if (deserialize != undefined){
-
-    //                     let retVal = new FreeswitchCallConfigModelParam();
-
-    //                     retVal.friendlyName = deserialize.friendlyName;
-    //                     retVal.phoneNumber = deserialize.phoneNumber;
-    //                     retVal.httpMethod = deserialize.httpMethod;
-    //                     retVal.webhookUrl = deserialize.webhookUrl;
-    //                     retVal.id = result.Id;
-
-    //                     console.log('ret', retVal);
-
-    //                     retVal = result;
-
-    //                      resolve(retVal);
-                        
-    //                 }else {
-    //                 reject(null);
-    //                 }
-    //             })
-    //             .catch(error => {
-    //                 reject(null);
-    //             });
-    //     }).catch(err => console.log(err));
-    // }
-
     private getById = (id: number): any => {
 
-        return new Promise<FreeswitchCallConfig>((resolve,reject) => {
-        
-            let record = this.freeswitchConfigRepo.findOneOrFail(id)
+        return new Promise<PhoneNumberConfig>((resolve,reject) => {
+            this._phoneNumberConfigRepo.findOneOrFail(id)
             .then(result => {
-                if (result == null){
+                if (result == null || result == undefined){
                     reject(null);
                 }
-                else{
+                else {
                     resolve(result);
                 }
+            })
+            .catch(err => {
+                reject(null);
             });
-        }); 
-    }
-
-    getRecordByPhoneNumber(phoneNumber: string):any{
-        return new Promise<FreeswitchCallConfig>((resolve,reject) => {
-
-            let name = this.getName(phoneNumber);
-
-            let record = this.freeswitchConfigRepo.createQueryBuilder("public.FreeswitchCallConfig")
-                .where("public.FreeswitchCallConfig.Name = :name", { name: name })
-                .getOneOrFail()
-                .then(result => {
-                    if (result == null){
-                        reject(null);
-                    }
-                    else {
-                        resolve(result);
-                    }
-                })
-                .catch(error => {
-                    reject(null);
-                });
-
-            
-        })
+        });
     }
 
     private getPhoneNumberConfigs(options: IPaginationOptions):Promise<any>{
 
         return new Promise<Pagination<FreeswitchPhoneNumberConfigParam>>((resolve, reject) => {
 
-            let pageRecords = paginate<FreeswitchCallConfig>(this.freeswitchConfigRepo, options);
+            let pageRecords = paginate<PhoneNumberConfig>(this._phoneNumberConfigRepo, options);
 
             pageRecords.then(result => {
                 let itemsObjs: FreeswitchPhoneNumberConfigParam[] = [];
@@ -212,12 +124,10 @@ export class FreeswitchPhoneNumberConfigService implements IFreeswitchPhoneNumbe
                     
                     let configModel = new FreeswitchPhoneNumberConfigParam();
 
-                    let jsonObj = JSON.parse(element.Value);
-
-                    configModel.friendlyName = jsonObj.friendlyName;
-                    configModel.httpMethod = jsonObj.httpMethod;
-                    configModel.phoneNumber = jsonObj.phoneNumber;
-                    configModel.webhookUrl = jsonObj.webhookUrl;
+                    configModel.friendlyName = element.FriendlyName;
+                    configModel.httpMethod = element.HttpMethod;
+                    configModel.phoneNumber = element.PhoneNumber;
+                    configModel.webhookUrl = element.WebhookUrl;
                     configModel.id = element.Id;
 
                     itemsObjs.push(configModel);

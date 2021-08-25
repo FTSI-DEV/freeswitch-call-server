@@ -3,7 +3,8 @@ import { FreeswitchPhoneNumberConfigParam } from "src/models/freeswitchCallConfi
 
 //Use this interface in the controller
 export interface IFreeswitchPhoneNumberConfigService{
-    saveUpdatePhoneNumberConfig(callConfigParam: FreeswitchPhoneNumberConfigParam);
     getPhoneNumberConfigById(id: number):FreeswitchPhoneNumberConfigParam;
     getAll(options: IPaginationOptions): Promise<any>;
+    add(param:FreeswitchPhoneNumberConfigParam);
+    update(param:FreeswitchPhoneNumberConfigParam):boolean;
 }

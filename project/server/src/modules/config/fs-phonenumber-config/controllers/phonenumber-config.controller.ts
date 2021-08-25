@@ -15,14 +15,21 @@ export class FreeswitchPhoneNumberConfigController {
         return this._freeswitchCallConfigService.getPhoneNumberConfigById(id);
     }
 
-   @Post('saveRecord')
-    saveRecord(@Body() callConfigParam: FreeswitchPhoneNumberConfigParam){
-
+    @Post('add')
+    add(@Body() callConfigParam: FreeswitchPhoneNumberConfigParam):string{
         console.log('entered', callConfigParam);
 
-        this._freeswitchCallConfigService.saveUpdatePhoneNumberConfig(callConfigParam);
+        this._freeswitchCallConfigService.add(callConfigParam);
 
         return "Successfully saved record";
+    }
+
+    @Post('update')
+    update(@Body() callConfigParam: FreeswitchPhoneNumberConfigParam):string{
+
+        this._freeswitchCallConfigService.update(callConfigParam);
+
+        return "Successfully updated record";
     }
 
     @Get('getPhonenumberConfigs')
@@ -36,9 +43,4 @@ export class FreeswitchPhoneNumberConfigController {
         limit
     });
   }
-
-  inboundCallConfig(){
-      
-  }
-    
 }

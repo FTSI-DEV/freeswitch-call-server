@@ -14,7 +14,7 @@ export class IncomingPhoneCallJob{
         console.log('TRIGGER JOB', data);
 
         let config = this._freeswitchCallConfig
-            .getRecordByPhoneNumber(data.CallerIdNumber)
+            .getPhoneNumberConfigById(data.CallerIdNumber)
             .then((result) => {
                 
                 
