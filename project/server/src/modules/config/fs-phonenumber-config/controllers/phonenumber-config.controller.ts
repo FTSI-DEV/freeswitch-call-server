@@ -10,7 +10,7 @@ export class FreeswitchPhoneNumberConfigController {
     ) {}
 
     @Get('getPhoneNumberConfigById/:id')
-    getPhoneNumberConfigById(@Param('id')id: number):Promise<FreeswitchPhoneNumberConfigParam>{
+    getPhoneNumberConfigById(@Param('id')id: number):FreeswitchPhoneNumberConfigParam{
         
         return this._freeswitchCallConfigService.getPhoneNumberConfigById(id);
     }
