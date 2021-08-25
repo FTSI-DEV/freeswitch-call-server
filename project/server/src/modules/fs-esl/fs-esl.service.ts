@@ -28,13 +28,13 @@ export class FsEslService {
       .then((connection) => {
         console.log('EXECUTING CLICK-TO-CALL');
 
-        // let app_args = `sofia/gateway/fs-test3/${phoneNumberTo}`;
-        // let arg1 = `{ignore_early_media=true,origination_caller_id_number=${callerId}}${app_args}`;
-        // let arg2 = `${arg1} &bridge(sofia/gateway/fs-test1/${phoneNumberFrom})`;
-
-        let app_args = `sofia/gateway/sip_provider/+1${phoneNumberTo}`;
+        let app_args = `sofia/gateway/fs-test3/${phoneNumberTo}`;
         let arg1 = `{ignore_early_media=true,origination_caller_id_number=${callerId}}${app_args}`;
-        let arg2 = `${arg1} &bridge(sofia/gateway/sip_provider/+1${phoneNumberFrom})`;
+        let arg2 = `${arg1} &bridge(sofia/gateway/fs-test1/${phoneNumberFrom})`;
+
+        // let app_args = `sofia/gateway/sip_provider/${phoneNumberTo}`;
+        // let arg1 = `{ignore_early_media=true,origination_caller_id_number=${callerId}}${app_args}`;
+        // let arg2 = `${arg1} &bridge(sofia/gateway/sip_provider/${phoneNumberFrom})`;
 
         connection.api('originate', arg2, function (res) {
           let callUid = res.getBody().toString().replace('+OK ', '');

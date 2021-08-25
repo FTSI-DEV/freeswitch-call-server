@@ -1,4 +1,4 @@
-import { BaseEntity, Column, Entity, EntityRepository, PrimaryGeneratedColumn, Repository } from "typeorm";
+import { Column, Entity, EntityRepository, PrimaryGeneratedColumn, Repository } from "typeorm";
 
 @Entity('FreeswitchCallConfig')
 export class FreeswitchCallConfig{
@@ -20,7 +20,7 @@ export class FreeswitchCallConfigRepository extends Repository<FreeswitchCallCon
     }
 
     getById = async (id:number) => {
-        
+        console.log('test');
         let retVal = null;
         
         let record = this.findOneOrFail(id)

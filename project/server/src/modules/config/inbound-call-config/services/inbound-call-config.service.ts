@@ -1,6 +1,7 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { FreeswitchCallConfig, FreeswitchCallConfigRepository } from 'src/entity/freeswitchCallConfig.entity';
+import { InboundCallConfig, InboundCallConfigRepository } from 'src/entity/inboundCallConfig.entity';
 import { INBOUND_CALL_CONFIG } from 'src/helpers/constants/call-config.constants';
 import { InboundCallConfigModel, InboundCallConfigParam } from '../models/inbound-call-config.model';
 
@@ -8,87 +9,83 @@ import { InboundCallConfigModel, InboundCallConfigParam } from '../models/inboun
 export class InboundCallConfigService {
 
     constructor(
-        @InjectRepository(FreeswitchCallConfig)
-        private _freeswitchConfigRepo : FreeswitchCallConfigRepository
+        @InjectRepository(InboundCallConfig)
+        private _inboundCallConfigRepo: InboundCallConfigRepository,
+        
     ) {}
 
-    add(inboundCallConfig: InboundCallConfigParam){
+    add(param: InboundCallConfigParam){
 
-        let inboundConfig = new FreeswitchCallConfig();
+        console.log('parma', param);
+        let inboundCallConfig = new InboundCallConfig();
 
-        inboundConfig.Value = JSON.stringify(inboundCallConfig);
-        inboundConfig.Name = `${INBOUND_CALL_CONFIG}:${inboundCallConfig.callForwardingNumber}`;
+        inboundCallConfig.CallForwardingNumber = param.callForwardingNumber;
+        inboundCallConfig.CallerId = param.callerId;
+        inboundCallConfig.PhoneNumberTo = param.phoneNumberTo;
 
-        this._freeswitchConfigRepo.saveUpdateRecord(inboundConfig);
+        this._inboundCallConfigRepo.saveUpdateRecord(inboundCallConfig);
     }
 
-    update(inboundCallConfig: InboundCallConfigParam):boolean{
-        
-        let inboundConfig = this.getRecordByPhoneNumber(inboundCallConfig.callForwardingNumber);
+    update(param: InboundCallConfigParam):boolean{
 
-        if (inboundCallConfig == null) return false;
+        this.getRecordById(param.id)
+        .then((result) => {
 
-        let value = JSON.parse(inboundConfig.Value);
+            if (result == null || result == undefined)  return false;
 
-        if (value == null) return false;
+            result.CallerId = param.callerId;
+            result.CallForwardingNumber = param.callForwardingNumber;
+            result.PhoneNumberTo = param.phoneNumberTo;
+            this._inboundCallConfigRepo.saveUpdateRecord(result);
+        })
+        .catch(err => {
+            return false;
+        });
 
-        value.phoneNumberTo = inboundCallConfig.phoneNumberTo;
-        value.callForwardingNumber = inboundCallConfig.callForwardingNumber;
-        value.callerId = inboundCallConfig.callerId;
-
-        let serializeObj = JSON.stringify(value);
-
-        inboundConfig.Value = serializeObj;
-
-        this._freeswitchConfigRepo.saveUpdateRecord(inboundConfig);
+        return true;
     }
 
-    getInboundCallByPhoneNumber(callForwardingNumber:string) :any {
-
+    getInboundCallConfigByCallForwardingNo(callForwardingNumber: string) : any {
         return new Promise<InboundCallConfigModel>((resolve, reject) => {
-            let record = this.getRecordByPhoneNumber(callForwardingNumber)
-                .then((result) => {
+            this.getConfigByCallForwardingNumber(callForwardingNumber)
+            .then((result) => {
+                if (result == null || result == undefined) reject(null);
 
-                    if (result == null) reject(null);
+                let retVal = new InboundCallConfigModel();
+                retVal.callerId = result.CallerId;
+                retVal.callForwardingNumber = result.CallForwardingNumber;
+                retVal.phoneNumberTo = result.PhoneNumberTo;
 
-                    let value = JSON.parse(result.Value);
+                resolve(retVal);
 
-                    if (value == null) reject(null);
-
-                    let retVal = new InboundCallConfigModel();
-                    retVal.callForwardingNumber = value.callForwardingNumber;
-                    retVal.callerId = value.callerId;
-                    retVal.phoneNumberTo = value.phoneNumberTo;
-
-                    resolve(retVal);
-                }).catch((err) => {
-                    reject(null);
-                });
+            }).catch((err) => {
+                reject(null);
+            });
         })
     }
 
-    private getRecordByPhoneNumber = (callForwardingNumber:string): any => {
-
-        return new Promise<FreeswitchCallConfig>((resolve,reject) => {
-           
-            let name = `${INBOUND_CALL_CONFIG}:${callForwardingNumber}`;
-
-            let record = this._freeswitchConfigRepo.createQueryBuilder("public.FreeswitchCallConfig")
-                .where("public.FreeswitchCallConfig.Name = :name", { name : name })
+    private getConfigByCallForwardingNumber = (callForwardingNumber:string) : any => {
+        return new Promise<InboundCallConfig>((resolve,reject) => {
+            
+            this._inboundCallConfigRepo.createQueryBuilder("public.InboundCallConfig")
+                .where("public.InboundCallConfig.CallForwardingNumber = :callForwardingNumber" , { callForwardingNumber : callForwardingNumber })
                 .getOneOrFail()
                 .then(result => {
-                   if (result == null){
-                       reject(null);
-                   }
-                   else {
-                       console.log('data', result);
-                       resolve(result);
-                   }
+                    if (result == null || result == undefined){
+                        reject(null);
+                    }
+                    else {
+                        resolve(result);
+                    }
                 })
-                .catch(error => {
+                .catch(err => {
                     reject(null);
-                });
+                })
         })
     }
+
+    private getRecordById = (id:number) : Promise<InboundCallConfig> => {
+        return this._inboundCallConfigRepo.findOneOrFail(id);
+    } 
 
 }

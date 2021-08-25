@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { IPaginationMeta, IPaginationOptions, paginate, Pagination } from 'nestjs-typeorm-paginate';
 import { FreeswitchCallConfig, FreeswitchCallConfigRepository } from 'src/entity/freeswitchCallConfig.entity';
+import { PhoneNumberConfigRepository } from 'src/entity/phoneNumberConfig.entity';
 import { FS_PHONENUMBER_CONFIG } from 'src/helpers/constants/call-config.constants';
 import { FreeswitchPhoneNumberConfigModel, FreeswitchPhoneNumberConfigParam } from 'src/models/freeswitchCallConfigModel';
 import { IFreeswitchPhoneNumberConfigService as IFreeswitchPhoneNumberConfigService } from './iphonenumber-config.interface';
@@ -9,6 +10,8 @@ import { IFreeswitchPhoneNumberConfigService as IFreeswitchPhoneNumberConfigServ
 @Injectable()
 export class FreeswitchPhoneNumberConfigService implements IFreeswitchPhoneNumberConfigService {
     constructor(
+        @InjectRepository(PhoneNumberConfigRepository)
+        private _phoneNumberConfigRepo: PhoneNumberConfigRepository,
         @InjectRepository(FreeswitchCallConfigRepository)
         private freeswitchConfigRepo: FreeswitchCallConfigRepository
     ) {}
@@ -80,6 +83,8 @@ export class FreeswitchPhoneNumberConfigService implements IFreeswitchPhoneNumbe
     getConfigByPhoneNumber(phoneNumber:string):FreeswitchPhoneNumberConfigModel{
 
         let config = this.getRecordByPhoneNumber(phoneNumber);
+
+        console.log('configs', config);
 
         if (config == null) return null;
 
@@ -170,7 +175,7 @@ export class FreeswitchPhoneNumberConfigService implements IFreeswitchPhoneNumbe
         }); 
     }
 
-    private getRecordByPhoneNumber(phoneNumber: string):any{
+    getRecordByPhoneNumber(phoneNumber: string):any{
         return new Promise<FreeswitchCallConfig>((resolve,reject) => {
 
             let name = this.getName(phoneNumber);

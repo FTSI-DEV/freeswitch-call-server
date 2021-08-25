@@ -9,8 +9,9 @@ export class InboundCallConfigController {
   @Get('getInboundCallConfig/:callForwardingNumber')
   getInboundCallConfig(
     @Param('callForwardingNumber') callForwardingNumber: string,
-  ): InboundCallConfigModel {
-    return this._inboundCallConfig.getInboundCallByPhoneNumber(callForwardingNumber);
+  ): any {
+
+    this._inboundCallConfig.getInboundCallConfigByCallForwardingNo(callForwardingNumber);
   }
 
   @Post('add/:phoneNumberTo/:callerId/:callForwardingNumber')
@@ -19,6 +20,8 @@ export class InboundCallConfigController {
     @Param('callerId') callerId: string,
     @Param('callForwardingNumber') callForwardingNumber: string,
   ): string {
+
+    console.log('entered');
     this._inboundCallConfig.add({
       phoneNumberTo: phoneNumberTo,
       callForwardingNumber: callForwardingNumber,

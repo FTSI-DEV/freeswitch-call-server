@@ -8,4 +8,5 @@ export class InboundCallConfigParam{
     callerId: string;
     phoneNumberTo: string;
     callForwardingNumber: string;
+    id?:number;
 }

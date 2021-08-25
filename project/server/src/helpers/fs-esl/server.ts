@@ -123,7 +123,7 @@ export class EslServerHelper {
     let self = this;
 
     self._inboundCallConfig
-      .getInboundCallByPhoneNumber(destinationNumber)
+      .getInboundCallConfigByCallForwardingNo(destinationNumber)
       .then((result) => {
         if (result == null || result == undefined) {
           conn.execute(
@@ -134,12 +134,12 @@ export class EslServerHelper {
 
         conn.execute('set', `effective_caller_id_number=${result.callerId}`);
 
-        conn.execute(
-          'bridge',
-          `sofia/gateway/fs-test3/${result.phoneNumberTo}`,
-        );
+        // conn.execute(
+        //   'bridge',
+        //   `sofia/gateway/fs-test3/${result.phoneNumberTo}`,
+        // );
 
-        // conn.execute('bridge', `sofia/gateway/sip_provider/+1${value.phoneNumberTo}`);
+        conn.execute('bridge', `sofia/gateway/sip_provider/${result.phoneNumberTo}`);
       })
       .catch((err) => {
         conn.execute('playback', 'ivr/ivr-call_cannot_be_completed_as_dialed');

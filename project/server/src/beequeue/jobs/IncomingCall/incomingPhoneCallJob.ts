@@ -13,8 +13,17 @@ export class IncomingPhoneCallJob{
     trigger(data){
         console.log('TRIGGER JOB', data);
 
-        // let config = this._freeswitchCallConfig
-        //     .getConfigByPhoneNumber(data.CallerIdNumber);
+        let config = this._freeswitchCallConfig
+            .getRecordByPhoneNumber(data.CallerIdNumber)
+            .then((result) => {
+                
+                
+
+            }).catch((err) => {
+                
+            });
+
+            console.log('con', config);
         
         // if (config != null){
         //     let webhook = config.webhookUrl;
