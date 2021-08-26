@@ -48,14 +48,36 @@
                     />
                   </a-form-item>
                 </a-col>
+
+                <a-col style="margin-right: 15px">
+                    <a-form-item label="HTTP Method" style="display: block; text-align: left">
+                      <a-dropdown>
+                        <template #overlay>
+                          <a-menu>
+                              <a-menu-item key="1" @click="setMethod('POST')">
+                                HTTP POST
+                              </a-menu-item>
+                              <a-menu-item key="2" @click="setMethod('GET')">
+                              HTTP GET
+                              </a-menu-item>
+                          </a-menu>
+                        </template>
+                         <a-button style="width: 100%; text-align: left">
+                          {{ selectedHttpMethod }}
+                          <DownOutlined style="float: right; margin-top: 5px" />
+                         </a-button>
+                      </a-dropdown>
+                    </a-form-item>
+                </a-col>
+
                 <a-col style="margin-right: 15px">
                   <a-form-item
-                    label="Call Forwarding #"
+                    label="Webhook Url"
                     style="display: block; text-align: left"
                   >
                     <input
-                      :class="['ant-input', isInvalid(callForwardingNumber)]"
-                      v-model="callForwardingNumber"
+                      :class="['ant-input', isInvalid(webhookUrl)]"
+                      v-model="webhookUrl"
                     />
                   </a-form-item>
                 </a-col>
@@ -103,11 +125,31 @@
           >
             <input :class="['ant-input']" v-model="selectedConfig.phoneNumberTo" />
           </a-form-item>
+<!-- 
+          <a-form-item label="HTTP Method" style="display: block; text-align: left">
+              <a-dropdown>
+                <template #overlay>
+                  <a-menu>
+                     <a-menu-item key="1" @click="setMethodUpdate('POST')">
+                            HTTP POST
+                     </a-menu-item>
+                     <a-menu-item key="2" @click="setMethodUpdate('GET')">
+                            HTTP GET
+                     </a-menu-item>
+                  </a-menu>
+                </template>
+                 <a-button style="width: 100%; text-align: left">
+                        {{ selectedConfig.httpMethod }}
+                        <DownOutlined style="float: right; margin-top: 5px" />
+                </a-button>
+              </a-dropdown>
+          </a-form-item> -->
+
           <a-form-item
-            label="Call Forwarding Number"
+            label="Webhook URL"
             style="display: block; text-align: left"
           >
-            <input :class="['ant-input']" v-model="selectedConfig.callForwardingNumber" />
+            <input :class="['ant-input']" v-model="selectedConfig.webhookUrl" />
           </a-form-item>
         </a-modal>
       </a-layout-content>
@@ -119,7 +161,7 @@ import EventService from "../services/EventService.ts";
 import { EditOutlined } from "@ant-design/icons-vue";
 
 export default {
-  components: { EditOutlined },
+  components: { EditOutlined , DownOutlined },
   data() {
     return {
       from: null,
@@ -127,7 +169,8 @@ export default {
       hasError: false,
       callerId: null,
       phoneNumberTo: null,
-      callForwardingNumber: null,
+      webhookUrl: null,
+      httpMethod: "POST",
       isSaved: false,
       isServerError: false,
       configList: null,
@@ -138,14 +181,19 @@ export default {
           key: "callerId",
         },
         {
+          title: "HTTP Method",
+          dataIndex: "httpMethod",
+          key: "httpMethod"
+        },
+        {
           title: "Phone Number To",
           dataIndex: "phoneNumberTo",
           key: "phoneNumberTo",
         },
         {
-          title: "Call Forwarding Number",
-          dataIndex: "callForwardingNumber",
-          key: "callForwardingNumber",
+          title: "Webhook URL",
+          dataIndex: "webhookUrl",
+          key: "webhookUrl",
         },
         {
           title: "Action",
@@ -156,22 +204,29 @@ export default {
       selectedConfig: {
         callerId: null,
         phoneNumberTo: null,
-        callForwardingNumber: null,
+        webhookUrl: null,
+        httpMethod: "GET"
       },
     };
+  },
+  computed: {
+    selectedHttpMethod(){
+      return this.httpMethod === "POST" ? "HTTP POST" : "HTTP GET";
+    }
   },
   methods: {
     editConfig(val) {
       this.selectedConfig.callerId = null;
       this.selectedConfig.phoneNumberTo = null;
-      this.selectedConfig.callForwardingNumber = null;
+      this.selectedConfig.webhookUrl = null;
       EventService.getInboundCallConfigById(val.id).then((res) => {
         if (res.status === 200) {
           this.modleVisibility = true;
-          const { callerId, phoneNumberTo, callForwardingNumber } = res.data;
+          const { callerId, phoneNumberTo, webhookUrl } = res.data;
           this.selectedConfig.callerId = callerId;
           this.selectedConfig.phoneNumberTo = phoneNumberTo;
-          this.selectedConfig.callForwardingNumber = callForwardingNumber;
+          this.selectedConfig.webhookUrl = webhookUrl;
+          this.selectedConfig.httpMethod = httpMethod || "GET";
         }
       });
     },
@@ -187,7 +242,7 @@ export default {
       return !value && this.hasError ? "invalid" : "";
     },
     saveConfig() {
-      if (!this.phoneNumberTo || !this.callerId || !this.callForwardingNumber) {
+      if (!this.phoneNumberTo || !this.callerId || !this.webhookUrl || !this.httpMethod) {
         this.hasError = true;
         return;
       }
@@ -195,7 +250,8 @@ export default {
       const params = {
         phoneNumberTo: this.phoneNumberTo,
         callerId: this.callerId,
-        callForwardingNumber: this.callForwardingNumber,
+        webhookUrl: this.webhookUrl,
+        httpMethod: this.httpMethod
       };
       console.log("inbound call params: ", params);
       EventService.addInboundCallConfig(params).then((res) => {
@@ -203,7 +259,7 @@ export default {
         if (res.status === 201) {
           this.phoneNumberTo = null;
           this.callerId = null;
-          this.callForwardingNumber = null;
+          this.webhookUrl = null;
           this.isSaved = true;
           this.getInboundCallConfigs();
         } else {
@@ -220,6 +276,12 @@ export default {
           };
         }
       });
+    },
+    setMethodUpdate(val){
+      this.selectedConfig.httpMethod = val;
+    },
+     setMethod(val) {
+      this.httpMethod = val;
     },
   },
   created() {
