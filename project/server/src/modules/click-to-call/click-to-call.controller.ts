@@ -1,9 +1,10 @@
-import { Controller, Get, Inject, Param, Post, Query } from '@nestjs/common';
+import { Controller, Get, Inject, Logger, Param, Post, Query } from '@nestjs/common';
 
 import { IBeeQueueJob } from 'src/beequeue/beeQueueJob.interface';
 import { redisOptions } from 'src/beequeue/config/redisOptions.config';
 import { ClickToCallJob } from 'src/beequeue/jobs/clickToCall/clickToCallJob';
 import { OriginationModel } from 'src/helpers/fs-esl/models/originate.model';
+import { CustomLogger } from 'src/logger/logger';
 import { CDRModels } from 'src/models/cdr.models';
 import { FreeswitchPhoneNumberConfigService } from '../config/fs-phonenumber-config/services/phonenumber-config.service';
 import { FreeswitchCallSystemService } from '../freeswitch-call-system/services/freeswitch-call-system.service';
@@ -16,11 +17,12 @@ const jobQueue = new BeeQueue('default', redisOptions);
 
 @Controller('/api/freeswitch')
 export class FreeswitchController {
+
   constructor(  
               @Inject(FsEslService)
               private _freeswitchService: IFSEslService,
               private _freeswitchCallSystemService: FreeswitchCallSystemService,
-              private _freeswitchCallConfigService: FreeswitchPhoneNumberConfigService,
+              private _freeswitchCallConfigService: FreeswitchPhoneNumberConfigService
               ) {}
 
   @Post('clickToCall/:phoneNumberFrom/:phoneNumberTo/:callerId')

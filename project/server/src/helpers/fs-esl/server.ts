@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import axios from 'axios';
 import { CONNREFUSED } from 'dns';
+import { CustomLogger } from 'src/logger/logger';
 import { CDRModels } from 'src/models/cdr.models';
 import { InboundCallConfigService } from 'src/modules/config/inbound-call-config/services/inbound-call-config.service';
 import apiClient from 'src/utils/apiClient';
@@ -18,6 +19,9 @@ let CDR = null;
 let callerDesinationNumber = null;
 
 export class EslServerHelper {
+
+  private readonly _logger = new CustomLogger(EslServerHelper.name);
+
   constructor(
     private readonly _inboundCallConfig: InboundCallConfigService,
     private readonly _callRecords = new CDRHelper(),
@@ -25,6 +29,9 @@ export class EslServerHelper {
 
   //for InboundCall
   startEslServer() {
+
+    let self = this;
+
     let esl = require('modesl');
 
     let esl_server = new esl.Server(
@@ -35,7 +42,7 @@ export class EslServerHelper {
       },
 
       function () {
-        console.log('esl server is up');
+        self._logger.log("ESL server is up!");
       },
     );
 

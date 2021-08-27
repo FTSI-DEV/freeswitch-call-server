@@ -17,6 +17,7 @@ import { EslServerHelper } from './helpers/fs-esl/server';
 import { StartFreeswitchApplication } from './helpers/fs-esl/event-socket-monitor';
 import { InboundCallConfigService } from './modules/config/inbound-call-config/services/inbound-call-config.service';
 import { CDRHelper } from './helpers/fs-esl/cdr.helper';
+import { CustomLoggerModule } from './logger/logger.module';
 // import { ClickToCallJobModule } from './beequeue/jobs/clickToCall/clickToCallJob.module';
 
 @Module({
@@ -31,7 +32,8 @@ import { CDRHelper } from './helpers/fs-esl/cdr.helper';
     FreeswitchCallSystemModule,
     ClickToCallModule,
     InboundCallConfigModule,
-    ClickToCallModule
+    ClickToCallModule,
+    CustomLoggerModule
   ],
   controllers: [AppController],
   providers: [AppService],
