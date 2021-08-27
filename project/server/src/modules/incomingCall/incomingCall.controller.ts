@@ -40,7 +40,7 @@ export class IncomingCallController {
 
     jobQueue.createJob(callData).save();
 
-    new IncomingCallJob(this.freeswitchCallSystemService).trigger(callData);
+    new IncomingCallJob(this.freeswitchCallSystemService, this.incomingCallService).trigger(callData);
 
     return "Successfully submitted to job queue";
   }

@@ -40,7 +40,7 @@ export class IncomingCallService {
     }
   }
 
-  incomingStatusCallBack(callData:CDRModels){
+  saveIncomingCallCDR(callData:CDRModels){
 
     console.log('service CDR VALUE', callData);
 
