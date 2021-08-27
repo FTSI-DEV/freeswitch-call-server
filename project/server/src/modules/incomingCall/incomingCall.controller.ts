@@ -1,12 +1,19 @@
 import { Body, Controller, Get, Query } from '@nestjs/common';
 import { IncomingCallService } from './incomingCall.service';
 import { CDRModels } from 'src/models/cdr.models';
-// import { IncomingPhoneCallJob } from 'src/beequeue/jobs/IncomingCall/incomingPhoneCallJob';
 import { FreeswitchPhoneNumberConfigService } from '../config/fs-phonenumber-config/services/phonenumber-config.service';
+import { redisOptions } from 'src/beequeue/config/redisOptions.config';
+import { IncomingCallJob } from 'src/beequeue/jobs/IncomingCall/incomingPhoneCallJob';
+import { FreeswitchCallSystemService } from '../freeswitch-call-system/services/freeswitch-call-system.service';
+
+const BeeQueue = require('bee-queue');
+const jobQueue = new BeeQueue('default', redisOptions);
+
 @Controller('NewInboundCall')
 export class IncomingCallController {
   constructor(private incomingCallService: IncomingCallService,
-              private freeswitchCallConfig: FreeswitchPhoneNumberConfigService) {}
+              private freeswitchCallConfig: FreeswitchPhoneNumberConfigService,
+              private freeswitchCallSystemService: FreeswitchCallSystemService) {}
   
   @Get('IncomingCallEnter')
   getIncomingCallEnter(@Query('StoreId') StoreId:string,@Query('SystemId') SystemId:string): any {
@@ -31,9 +38,9 @@ export class IncomingCallController {
 
     console.log('IncomingCall/IncomingStatusCallBack' , callData);
 
-    this.incomingCallService.incomingStatusCallBack(callData);
+    jobQueue.createJob(callData).save();
 
-    // new IncomingPhoneCallJob(this.freeswitchCallConfig).trigger(callData);
+    new IncomingCallJob(this.freeswitchCallSystemService).trigger(callData);
 
     return "Successfully submitted to job queue";
   }

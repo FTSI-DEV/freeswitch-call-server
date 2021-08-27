@@ -1,11 +1,5 @@
-import { Inject } from "@nestjs/common";
 import { IBeeQueueJob } from "src/beequeue/beeQueueJob.interface";
-import { queueDefault } from "src/beequeue/config/beeQueueInstance.config";
 import { redisOptions } from "src/beequeue/config/redisOptions.config";
-import { CDRModels } from "src/models/cdr.models";
-import { IFSEslService } from "src/modules/click-to-call/click-to-call.interface";
-import { FsEslService } from "src/modules/click-to-call/click-to-call.service";
-import { FreeswitchPhoneNumberConfigService } from "src/modules/config/fs-phonenumber-config/services/phonenumber-config.service";
 import { FreeswitchCallSystemService } from "src/modules/freeswitch-call-system/services/freeswitch-call-system.service";
 
 const BeeQueue = require('bee-queue');

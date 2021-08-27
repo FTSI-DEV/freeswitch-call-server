@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import axios from 'axios';
 import { CONNREFUSED } from 'dns';
+import { CDRModels } from 'src/models/cdr.models';
 import { InboundCallConfigService } from 'src/modules/config/inbound-call-config/services/inbound-call-config.service';
 import apiClient from 'src/utils/apiClient';
 import { WebhookIncomingStatusCallBack } from 'src/utils/webhooks';
@@ -68,6 +69,94 @@ export class EslServerHelper {
     });
   }
 
+  private inboundCallEnter(): any {
+    let self = this;
+
+    eslServerRes.on(ESL_SERVER.CONNECTION.READY, function (conn) {
+      console.log('CONNECTION SERVER READY');
+
+      self._onListen(conn);
+
+      let eslInfo = conn.getInfo();
+
+      let destinationNumber = eslInfo.getHeader('Caller-Destination-Number');
+
+      console.log('dest', destinationNumber);
+
+      self.inboundCallExecute(conn, destinationNumber);
+
+      conn.on('esl::end', function (evt, body) {
+        console.log('ESL END');
+        console.log('CDR - END', CDR);
+
+        http.get(WebhookIncomingStatusCallBack(CDR), function (res) {});
+      });
+    });
+  }
+
+  private inboundCallExecute(conn, callerId: string) {
+    let self = this;
+
+    self._inboundCallConfig.getInboundConfigCallerId(callerId)
+    .then((result) => {
+
+      if (result == null || result == undefined){
+        conn.execute('playback', 'ivr/ivr-call_cannot_be_completed_as_dialed');
+      }
+
+      console.log('fs inbound call config', result);
+
+      let apiRetVal =  this.triggerWebhookURL(result);
+
+      apiRetVal.then((result) => {
+        
+        console.log('record crm api', result);
+
+        if (result != null){
+          let phoneNumberTo = result.PhoneNumberTo;
+
+          conn.execute('bridge', `sofia/gateway/sip_provider/${phoneNumberTo}`);
+        }
+
+      }).catch((err) => {
+        console.log('UNEXPECTED ERROR CALLING API -> ', err);
+      });
+      
+      this.triggerIncomingStatusCallBack(CDR);
+
+    }).catch((err) => {
+      console.log('UNEXPECTED ERROR -> ', err);
+    });
+  }
+
+  private triggerIncomingStatusCallBack(cdrModel: CDRModels){
+
+    if (cdrModel == null || cdrModel == undefined) return;
+
+    http.get(WebhookIncomingStatusCallBack(cdrModel));
+  }
+
+  private triggerWebhookURL(result):any{
+
+    let record = null;
+
+    let webhookurl = result.webhookUrl;
+      
+    let httpMethod = result.httpMethod;
+
+    if (httpMethod == "POST")
+    {
+      record =  axios.post(webhookurl);
+    }
+    else if (httpMethod == "GET")
+    {
+      console.log('webhook URL', webhookurl);
+      record = axios.get(webhookurl);
+    }
+
+    return record;
+  }
+
   private _executeTestCrmApi(conn: any) {
     console.log('EXECUTING CRM API -> ');
 
@@ -94,137 +183,6 @@ export class EslServerHelper {
       })
       .catch((err) => console.log('UNEXPECTED ERROR -> ', err));
   }
-
-  private inboundCallEnter(): any {
-    let self = this;
-
-    eslServerRes.on(ESL_SERVER.CONNECTION.READY, function (conn) {
-      console.log('CONNECTION SERVER READY');
-
-      self._onListen(conn);
-
-      let eslInfo = conn.getInfo();
-
-      let destinationNumber = eslInfo.getHeader('Caller-Destination-Number');
-
-      console.log('dest', destinationNumber);
-
-      self.inboundCallExecute(conn, destinationNumber);
-
-      conn.on('esl::end', function (evt, body) {
-        console.log('ESL END');
-        console.log('CDR - END', CDR);
-
-        http.get(WebhookIncomingStatusCallBack(CDR), function (res) {});
-      });
-    });
-  }
-
-  private triggerWebhookURL(result):any{
-
-    let record = null;
-
-    let webhookurl = result.webhookUrl;
-      
-    let httpMethod = result.httpMethod;
-
-    if (httpMethod == "POST")
-    {
-      record =  axios.post(webhookurl);
-    }
-    else if (httpMethod == "GET")
-    {
-      console.log('webhook URL', webhookurl);
-      record = axios.get(webhookurl);
-    }
-
-    return record;
-  }
-
-  private inboundCallExecute(conn, callerId: string) {
-    let self = this;
-
-    self._inboundCallConfig.getInboundConfigCallerId(callerId)
-    .then((result) => {
-
-      if (result == null || result == undefined){
-        conn.execute('playback', 'ivr/ivr-call_cannot_be_completed_as_dialed');
-      }
-
-      console.log('fs inbound call config', result);
-
-      let apiRetVal =  this.triggerWebhookURL(result);
-
-      apiRetVal.then((result) => {
-        
-        console.log('record crm api', result);
-
-        if (result != null){
-          let phoneNumberTo = result.PhoneNumberTo;
-
-          conn.execute('bridge', `sofia/gateway/fs-test3/${phoneNumberTo}`);
-        }
-
-      }).catch((err) => {
-        console.log('UNEXPECTED ERROR CALLING API -> ', err);
-      });
-
-    }).catch((err) => {
-      console.log('UNEXPECTED ERROR -> ', err);
-    });
-
-    // self._inboundCallConfig
-    //   .getInboundCallConfigByCallForwardingNo(destinationNumber)
-    //   .then((result) => {
-    //     if (result == null || result == undefined) {
-    //       conn.execute(
-    //         'playback',
-    //         'ivr/ivr-call_cannot_be_completed_as_dialed',
-    //       );
-    //     }
-
-    //     conn.execute('set', `effective_caller_id_number=${result.callerId}`);
-
-    //     // conn.execute(
-    //     //   'bridge',
-    //     //   `sofia/gateway/fs-test3/${result.phoneNumberTo}`,
-    //     // );
-
-    //     conn.execute('bridge', `sofia/gateway/sip_provider/${result.phoneNumberTo}`);
-    //   })
-    //   .catch((err) => {
-    //     conn.execute('playback', 'ivr/ivr-call_cannot_be_completed_as_dialed');
-    //   });
-  }
-
-  // private incomingCallEnter(): any {
-  //   // const self = this;
-  //   let connData = null;
-  //   eslServerRes.on('connection::ready', function (conn) {
-  //     console.log('CONNECTION SERVER READY');
-  //     connData = conn;
-
-  //     // self._onListen(conn);
-
-  //     // self._executeCrmApi(conn);
-
-  //     conn.execute('set', 'effective_caller_id_number=+17132633133');
-
-  //     conn.execute('bridge', 'sofia/gateway/fs-test3/1000');
-
-  //     conn.on('esl::end', function (evt, body) {
-  //       console.log('TRIGGER WEBHOOK');
-
-  //       console.log('CDR - end', CDR);
-
-  //       http.get(WebhookIncomingStatusCallBack(CDR), function (res) {
-  //         // console.log('ENTERED GET ', res);
-  //       });
-
-  //       // call webhook here
-  //     });
-  //   });
-  // }
 
   private XmlConversionTaskValues(xmlParserResult: KeyValues[]): KeyValues[] {
     let freeswitchTaskListKeyValues: KeyValues[] = [];
