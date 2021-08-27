@@ -2,7 +2,7 @@ import { Module } from "@nestjs/common";
 import { CustomLogger } from "./logger";
 
 @Module({
-    providers: [CustomLogger],
+    providers: [ CustomLogger],
     exports: [CustomLogger]
 })
 

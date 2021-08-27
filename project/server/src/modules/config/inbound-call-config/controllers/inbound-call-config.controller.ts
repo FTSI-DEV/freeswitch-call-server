@@ -19,12 +19,12 @@ export class InboundCallConfigController {
     @Param('httpMethod') httpMethod:string
   ): string {
 
-    console.log('entered', webhookUrl);
-    // this._inboundCallConfig.add({
-    //   webhookUrl: webhookUrl,
-    //   callerId: callerId,
-    //   httpMethod: httpMethod
-    // });
+    console.log('entered');
+    this._inboundCallConfig.add({
+      webhookUrl: webhookUrl,
+      callerId: callerId,
+      httpMethod: httpMethod
+    });
 
     return 'Successfully added config';
   }
