@@ -9,8 +9,8 @@ export class FreeswitchPhoneNumberConfigController {
         private _freeswitchCallConfigService: FreeswitchPhoneNumberConfigService
     ) {}
 
-    @Get('getPhoneNumberConfigById')
-    getPhoneNumberConfigById(@Param('id')id: number):FreeswitchPhoneNumberConfigParam{
+    @Get('getPhoneNumberConfigById/:id')
+    getPhoneNumberConfigById(@Param('id')id: number):any{
         
         return this._freeswitchCallConfigService.getPhoneNumberConfigById(id);
     }
@@ -27,6 +27,7 @@ export class FreeswitchPhoneNumberConfigController {
     @Post('update')
     update(@Body() callConfigParam: FreeswitchPhoneNumberConfigParam):string{
 
+        callConfigParam.id = 3;
         this._freeswitchCallConfigService.update(callConfigParam);
 
         return "Successfully updated record";

@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { IPaginationMeta, IPaginationOptions, paginate, Pagination } from 'nestjs-typeorm-paginate';
-import { resolve } from 'path';
 import { InboundCallConfig, InboundCallConfigRepository } from 'src/entity/inboundCallConfig.entity';
 import { InboundCallConfigModel, InboundCallConfigParam } from '../models/inbound-call-config.model';
 
@@ -19,9 +18,9 @@ export class InboundCallConfigService {
         console.log('parma', param);
         let inboundCallConfig = new InboundCallConfig();
 
-        inboundCallConfig.CallForwardingNumber = param.callForwardingNumber;
+        inboundCallConfig.WebhookUrl = param.webhookUrl;
         inboundCallConfig.CallerId = param.callerId;
-        inboundCallConfig.PhoneNumberTo = param.phoneNumberTo;
+        inboundCallConfig.HTTPMethod = param.httpMethod;
 
         this._inboundCallConfigRepo.saveUpdateRecord(inboundCallConfig);
     }
@@ -34,8 +33,8 @@ export class InboundCallConfigService {
             if (result == null || result == undefined)  return false;
 
             result.CallerId = param.callerId;
-            result.CallForwardingNumber = param.callForwardingNumber;
-            result.PhoneNumberTo = param.phoneNumberTo;
+            result.WebhookUrl = param.webhookUrl;
+            result.HTTPMethod = param.httpMethod;
             this._inboundCallConfigRepo.saveUpdateRecord(result);
         })
         .catch(err => {
@@ -45,16 +44,16 @@ export class InboundCallConfigService {
         return true;
     }
 
-    getInboundCallConfigByCallForwardingNo(callForwardingNumber: string) : any {
+    getInboundConfigCallerId(callerId: string) : any {
         return new Promise<InboundCallConfigModel>((resolve, reject) => {
-            this.getConfigByCallForwardingNumber(callForwardingNumber)
+            this.getConfigByCallerId(callerId)
             .then((result) => {
                 if (result == null || result == undefined) reject(null);
 
                 let retVal = new InboundCallConfigModel();
                 retVal.callerId = result.CallerId;
-                retVal.callForwardingNumber = result.CallForwardingNumber;
-                retVal.phoneNumberTo = result.PhoneNumberTo;
+                retVal.webhookUrl = result.WebhookUrl;
+                retVal.httpMethod = result.HTTPMethod;
 
                 resolve(retVal);
 
@@ -71,10 +70,10 @@ export class InboundCallConfigService {
                     if (result == null || result == undefined) reject(null);
 
                     let configModel: InboundCallConfigModel = {
-                        phoneNumberTo: result.PhoneNumberTo,
-                        callForwardingNumber: result.CallForwardingNumber,
-                        callerId: result.CallForwardingNumber,
-                        id: result.Id
+                        webhookUrl: result.WebhookUrl,
+                        callerId: result.CallerId,
+                        id: result.Id,
+                        httpMethod: result.HTTPMethod
                     };
 
                     resolve(configModel);
@@ -98,9 +97,9 @@ export class InboundCallConfigService {
 
                     let configModel = new InboundCallConfigModel();
 
-                    configModel.callForwardingNumber = element.CallForwardingNumber;
+                    configModel.webhookUrl = element.WebhookUrl;
                     configModel.callerId = element.CallerId;
-                    configModel.phoneNumberTo = element.PhoneNumberTo;
+                    configModel.httpMethod = element.HTTPMethod;
                     configModel.id = element.Id;
 
                     itemsObjs.push(configModel);
@@ -129,11 +128,11 @@ export class InboundCallConfigService {
         })
     }
 
-    private getConfigByCallForwardingNumber = (callForwardingNumber:string) : any => {
+    private getConfigByCallerId = (callerId:string) : any => {
         return new Promise<InboundCallConfig>((resolve,reject) => {
             
             this._inboundCallConfigRepo.createQueryBuilder("public.InboundCallConfig")
-                .where("public.InboundCallConfig.CallForwardingNumber = :callForwardingNumber" , { callForwardingNumber : callForwardingNumber })
+                .where("public.InboundCallConfig.CallerId = :callerId" , { callerId : callerId })
                 .getOneOrFail()
                 .then(result => {
                     if (result == null || result == undefined){

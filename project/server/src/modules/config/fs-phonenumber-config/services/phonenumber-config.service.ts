@@ -25,25 +25,35 @@ export class FreeswitchPhoneNumberConfigService{
         this._phoneNumberConfigRepo.saveUpdateRecord(phoneNumberConfig);
     }
 
-    update(param: FreeswitchPhoneNumberConfigParam):boolean{
+    async update(param: FreeswitchPhoneNumberConfigParam){
 
-        this.getRecordById(param.id)
-        .then((result) => {
+        let record = this.getById(param.id);
 
-            if (result == null || result == undefined) return false;
+        console.log('re', record);
 
-            result.FriendlyName = param.friendlyName;
-            result.HttpMethod = param.httpMethod;
-            result.WebhookUrl = param.webhookUrl;
-            result.PhoneNumber = param.phoneNumber
 
-            this._phoneNumberConfigRepo.saveUpdateRecord(result);
+        return false;
 
-        }).catch((err) => {
-            return false;
-        });
+        // this.getRecordById(param.id)
+        // .then((result) => {
 
-        return true;
+        //     if (result == null || result == undefined) return false;
+
+        //     result.FriendlyName = param.friendlyName;
+        //     result.HttpMethod = param.httpMethod;
+        //     result.WebhookUrl = param.webhookUrl;
+        //     result.PhoneNumber = param.phoneNumber
+
+        //     console.log('res', result);
+
+        //     // this._phoneNumberConfigRepo.saveUpdateRecord(result);
+
+        // }).catch((err) => {
+        //     console.log('err',err);
+        //     return false;
+        // });
+
+        // return true;
 
     }
 
@@ -58,7 +68,6 @@ export class FreeswitchPhoneNumberConfigService{
     }
 
     getPhoneNumberConfigById(id: number): any{
-
         return new Promise<FreeswitchPhoneNumberConfigParam>((resolve, reject) => {
             this.getById(id)
                 .then((result) => {
@@ -66,7 +75,7 @@ export class FreeswitchPhoneNumberConfigService{
                     if (result == null || result == undefined){
                         reject(null);
                     }
-
+                    console.log('res', result);
                     let configModel: FreeswitchPhoneNumberConfigParam = {
                         friendlyName: result.FriendlyName,
                         phoneNumber: result.PhoneNumber,
@@ -81,6 +90,7 @@ export class FreeswitchPhoneNumberConfigService{
                 });
         })
         .catch(err => {
+            console.log('err', err);
             return null;
         });
     }
@@ -92,6 +102,7 @@ export class FreeswitchPhoneNumberConfigService{
 
     private getRecordById(id:number):any{
 
+        console.log('test', id);
         this.getPhoneNumberConfigById(id)
         .then((result) => {
             if (result == null){
@@ -108,7 +119,8 @@ export class FreeswitchPhoneNumberConfigService{
     private getById = (id: number): any => {
 
         return new Promise<PhoneNumberConfig>((resolve,reject) => {
-            this._phoneNumberConfigRepo.findOneOrFail(id)
+            console.log('id', id);
+            this._phoneNumberConfigRepo.findOneOrFail({ where: { Id: id } })
             .then(result => {
                 if (result == null || result == undefined){
                     reject(null);

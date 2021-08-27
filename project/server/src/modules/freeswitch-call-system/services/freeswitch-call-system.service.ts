@@ -11,7 +11,7 @@ export class FreeswitchCallSystemService {
         private freeswitchCallSystemRepo: FsCallDetailRecordRepository)
     {}
 
-    saveCDR(cdrParam: CDRModels, storeId: number){
+    saveCDR(cdrParam: CDRModels){
         
         console.log('TRYING TO CREATE A RECORD');
 
@@ -22,12 +22,11 @@ export class FreeswitchCallSystemService {
         cdr.CallUUID = cdrParam.UUID;
         cdr.CallStatus = cdrParam.CallStatus;
         cdr.DateCreated = cdrParam.StartedDate;
-        cdr.StoreId = storeId;
         cdr.RecordingUUID = cdrParam.RecordingUUID;
         cdr.PhoneNumberFrom = cdrParam.CallerIdNumber;
         cdr.PhoneNumberTo = cdrParam.CalleeIdNumber;
-        cdr.Duration = cdrParam.Duration;
-        cdr.Direction = cdrParam.Duration;
+        cdr.CallDuration = cdrParam.CallDuration;
+        cdr.CallDirection = cdrParam.CallDirection;
 
         this.freeswitchCallSystemRepo.saveCDR(cdr);
 
@@ -68,11 +67,10 @@ export class FreeswitchCallSystemService {
                         CallUUID: element.CallUUID,
                         PhoneNumberFrom: element.PhoneNumberFrom,
                         PhoneNumberTo: element.PhoneNumberTo,
-                        CallDirection: element.Direction,
+                        CallDirection: element.CallDirection,
                         CallStatus: element.CallStatus,
                         DateCreated: element.DateCreated,
-                        Duration: element.Duration,
-                        StoreId: element.StoreId,
+                        Duration: element.CallDuration,
                         Id: element.id,
                         RecordingUUID: element.RecordingUUID
                     };
@@ -111,11 +109,10 @@ export class FreeswitchCallSystemService {
                     PhoneNumberFrom: result.PhoneNumberFrom,
                     CallStatus: result.CallStatus,
                     CallUUID: result.CallUUID,
-                    Duration: result.Duration,
+                    Duration: result.CallDuration,
                     DateCreated: result.DateCreated,
-                    StoreId: result.StoreId,
                     RecordingUUID: result.RecordingUUID,
-                    CallDirection: result.Direction
+                    CallDirection: result.CallDirection
                 };
 
                 console.log('resolving ', cdrDTO);

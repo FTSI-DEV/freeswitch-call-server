@@ -2,8 +2,8 @@ import api from 'ant-design-vue/lib/notification';
 import axios from 'axios';
 
 const apiClient = axios.create({
-    baseURL: 'http://www.freeswitchcallapp.com',
-    //baseURL: 'http://localhost:3000',
+    // baseURL: 'http://www.freeswitchcallapp.com',
+    baseURL: 'http://localhost:3000',
     withCredentials: false,
     headers: {
         // crossdomain: true ,
@@ -48,7 +48,7 @@ export default {
     },
     addInboundCallConfig(params: any) {
         console.log('params: ', params)
-        return apiClient.post(`/api/inbound-call-config/add/${params.phoneNumberTo}/${params.callerId}/${params.callForwardingNumber}`);
+        return apiClient.post(`/api/inbound-call-config/add/${params.callerId}/${params.webhookUrl}/${params.httpMethod}`);
     },
     updateInboundCallConfig(params: any) {
         return apiClient.post(`/api/inbound-call-config/${params.phoneNumberTo}/${params.callerId}/${params.callForwardingNumber}`);

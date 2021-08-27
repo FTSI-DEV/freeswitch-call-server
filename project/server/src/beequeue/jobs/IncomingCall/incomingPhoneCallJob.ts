@@ -1,54 +1,44 @@
+import { IBeeQueueJob } from "src/beequeue/beeQueueJob.interface";
 import { queueDefault } from "src/beequeue/config/beeQueueInstance.config";
+import { redisOptions } from "src/beequeue/config/redisOptions.config";
 import { FreeswitchPhoneNumberConfigService } from "src/modules/config/fs-phonenumber-config/services/phonenumber-config.service";
+import { FreeswitchCallSystemService } from "src/modules/freeswitch-call-system/services/freeswitch-call-system.service";
 
-const jobQueue = queueDefault;
+const BeeQueue = require('bee-queue');
 
-export class IncomingPhoneCallJob{
+const jobQueue = new BeeQueue('default', redisOptions);
+
+export class IncomingCallJob implements IBeeQueueJob<any>{
+
     constructor(
-        private readonly _freeswitchCallConfig: FreeswitchPhoneNumberConfigService
-
+        private readonly _freeswitchCallSystemService: FreeswitchCallSystemService
     ) {}
 
-    trigger(data){
-        console.log('TRIGGER JOB', data);
+    trigger(parameter: any) {
+        console.log('Parameter', parameter);
 
-        let config = this._freeswitchCallConfig
-            .getPhoneNumberConfigById(data.CallerIdNumber)
-            .then((result) => {
-                
-                
+        jobQueue.process((job,done) => {
+            console.log('jobId',job.id);
 
-            }).catch((err) => {
-                
+            this._freeswitchCallSystemService.saveCDR({
+                UUID: parameter.UUID,
+                CallerIdNumber: parameter.CallerIdNumber,
+                CallerName: parameter.CallerIdNumber,
+                CalleeIdNumber: parameter.CalleeIdNumber,
+                CallDirection: parameter.CallDirection,
+                StartedDate: parameter.StartedDate,
+                CallStatus: parameter.CallStatus,
+                CallDuration: parameter.Duration,
+                RecordingUUID: parameter.RecordingUUID
             });
 
-            console.log('con', config);
-        
-        // if (config != null){
-        //     let webhook = config.webhookUrl;
+            console.log('result', job.data);
+            done(null, job.id);
+        });
 
-        //     let httpMethod = config.httpMethod;
-
-        //     if (httpMethod === "HTTP GET"){
-        //         apiClient.get(webhook);
-        //     }
-        //     else if (httpMethod === "HTTP POST") {
-        //         apiClient.post(webhook);
-        //     }
-        // }
-
-        return jobQueue.createJob(data).save();
+        jobQueue.on('succeeded', (job,result) => {
+            console.log('success');
+        })
     }
 }
 
-// export const incomingPhoneCallJob = (data) => {
-//     console.log('INTEREED PHONE CALL JOB', data);
-//     return jobQueue.createJob(data).save();
-// }
-
-jobQueue.process((job,done) => {
-    console.log(`CallUUID -> ${job.data.CallUid}`);
-
-    console.log('JOB PROCESS', job.data);
-    return done();
-})

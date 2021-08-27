@@ -53,7 +53,7 @@ export class IncomingCallService {
       CalleeIdNumber: callData.CalleeIdNumber,
       StartedDate: callData.StartedDate,
       RecordingUUID: callData.UUID,
-      Duration: callData.Duration,
-    }, 60);
+      CallDuration: callData.CallDuration,
+    });
   }
 }

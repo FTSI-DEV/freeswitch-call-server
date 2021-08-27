@@ -1,17 +1,27 @@
-import { Controller, Get, Param, Post, Query } from '@nestjs/common';
+import { Controller, Get, Inject, Param, Post, Query } from '@nestjs/common';
+
+import { IBeeQueueJob } from 'src/beequeue/beeQueueJob.interface';
+import { redisOptions } from 'src/beequeue/config/redisOptions.config';
 import { ClickToCallJob } from 'src/beequeue/jobs/clickToCall/clickToCallJob';
 import { OriginationModel } from 'src/helpers/fs-esl/models/originate.model';
 import { CDRModels } from 'src/models/cdr.models';
 import { FreeswitchPhoneNumberConfigService } from '../config/fs-phonenumber-config/services/phonenumber-config.service';
 import { FreeswitchCallSystemService } from '../freeswitch-call-system/services/freeswitch-call-system.service';
-import { FsEslService } from './fs-esl.service';
+import { GREETING_SERVICE, IFSEslService } from './click-to-call.interface';
+import { FsEslService } from './click-to-call.service';
 const http = require('http');
+
+const BeeQueue = require('bee-queue');
+const jobQueue = new BeeQueue('default', redisOptions);
 
 @Controller('/api/freeswitch')
 export class FreeswitchController {
-  constructor(private _freeswitchService: FsEslService,
+  constructor(  
+              @Inject(FsEslService)
+              private _freeswitchService: IFSEslService,
               private _freeswitchCallSystemService: FreeswitchCallSystemService,
-              private _freeswitchCallConfigService: FreeswitchPhoneNumberConfigService) {}
+              private _freeswitchCallConfigService: FreeswitchPhoneNumberConfigService,
+              ) {}
 
   @Post('clickToCall/:phoneNumberFrom/:phoneNumberTo/:callerId')
   clickToCall(
@@ -29,28 +39,16 @@ export class FreeswitchController {
       callerId,
     );
 
-    // http.get()
-
     return result;
   }
 
   @Get('clickToCallStatusCallBack')
   clickToCallStatusCallBack(@Query() callData: CDRModels){
-    console.log('CLICK TO CALL STATUS CALL BACK', callData);
+    console.log('CLICK TO CALL STATUS CALL BACK API', callData);
 
-    // this._freeswitchCallSystemService.saveCDR({
-    //   StartedDate: callData.StartedDate,
-    //   UUID: callData.UUID,
-    //   Duration: callData.Duration,
-    //   CallDirection: callData.CallDirection,
-    //   CallStatus: callData.CallStatus,
-    //   CalleeIdNumber: callData.CalleeIdNumber,
-    //   CallerIdNumber: callData.CallerIdNumber,
-    //   CallerName: callData.CallerName,
-    //   RecordingUUID: callData.RecordingUUID
-    // },60)
+    jobQueue.createJob(callData).save();
 
-    // new ClickToCallJob(this._freeswitchCallConfigService, this._freeswitchCallSystemService).trigger(callData);
+    new ClickToCallJob(this._freeswitchCallSystemService).trigger(callData);
 
     return "Successfully submitted to job queue";
   }

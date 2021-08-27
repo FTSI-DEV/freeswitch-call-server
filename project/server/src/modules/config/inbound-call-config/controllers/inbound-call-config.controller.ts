@@ -12,33 +12,33 @@ export class InboundCallConfigController {
     return this._inboundCallConfig.getInboundCallConfigById(id);
   }
 
-  @Post('add/:phoneNumberTo/:callerId/:callForwardingNumber')
+  @Post('add/:callerId/:webhookUrl/:httpMethod')
   add(
-    @Param('phoneNumberTo') phoneNumberTo: string,
     @Param('callerId') callerId: string,
-    @Param('callForwardingNumber') callForwardingNumber: string,
+    @Param('webhookUrl') webhookUrl: string,
+    @Param('httpMethod') httpMethod:string
   ): string {
 
-    console.log('entered');
-    this._inboundCallConfig.add({
-      phoneNumberTo: phoneNumberTo,
-      callForwardingNumber: callForwardingNumber,
-      callerId: callerId,
-    });
+    console.log('entered', webhookUrl);
+    // this._inboundCallConfig.add({
+    //   webhookUrl: webhookUrl,
+    //   callerId: callerId,
+    //   httpMethod: httpMethod
+    // });
 
     return 'Successfully added config';
   }
 
-  @Post('update/:phoneNumberTo:/callerId/:callForwardingNumber')
+  @Post('update/:/callerId/:webhookUrl/:httpMethod')
   update(
-    @Param('phoneNumberTo') phoneNumberTo: string,
     @Param('callerId') callerId: string,
-    @Param('callForwardingNumber') callForwardingNumber: string,
+    @Param('webhookUrl') webhookUrl: string,
+    @Param('httpMethod') httpMethod:string
   ): string {
     this._inboundCallConfig.update({
-      phoneNumberTo: phoneNumberTo,
-      callForwardingNumber: callForwardingNumber,
+      webhookUrl: webhookUrl,
       callerId: callerId,
+      httpMethod : httpMethod
     });
 
     return 'Successfully updated config';

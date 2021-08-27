@@ -18,16 +18,13 @@ export class FsCallDetailRecordEntity{
     CallUUID: string;
 
     @Column()
-    Duration: number;
+    CallDuration: number;
 
     @Column()
     DateCreated: Date;
 
     @Column()
-    Direction?: string;
-
-    @Column()
-    StoreId: number;
+    CallDirection?: string;
 
     @Column()
     RecordingUUID? : string;

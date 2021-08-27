@@ -1,30 +1,38 @@
-import { Column, Entity, EntityRepository, PrimaryGeneratedColumn, Repository } from "typeorm";
+import { truncate } from "fs/promises";
+import { Column, Entity, EntityRepository, Index, PrimaryGeneratedColumn, Repository } from "typeorm";
 
 @Entity('InboundCallConfig')
 export class InboundCallConfig{
+    @Index()
     @PrimaryGeneratedColumn()
     Id: number;
 
     @Column()
-    PhoneNumberTo: string;
-
-    @Column()
     CallerId: string;
 
-    @Column()
-    CallForwardingNumber:string;
+    @Column( { nullable: true } )
+    WebhookUrl :string;
+
+    @Column( {nullable:true})
+    HTTPMethod: string;
+
+    @Column( {default: false} )
+    IsDeleted: boolean;
 }
 
 @EntityRepository(InboundCallConfig)
 export class InboundCallConfigRepository extends Repository<InboundCallConfig>{
 
     saveUpdateRecord = async (inboundCallConfig: InboundCallConfig) => {
-        console.log('test');
         return await this.save(inboundCallConfig);
     }
 
-    getrec = async (id: number) => {
-        console.log('test', id);
+    deleteRecord = async(config:InboundCallConfig) => {
+        await this.createQueryBuilder()
+            .update(InboundCallConfig)
+            .set({ IsDeleted : config.IsDeleted })
+            .where("Id = :Id ", { Id: config.Id } )
+            .execute();
     }
 
 }

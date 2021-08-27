@@ -1,7 +1,7 @@
 import { Body, Controller, Get, Query } from '@nestjs/common';
 import { IncomingCallService } from './incomingCall.service';
 import { CDRModels } from 'src/models/cdr.models';
-import { IncomingPhoneCallJob } from 'src/beequeue/jobs/IncomingCall/incomingPhoneCallJob';
+// import { IncomingPhoneCallJob } from 'src/beequeue/jobs/IncomingCall/incomingPhoneCallJob';
 import { FreeswitchPhoneNumberConfigService } from '../config/fs-phonenumber-config/services/phonenumber-config.service';
 @Controller('NewInboundCall')
 export class IncomingCallController {
@@ -33,7 +33,7 @@ export class IncomingCallController {
 
     this.incomingCallService.incomingStatusCallBack(callData);
 
-    new IncomingPhoneCallJob(this.freeswitchCallConfig).trigger(callData);
+    // new IncomingPhoneCallJob(this.freeswitchCallConfig).trigger(callData);
 
     return "Successfully submitted to job queue";
   }

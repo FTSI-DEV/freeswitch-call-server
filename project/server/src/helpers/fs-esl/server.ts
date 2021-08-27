@@ -1,8 +1,11 @@
 import { Injectable } from '@nestjs/common';
+import axios from 'axios';
+import { CONNREFUSED } from 'dns';
 import { InboundCallConfigService } from 'src/modules/config/inbound-call-config/services/inbound-call-config.service';
 import apiClient from 'src/utils/apiClient';
 import { WebhookIncomingStatusCallBack } from 'src/utils/webhooks';
-import { FS_DIALPLAN, FS_ESL } from '../constants/fs-esl.constants';
+import { EVENT_LIST } from '../constants/event-list.constants';
+import { ESL_SERVER, FS_DIALPLAN, FS_ESL } from '../constants/fs-esl.constants';
 import { TwiMLContants } from '../constants/twiml.constants';
 import { KeyValues, XMLParser } from '../parser/twimlXML.parser';
 import { CDRHelper } from './cdr.helper';
@@ -19,34 +22,53 @@ export class EslServerHelper {
     private readonly _callRecords = new CDRHelper(),
   ) {}
 
+  //for InboundCall
+  startEslServer() {
+    let esl = require('modesl');
+
+    let esl_server = new esl.Server(
+      {
+        port: process.env.ESL_SERVER_PORT,
+        host: process.env.ESL_SERVER_HOST,
+        myevents: true,
+      },
+
+      function () {
+        console.log('esl server is up');
+      },
+    );
+
+    eslServerRes = esl_server;
+
+    this.inboundCallEnter();
+  }
+
   private _onListen(conn: any): any {
+
     conn.on(FS_ESL.RECEIVED, (fsEvent) => {
-      const eventName = fsEvent.getHeader('Event-Name');
 
-      console.log('LISTENING TO AN EVENT ->', eventName);
-      
-      if (eventName === 'CHANNEL_EXECUTE' || eventName === 'CHANNE_CREATE') {
-        callerDesinationNumber =
-          this._callRecords.getCallerDestinationNumber(fsEvent);
-        console.log('CALLER_DESINATION_NUMBER', callerDesinationNumber);
-      }
+        const eventName = fsEvent.getHeader(EVENT_LIST.EVENT_NAME);
 
-      if (
-        eventName === 'CHANNEL_HANGUP_COMPLETE' ||
-        eventName === 'CHANNEL_HANGUP'
-      ) {
-        let call_record = this._callRecords.getCallRecords(fsEvent);
+        console.log('EVEN-NAME -> ', eventName);
 
-        console.log('CALL-RECORD', call_record);
+        if (eventName === EVENT_LIST.CHANNEL_EXECUTE || eventName === EVENT_LIST.CHANNEL_CREATE){
 
-        CDR = call_record;
+          callerDesinationNumber = this._callRecords.getCallerDestinationNumber(fsEvent);
 
-        return call_record;
-      }
+          console.log('CALLER-DESTINATION-NUMBER' , callerDesinationNumber);
+        }
+
+        if (eventName === EVENT_LIST.CHANNEL_HANGUP || eventName === EVENT_LIST.CHANNEL_HANGUP_COMPLETE){
+          CDR = this._callRecords.getCallRecords(fsEvent);
+
+          console.log('CALL-RECORD', CDR);
+
+          return CDR;
+        }
     });
   }
 
-  private _executeCrmApi(conn: any) {
+  private _executeTestCrmApi(conn: any) {
     console.log('EXECUTING CRM API -> ');
 
     apiClient
@@ -73,31 +95,10 @@ export class EslServerHelper {
       .catch((err) => console.log('UNEXPECTED ERROR -> ', err));
   }
 
-  //for InboundCall
-  startEslServer() {
-    let esl = require('modesl');
-
-    let esl_server = new esl.Server(
-      {
-        port: process.env.ESL_SERVER_PORT,
-        host: process.env.ESL_SERVER_HOST,
-        myevents: true,
-      },
-
-      function () {
-        console.log('esl server is up');
-      },
-    );
-
-    eslServerRes = esl_server;
-
-    this.inboundCallEnter();
-  }
-
   private inboundCallEnter(): any {
     let self = this;
 
-    eslServerRes.on('connection::ready', function (conn) {
+    eslServerRes.on(ESL_SERVER.CONNECTION.READY, function (conn) {
       console.log('CONNECTION SERVER READY');
 
       self._onListen(conn);
@@ -119,31 +120,81 @@ export class EslServerHelper {
     });
   }
 
-  private inboundCallExecute(conn, destinationNumber: string) {
+  private triggerWebhookURL(result):any{
+
+    let record = null;
+
+    let webhookurl = result.webhookUrl;
+      
+    let httpMethod = result.httpMethod;
+
+    if (httpMethod == "POST")
+    {
+      record =  axios.post(webhookurl);
+    }
+    else if (httpMethod == "GET")
+    {
+      console.log('webhook URL', webhookurl);
+      record = axios.get(webhookurl);
+    }
+
+    return record;
+  }
+
+  private inboundCallExecute(conn, callerId: string) {
     let self = this;
 
-    self._inboundCallConfig
-      .getInboundCallConfigByCallForwardingNo(destinationNumber)
-      .then((result) => {
-        if (result == null || result == undefined) {
-          conn.execute(
-            'playback',
-            'ivr/ivr-call_cannot_be_completed_as_dialed',
-          );
+    self._inboundCallConfig.getInboundConfigCallerId(callerId)
+    .then((result) => {
+
+      if (result == null || result == undefined){
+        conn.execute('playback', 'ivr/ivr-call_cannot_be_completed_as_dialed');
+      }
+
+      console.log('fs inbound call config', result);
+
+      let apiRetVal =  this.triggerWebhookURL(result);
+
+      apiRetVal.then((result) => {
+        
+        console.log('record crm api', result);
+
+        if (result != null){
+          let phoneNumberTo = result.PhoneNumberTo;
+
+          conn.execute('bridge', `sofia/gateway/fs-test3/${phoneNumberTo}`);
         }
 
-        conn.execute('set', `effective_caller_id_number=${result.callerId}`);
-
-        // conn.execute(
-        //   'bridge',
-        //   `sofia/gateway/fs-test3/${result.phoneNumberTo}`,
-        // );
-
-        conn.execute('bridge', `sofia/gateway/sip_provider/${result.phoneNumberTo}`);
-      })
-      .catch((err) => {
-        conn.execute('playback', 'ivr/ivr-call_cannot_be_completed_as_dialed');
+      }).catch((err) => {
+        console.log('UNEXPECTED ERROR CALLING API -> ', err);
       });
+
+    }).catch((err) => {
+      console.log('UNEXPECTED ERROR -> ', err);
+    });
+
+    // self._inboundCallConfig
+    //   .getInboundCallConfigByCallForwardingNo(destinationNumber)
+    //   .then((result) => {
+    //     if (result == null || result == undefined) {
+    //       conn.execute(
+    //         'playback',
+    //         'ivr/ivr-call_cannot_be_completed_as_dialed',
+    //       );
+    //     }
+
+    //     conn.execute('set', `effective_caller_id_number=${result.callerId}`);
+
+    //     // conn.execute(
+    //     //   'bridge',
+    //     //   `sofia/gateway/fs-test3/${result.phoneNumberTo}`,
+    //     // );
+
+    //     conn.execute('bridge', `sofia/gateway/sip_provider/${result.phoneNumberTo}`);
+    //   })
+    //   .catch((err) => {
+    //     conn.execute('playback', 'ivr/ivr-call_cannot_be_completed_as_dialed');
+    //   });
   }
 
   // private incomingCallEnter(): any {

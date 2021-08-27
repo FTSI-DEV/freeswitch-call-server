@@ -1,5 +1,6 @@
 import { stringify } from "querystring";
 import { CDRModels } from "src/models/cdr.models";
+import { CHANNEL_VARIABLE } from "../constants/channel-variables.constants";
 
 export class CDRHelper{
 
@@ -15,21 +16,15 @@ export class CDRHelper{
 
         const eventName = fsEvent.getHeader('Event-Name');
 
-        console.log('EVENTS ' , fsEvent);
-
-        const uuid = this.getHeader('Unique-ID', fsEvent);
-        const callerId = this.getHeader('Caller-Caller-ID-Number', fsEvent);
-        const callerName = this.getHeader('Caller-Caller-ID-Name', fsEvent);
-        const calleeIdNumber = this.getHeader('Caller-Callee-ID-Number', fsEvent);
-        const callDirection = this.getHeader('Call-Direction', fsEvent);
-        const hangup_cause = this.getHeader('Hangup-Cause', fsEvent);
-        const started_date = this.getHeader('Event-Date-Local', fsEvent);
-        const start_stamp = this.getHeader('Event-Date-Timestamp', fsEvent);
-        const answer_stamp = this.getHeader('variable_answer_stamp' ,fsEvent);
-        const end_stamp = this.getHeader('variable_end_stamp', fsEvent);
-        const answer_epoch = this.getHeader('variable_answer_epoch', fsEvent);
-        const start_epoch = this.getHeader('variable_start_epoch', fsEvent);
-        const end_epoch = this.getHeader('variable_end_epoch' , fsEvent);
+        const uuid = this.getHeader(CHANNEL_VARIABLE.UNIQUE_ID, fsEvent);
+        const callerId = this.getHeader(CHANNEL_VARIABLE.CALLER_CALLER_ID_NUMBER, fsEvent);
+        const callerName = this.getHeader(CHANNEL_VARIABLE.CALLER_CALLER_ID_NAME, fsEvent);
+        const calleeIdNumber = this.getHeader(CHANNEL_VARIABLE.CALLER_CALLE_ID_NUMBER, fsEvent);
+        const callDirection = this.getHeader(CHANNEL_VARIABLE.CALL_DIRECTION, fsEvent);
+        const hangup_cause = this.getHeader(CHANNEL_VARIABLE.HANGUP_CAUSE, fsEvent);
+        const started_date = this.getHeader(CHANNEL_VARIABLE.EVENT_DATE_LOCAL, fsEvent);
+        const answer_epoch = this.getHeader(CHANNEL_VARIABLE.ANSWER_EPOCH, fsEvent);
+        const end_epoch = this.getHeader(CHANNEL_VARIABLE.END_EPOCH , fsEvent);
 
         const duration = this.calculateDuration(answer_epoch, end_epoch);
 
@@ -60,7 +55,7 @@ export class CDRHelper{
             CallDirection: callDirection,
             CallStatus: hangup_cause,
             StartedDate: started_date,
-            Duration: duration,
+            CallDuration: duration,
             Id: null,
             RecordingUUID: uuid
         };

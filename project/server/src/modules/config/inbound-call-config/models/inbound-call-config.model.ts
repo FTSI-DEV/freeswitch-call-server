@@ -1,13 +1,13 @@
 export class InboundCallConfigModel{
     callerId: string;
-    phoneNumberTo: string;
-    callForwardingNumber: string;
+    webhookUrl: string;
+    httpMethod:string;
     id?: number;
 }
 
 export class InboundCallConfigParam{
     callerId: string;
-    phoneNumberTo: string;
-    callForwardingNumber: string;
+    webhookUrl: string;
+    httpMethod:string;
     id?:number;
 }

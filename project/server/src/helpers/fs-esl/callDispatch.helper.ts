@@ -1,4 +1,4 @@
-import { IncomingPhoneCallJob } from "src/beequeue/jobs/IncomingCall/incomingPhoneCallJob";
+// import { IncomingPhoneCallJob } from "src/beequeue/jobs/IncomingCall/incomingPhoneCallJob";
 import { OriginationModel } from "./models/originate.model";
 
 export class CallDispatchHelper{
@@ -35,7 +35,7 @@ export class CallDispatchHelper{
 
                 //   incomingPhoneCallJob(callUid);
 
-                new IncomingPhoneCallJob(null).trigger(callUid);
+                // new IncomingPhoneCallJob(null).trigger(callUid);
             })
 
             //call webhook

@@ -1,42 +1,50 @@
+import { Inject } from "@nestjs/common";
+import { IBeeQueueJob } from "src/beequeue/beeQueueJob.interface";
 import { queueDefault } from "src/beequeue/config/beeQueueInstance.config";
+import { redisOptions } from "src/beequeue/config/redisOptions.config";
+import { CDRModels } from "src/models/cdr.models";
+import { IFSEslService } from "src/modules/click-to-call/click-to-call.interface";
+import { FsEslService } from "src/modules/click-to-call/click-to-call.service";
 import { FreeswitchPhoneNumberConfigService } from "src/modules/config/fs-phonenumber-config/services/phonenumber-config.service";
 import { FreeswitchCallSystemService } from "src/modules/freeswitch-call-system/services/freeswitch-call-system.service";
 
-const jobQueue = queueDefault;
+const BeeQueue = require('bee-queue');
 
-export class ClickToCallJob{
+const jobQueue = new BeeQueue('default', redisOptions);
+
+export class ClickToCallJob implements IBeeQueueJob<any>{
+
     constructor(
-        private readonly _freeswitchCallConfigService: FreeswitchPhoneNumberConfigService,
         private readonly _freeswitchCallSystemService: FreeswitchCallSystemService
-    ) {}
+    ){}
 
-    trigger(data){
-        console.log('TRIGGER CLICK-TO-CALL JOB', data);
+    trigger(parameter: any) {
 
-        return jobQueue.createJob(data).save();
+        console.log('Parameter', parameter);
+
+        console.log('callduration', parameter.Duration);
+
+        jobQueue.process((job, done) => {
+
+            console.log('jobid', job.id);
+           this._freeswitchCallSystemService.saveCDR({
+                UUID: parameter.UUID,
+                CallerIdNumber: parameter.CallerIdNumber,
+                CallerName: parameter.CallerIdNumber,
+                CalleeIdNumber: parameter.CalleeIdNumber,
+                CallDirection: parameter.CallDirection,
+                StartedDate: parameter.StartedDate,
+                CallStatus: parameter.CallStatus,
+                CallDuration: parameter.Duration,
+                RecordingUUID: parameter.RecordingUUID
+            });
+
+            console.log('result', job.data);
+            done(null, job.id);
+        });
+
+        jobQueue.on('succeeded', (job,result) => {
+            console.log('success');
+        })
     }
-
-    private saveRecord(callData){
-        this._freeswitchCallSystemService.saveCDR({
-            StartedDate: callData.StartedDate,
-            UUID: callData.UUID,
-            Duration: callData.Duration,
-            CallDirection: callData.CallDirection,
-            CallStatus: callData.CallStatus,
-            CalleeIdNumber: callData.CalleeIdNumber,
-            CallerIdNumber: callData.CallerIdNumber,
-            CallerName: callData.CallerName,
-            RecordingUUID: callData.RecordingUUID
-        }, 60);
-    }
-
-   private test(){
-       jobQueue.process((job,done) => {
-
-        console.log('test here ');
-
-            this.saveRecord(job);
-       })
-   }
 }
-

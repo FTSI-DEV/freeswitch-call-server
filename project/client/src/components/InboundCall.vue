@@ -37,17 +37,6 @@
                     />
                   </a-form-item>
                 </a-col>
-                <a-col style="margin-right: 15px">
-                  <a-form-item
-                    label="Phone Number To"
-                    style="display: block; text-align: left"
-                  >
-                    <input
-                      :class="['ant-input', isInvalid(phoneNumberTo)]"
-                      v-model="phoneNumberTo"
-                    />
-                  </a-form-item>
-                </a-col>
 
                 <a-col style="margin-right: 15px">
                     <a-form-item label="HTTP Method" style="display: block; text-align: left">
@@ -119,13 +108,7 @@
           >
             <input :class="['ant-input']" v-model="selectedConfig.callerId"/>
           </a-form-item>
-          <a-form-item
-            label="Phone Number To"
-            style="display: block; text-align: left"
-          >
-            <input :class="['ant-input']" v-model="selectedConfig.phoneNumberTo" />
-          </a-form-item>
-<!-- 
+
           <a-form-item label="HTTP Method" style="display: block; text-align: left">
               <a-dropdown>
                 <template #overlay>
@@ -143,7 +126,7 @@
                         <DownOutlined style="float: right; margin-top: 5px" />
                 </a-button>
               </a-dropdown>
-          </a-form-item> -->
+          </a-form-item>
 
           <a-form-item
             label="Webhook URL"
@@ -158,7 +141,7 @@
 </template>
 <script>
 import EventService from "../services/EventService.ts";
-import { EditOutlined } from "@ant-design/icons-vue";
+import { EditOutlined, DownOutlined } from "@ant-design/icons-vue";
 
 export default {
   components: { EditOutlined , DownOutlined },
@@ -168,7 +151,6 @@ export default {
       to: null,
       hasError: false,
       callerId: null,
-      phoneNumberTo: null,
       webhookUrl: null,
       httpMethod: "POST",
       isSaved: false,
@@ -186,11 +168,6 @@ export default {
           key: "httpMethod"
         },
         {
-          title: "Phone Number To",
-          dataIndex: "phoneNumberTo",
-          key: "phoneNumberTo",
-        },
-        {
           title: "Webhook URL",
           dataIndex: "webhookUrl",
           key: "webhookUrl",
@@ -203,7 +180,6 @@ export default {
       modleVisibility: false,
       selectedConfig: {
         callerId: null,
-        phoneNumberTo: null,
         webhookUrl: null,
         httpMethod: "GET"
       },
@@ -217,14 +193,12 @@ export default {
   methods: {
     editConfig(val) {
       this.selectedConfig.callerId = null;
-      this.selectedConfig.phoneNumberTo = null;
       this.selectedConfig.webhookUrl = null;
       EventService.getInboundCallConfigById(val.id).then((res) => {
         if (res.status === 200) {
           this.modleVisibility = true;
-          const { callerId, phoneNumberTo, webhookUrl } = res.data;
+          const { callerId, webhookUrl, httpMethod } = res.data;
           this.selectedConfig.callerId = callerId;
-          this.selectedConfig.phoneNumberTo = phoneNumberTo;
           this.selectedConfig.webhookUrl = webhookUrl;
           this.selectedConfig.httpMethod = httpMethod || "GET";
         }
@@ -242,13 +216,12 @@ export default {
       return !value && this.hasError ? "invalid" : "";
     },
     saveConfig() {
-      if (!this.phoneNumberTo || !this.callerId || !this.webhookUrl || !this.httpMethod) {
+      if (!this.callerId || !this.webhookUrl) {
         this.hasError = true;
         return;
       }
       this.hasError = false;
       const params = {
-        phoneNumberTo: this.phoneNumberTo,
         callerId: this.callerId,
         webhookUrl: this.webhookUrl,
         httpMethod: this.httpMethod
@@ -257,7 +230,6 @@ export default {
       EventService.addInboundCallConfig(params).then((res) => {
         console.log("RESPONSE: ", res);
         if (res.status === 201) {
-          this.phoneNumberTo = null;
           this.callerId = null;
           this.webhookUrl = null;
           this.isSaved = true;
