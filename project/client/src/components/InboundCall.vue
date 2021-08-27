@@ -144,12 +144,10 @@
 </template>
 <script>
 import EventService from "../services/EventService.ts";
-import { EditOutlined, DownOutlined } from "@ant-design/icons-vue";
-import { EditOutlined, DeleteOutlined } from "@ant-design/icons-vue";
+import { EditOutlined, DownOutlined, DeleteOutlined } from "@ant-design/icons-vue";
 
 export default {
-  components: { EditOutlined , DownOutlined },
-  components: { EditOutlined, DeleteOutlined },
+  components: { EditOutlined , DownOutlined, DeleteOutlined},
   data() {
     return {
       from: null,
