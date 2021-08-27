@@ -104,8 +104,11 @@
             <a-table :data-source="configList.list" :columns="columns">
               <template #action="{ record }">
                 <a title="Edit" @click="editConfig(record)"
-                  ><EditOutlined style="font-size: 1.2em"
+                  ><EditOutlined style="font-size: 1.2em; margin-right: 15px"
                 /></a>
+                <a title="Delete" @click="deleteConfig(record)">
+                  <DeleteOutlined style="font-size: 1.2em" />
+                </a>
               </template>
             </a-table>
           </b-col>
@@ -120,40 +123,46 @@
             label="Friendly Name"
             style="display: block; text-align: left"
           >
-            <input :class="['ant-input']" v-model="selectedConfig.friendlyName" />
+            <input
+              :class="['ant-input']"
+              v-model="selectedConfig.friendlyName"
+            />
           </a-form-item>
           <a-form-item
             label="Phone Number"
             style="display: block; text-align: left"
           >
-            <input :class="['ant-input']"  v-model="selectedConfig.phoneNumber"/>
+            <input
+              :class="['ant-input']"
+              v-model="selectedConfig.phoneNumber"
+            />
           </a-form-item>
-       <a-form-item
-                    label="HTTP Method"
-                    style="display: block; text-align: left"
-                  >
-                    <a-dropdown>
-                      <template #overlay>
-                        <a-menu>
-                          <a-menu-item key="1" @click="setMethodUpdate('POST')">
-                            HTTP POST
-                          </a-menu-item>
-                          <a-menu-item key="2" @click="setMethodUpdate('GET')">
-                            HTTP GET
-                          </a-menu-item>
-                        </a-menu>
-                      </template>
-                      <a-button style="width: 100%; text-align: left">
-                        {{ selectedConfig.httpMethod }}
-                        <DownOutlined style="float: right; margin-top: 5px" />
-                      </a-button>
-                    </a-dropdown>
-                  </a-form-item>
+          <a-form-item
+            label="HTTP Method"
+            style="display: block; text-align: left"
+          >
+            <a-dropdown>
+              <template #overlay>
+                <a-menu>
+                  <a-menu-item key="1" @click="setMethodUpdate('POST')">
+                    HTTP POST
+                  </a-menu-item>
+                  <a-menu-item key="2" @click="setMethodUpdate('GET')">
+                    HTTP GET
+                  </a-menu-item>
+                </a-menu>
+              </template>
+              <a-button style="width: 100%; text-align: left">
+                {{ selectedConfig.httpMethod }}
+                <DownOutlined style="float: right; margin-top: 5px" />
+              </a-button>
+            </a-dropdown>
+          </a-form-item>
           <a-form-item
             label="Webhook URL"
             style="display: block; text-align: left"
           >
-            <input :class="['ant-input']" v-model="selectedConfig.webhookUrl"/>
+            <input :class="['ant-input']" v-model="selectedConfig.webhookUrl" />
           </a-form-item>
         </a-modal>
       </a-layout-content>
@@ -162,7 +171,11 @@
 </template>
 <script>
 import EventService from "../services/EventService.ts";
-import { DownOutlined, EditOutlined } from "@ant-design/icons-vue";
+import {
+  DownOutlined,
+  EditOutlined,
+  DeleteOutlined,
+} from "@ant-design/icons-vue";
 // import OutboundCall from './OutboundCall.vue';
 export default {
   data() {
@@ -207,10 +220,10 @@ export default {
       ],
       modleVisibility: false,
       selectedConfig: {
-          friendlyName: null,
-          phoneNumber: null,
-          httpMethod: "GET",
-          webhookUrl: null,
+        friendlyName: null,
+        phoneNumber: null,
+        httpMethod: "GET",
+        webhookUrl: null,
       },
     };
   },
@@ -223,13 +236,23 @@ export default {
     setMethodUpdate(val) {
       this.selectedConfig.httpMethod = val;
     },
+    deleteConfig(val) {
+      if (confirm("Are you sure you want to delete this config?")) {
+        EventService.deletePhoneNumberConfig(val.id).then((res) => {
+          if (res.status === 201) {
+            this.getPhoneNumberConfigs();
+          }
+        });
+      }
+    },
     editConfig(val) {
       this.selectedConfig.friendlyName = null;
       this.selectedConfig.phoneNumber = null;
       this.selectedConfig.webhookUrl = null;
       EventService.getPhoneNumberConfigById({ id: val.id }).then((res) => {
         if (res.status === 200) {
-          const { friendlyName, phoneNumber, httpMethod, webhookUrl } = res.data;
+          const { friendlyName, phoneNumber, httpMethod, webhookUrl } =
+            res.data;
           this.modleVisibility = true;
           this.selectedConfig.friendlyName = friendlyName;
           this.selectedConfig.phoneNumber = phoneNumber;
@@ -240,12 +263,12 @@ export default {
       console.log("val: ", val.id);
     },
     handleOk() {
-      EventService.updatePhoneNumberConfig(this.selectedConfig).then(res => {
+      EventService.updatePhoneNumberConfig(this.selectedConfig).then((res) => {
         if (res.status === 201) {
           this.getPhoneNumberConfigs();
           this.modleVisibility = false;
         }
-      })
+      });
     },
     isInvalid(value) {
       return !value && this.hasError ? "invalid" : "";
@@ -302,7 +325,7 @@ export default {
   created() {
     this.getPhoneNumberConfigs();
   },
-  components: { DownOutlined, EditOutlined },
+  components: { DownOutlined, EditOutlined, DeleteOutlined },
 };
 </script>
 <style scoped>

@@ -32,7 +32,10 @@ export default {
     },
     getPhoneNumberConfigs(params:any){
         return apiClient.get('/api/freeswitch-phonenumber-config/getPhonenumberConfigs');
-    }, 
+    },
+    deletePhoneNumberConfig(params:any){
+        return apiClient.post(`/api/freeswitch-phonenumber-config/deleteConfig/${params}`);
+    },  
     getPhoneNumberConfigById(params:any){
         return apiClient.get('/api/freeswitch-phonenumber-config/getPhoneNumberConfigById', { params: params });
     },
@@ -50,6 +53,9 @@ export default {
         console.log('params: ', params)
         return apiClient.post(`/api/inbound-call-config/add/${params.callerId}/${params.webhookUrl}/${params.httpMethod}`);
     },
+    deleteInboundCallConfig(params:any){
+        return apiClient.post(`/api/inbound-call-config/deleteConfig/${params}`);
+    }, 
     updateInboundCallConfig(params: any) {
         return apiClient.post(`/api/inbound-call-config/${params.phoneNumberTo}/${params.callerId}/${params.callForwardingNumber}`);
     }
