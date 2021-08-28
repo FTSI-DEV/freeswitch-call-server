@@ -1,19 +1,14 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import { EslServerHelper } from './helpers/fs-esl/server';
-import { StartFreeswitchApplication } from './helpers/fs-esl/event-socket-monitor';
-import ArenaConfig from './beequeue/arenaConfig';
-import { Logger } from '@nestjs/common';
-import { CustomLogger, getLog } from './logger/logger';
+import ArenaConfig from './bull-queue/arenaConfig';
+import { CustomLogger } from './logger/logger';
 const Arena = require('bull-arena');
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule,{
-    logger: getLog('system').loggerService
-  });
+  const app = await NestFactory.create(AppModule);
 
-  // // Allow crossorigin
+  // Allow crossorigin
   app.enableCors();
 
   // Swagger
@@ -24,10 +19,10 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
 
-  // Beequeue Arena initialization
+  // BullQueue Arena initialization
   Arena(ArenaConfig);
 
-  // app.useLogger(app.get(CustomLogger));
+  app.useLogger(app.get(CustomLogger));
 
   await app.listen(3000);
 }

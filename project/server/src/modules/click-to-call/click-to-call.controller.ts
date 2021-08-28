@@ -1,4 +1,6 @@
+import { InjectQueue } from '@nestjs/bull';
 import { Controller, Get, Inject, Logger, Param, Post, Query } from '@nestjs/common';
+import { Queue } from 'bull';
 
 import { IBeeQueueJob } from 'src/beequeue/beeQueueJob.interface';
 import { redisOptions } from 'src/beequeue/config/redisOptions.config';
@@ -22,7 +24,9 @@ export class FreeswitchController {
               @Inject(FsEslService)
               private _freeswitchService: IFSEslService,
               private _freeswitchCallSystemService: FreeswitchCallSystemService,
-              private _freeswitchCallConfigService: FreeswitchPhoneNumberConfigService
+              private _freeswitchCallConfigService: FreeswitchPhoneNumberConfigService,
+              @InjectQueue('default')
+              private clickToCallJobQueue: Queue
               ) {}
 
   @Post('clickToCall/:phoneNumberFrom/:phoneNumberTo/:callerId')
@@ -48,9 +52,11 @@ export class FreeswitchController {
   clickToCallStatusCallBack(@Query() callData: CDRModels){
     console.log('CLICK TO CALL STATUS CALL BACK API', callData);
 
-    jobQueue.createJob(callData).save();
+    const job = this.clickToCallJobQueue.add(callData);
+    
+    // jobQueue.createJob(callData).save();
 
-    new ClickToCallJob(this._freeswitchCallSystemService).trigger(callData);
+    // new ClickToCallJob(this._freeswitchCallSystemService).trigger(callData);
 
     return "Successfully submitted to job queue";
   }

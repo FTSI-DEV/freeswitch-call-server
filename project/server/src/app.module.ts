@@ -18,6 +18,9 @@ import { StartFreeswitchApplication } from './helpers/fs-esl/event-socket-monito
 import { InboundCallConfigService } from './modules/config/inbound-call-config/services/inbound-call-config.service';
 import { CDRHelper } from './helpers/fs-esl/cdr.helper';
 import { CustomLoggerModule } from './logger/logger.module';
+import { BullModule } from '@nestjs/bull';
+import { BullModuleQueue } from './bull-queue/bull.module';
+import { TestModule } from './modules/test/test.module';
 // import { ClickToCallJobModule } from './beequeue/jobs/clickToCall/clickToCallJob.module';
 
 @Module({
@@ -32,8 +35,15 @@ import { CustomLoggerModule } from './logger/logger.module';
     FreeswitchCallSystemModule,
     ClickToCallModule,
     InboundCallConfigModule,
-    ClickToCallModule,
-    CustomLoggerModule
+    CustomLoggerModule,
+    BullModuleQueue,
+    TestModule,
+    BullModule.forRoot({
+      redis:{
+        host: process.env.REDIS_SERVER_HOST,
+        port: 6379
+      }
+    })
   ],
   controllers: [AppController],
   providers: [AppService],

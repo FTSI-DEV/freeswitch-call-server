@@ -18,7 +18,9 @@ export class ClickToCallJob implements IBeeQueueJob<any>{
     trigger(parameter: any) {
         jobQueue.process((job, done) => {
 
-            this._consoleLogger.log('JobId: ', job.id);
+            this._consoleLogger.info('JobId: ', job.id);
+
+            this._consoleLogger.getLog(ClickToCallJob.name).info(`JobId: ${job.id}`);
 
            this._freeswitchCallSystemService.saveCDR({
                 UUID: parameter.UUID,
