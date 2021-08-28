@@ -1,20 +1,13 @@
-import { HttpCode, Injectable } from '@nestjs/common';
-import { connect } from 'http2';
-import { stringify } from 'querystring';
-import { redisOptions } from 'src/beequeue/config/redisOptions.config';
+import { Injectable } from '@nestjs/common';
 import { CHANNEL_VARIABLE } from 'src/helpers/constants/channel-variables.constants';
 import { FS_ESL } from 'src/helpers/constants/fs-esl.constants';
 import { CallDispatchHelper } from 'src/helpers/fs-esl/callDispatch.helper';
 import { CDRHelper } from 'src/helpers/fs-esl/cdr.helper';
 import { FreeswitchConnectionHelper } from 'src/helpers/fs-esl/eslfreeswitch.connection';
-import { OriginationModel } from 'src/helpers/fs-esl/models/originate.model';
 import { CDRModels } from 'src/models/cdr.models';
 import { WebhookClickToCallStatusCallBack } from 'src/utils/webhooks';
 import { IFSEslService } from './click-to-call.interface';
 const http = require('http');
-
-const BeeQueue = require('bee-queue');
-const jobQueue = new BeeQueue('default', redisOptions);
 
 @Injectable()
 export class FsEslService implements IFSEslService {

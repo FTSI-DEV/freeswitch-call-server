@@ -10,8 +10,7 @@ import { TestController } from './test.controller';
     BullModule.registerQueue({
       name: 'default',
     }),
-    FreeswitchCallSystemModule,
-    IncomingCallModule
+    FreeswitchCallSystemModule
   ],
   providers: [ClickToCallProcessor],
   exports: [ClickToCallProcessor,BullModule],

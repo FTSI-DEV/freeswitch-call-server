@@ -1,17 +1,18 @@
 import { OnQueueActive, Process, Processor } from '@nestjs/bull';
 import { Job } from 'bull';
+import { FreeswitchCallSystemService } from 'src/modules/freeswitch-call-system/services/freeswitch-call-system.service';
 import { IncomingCallService } from 'src/modules/incomingCall/incomingCall.service';
 
 @Processor('default')
 export class IncomingCallJob {
-  constructor(private readonly _incomingCallService: IncomingCallService) {}
+  constructor(private readonly _freeswitchSystemService: FreeswitchCallSystemService) {}
 
   @Process()
   handleTranscode(parameter: Job) {
     console.log('Start transcoding incoming call...');
     console.log('PARAMETER', parameter);
 
-    this._incomingCallService.saveIncomingCallCDR({
+    this._freeswitchSystemService.saveCDR({
       UUID: parameter.data.UUID,
       CallerIdNumber: parameter.data.CallerIdNumber,
       CallerName: parameter.data.CallerIdNumber,
