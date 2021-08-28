@@ -3,13 +3,6 @@ const http = require('http');
 
 //const baseUrl = 'http://www.google.com/search?q=';
 
-
-import { 
-    WebhookGetIncomingCallEnterUri, 
-    WebhookGetIncomingCallVerify, 
-    WebhookGetWaitingToConnect 
-} from '../utils/webhooks';
-
 export class CreateQueue {
 
     private queue: any
@@ -58,10 +51,10 @@ export class CreateQueue {
             // });
 
             console.log('JOB DATA: ', job.data);
-            http.get(WebhookGetIncomingCallEnterUri(1, 2), function (res) {
+            // http.get(WebhookGetIncomingCallEnterUri(1, 2), function (res) {
                 
-                return done(null, `StatusCode: ${res.statusCode}; StatusMessage: ${res.statusMessage}; `);
-            });
+            //     return done(null, `StatusCode: ${res.statusCode}; StatusMessage: ${res.statusMessage}; `);
+            // });
 
             //  http.get(WebhookGetIncomingCallVerify(1, 2), function (res) {
             //     return done(null, `StatusCode: ${res.statusCode}; StatusMessage: ${res.statusMessage}; `);

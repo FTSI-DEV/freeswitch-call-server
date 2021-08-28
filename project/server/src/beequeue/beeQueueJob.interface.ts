@@ -1,4 +1,4 @@
 
 export interface IBeeQueueJob<T>{
-    trigger(parameter: T, )
+    trigger(parameter: T);
 }

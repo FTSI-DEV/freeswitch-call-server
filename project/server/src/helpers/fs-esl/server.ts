@@ -170,28 +170,28 @@ export class EslServerHelper {
   private _executeTestCrmApi(conn: any) {
     console.log('EXECUTING CRM API -> ');
 
-    apiClient
-      .getIncomingCallEnter({
-        StoreId: 60,
-        SystemId: 1,
-      })
-      .then((res) => {
-        let xmlParserResult = new XMLParser().tryParseXMLBody(res.data);
+    // apiClient
+    //   .getIncomingCallEnter({
+    //     StoreId: 60,
+    //     SystemId: 1,
+    //   })
+    //   .then((res) => {
+    //     let xmlParserResult = new XMLParser().tryParseXMLBody(res.data);
 
-        let dialplan_taskList = this.XmlConversionTaskValues(xmlParserResult);
+    //     let dialplan_taskList = this.XmlConversionTaskValues(xmlParserResult);
 
-        dialplan_taskList.forEach((element) => {
-          console.log(`Key: ${element.key} , Value: ${element.value}`);
+    //     dialplan_taskList.forEach((element) => {
+    //       console.log(`Key: ${element.key} , Value: ${element.value}`);
 
-          if (element.key === FS_DIALPLAN.Say) {
-            element.value = 'ivr/ivr-welcome_to_freeswitch.wav';
-            element.key = 'playback';
-          }
+    //       if (element.key === FS_DIALPLAN.Say) {
+    //         element.value = 'ivr/ivr-welcome_to_freeswitch.wav';
+    //         element.key = 'playback';
+    //       }
 
-          conn.execute(element.key, element.value);
-        });
-      })
-      .catch((err) => console.log('UNEXPECTED ERROR -> ', err));
+    //       conn.execute(element.key, element.value);
+    //     });
+    //   })
+    //   .catch((err) => console.log('UNEXPECTED ERROR -> ', err));
   }
 
   private XmlConversionTaskValues(xmlParserResult: KeyValues[]): KeyValues[] {

@@ -12,25 +12,7 @@ export const apiClient = axios.create({
     //     keepAlive: true
     // })
 });
-
 export default {
-    getIncomingCallEnter({ StoreId, SystemId }) {
-        console.log('StoreId: ', StoreId);
-        console.log('SystemId: ', SystemId);
-        return apiClient.get('/NewInboundCall/IncomingCallEnter', {
-            params: { StoreId, SystemId }
-        })
-    },
-    getIncomingCallVerify({ StoreId, SystemId }) {
-        return apiClient.get('/NewInboundCall/IncomingCallVerify', {
-            params: { StoreId, SystemId }
-        })
-    },
-    getWaitingToConnect({ StoreId, SystemId }) {
-        return apiClient.get('/NewInboundCall/WaitingToConnect', {
-            params: { StoreId, SystemId }
-        })
-    },
     getIncomingStatusCallBack(request: InboundRequestCall){
         return apiClient.get('/NewInboundCall/IncomingStatusCallBack',{
             params: { request }

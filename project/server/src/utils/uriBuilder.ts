@@ -1,4 +1,3 @@
-import { ReturningStatementNotSupportedError } from "typeorm";
 
 export class URIBuilder {
   baseUrl: string;

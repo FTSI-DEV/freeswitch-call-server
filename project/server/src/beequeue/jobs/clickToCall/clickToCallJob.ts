@@ -10,15 +10,12 @@ const jobQueue = new BeeQueue('default', redisOptions);
 export class ClickToCallJob implements IBeeQueueJob<any>{
 
     private readonly _consoleLogger = new CustomLogger(ClickToCallJob.name);
-    private readonly _logger
 
     constructor(
         private readonly _freeswitchCallSystemService: FreeswitchCallSystemService,
     ){}
 
     trigger(parameter: any) {
-
-        
         jobQueue.process((job, done) => {
 
             this._consoleLogger.log('JobId: ', job.id);

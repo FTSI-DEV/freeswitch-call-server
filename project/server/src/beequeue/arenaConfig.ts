@@ -12,45 +12,9 @@ export default {
           hostId: 'default',
           type: 'bee',
           redis:{
-            host: '127.0.0.1',
-            port: REDIS_SERVER_PORT
+            host: process.env.REDIS_SERVER_HOST,
+            port: process.env.REDIS_SERVER_PORT
           }
-        },
-        {
-          // Required for each queue definition.
-          name: 'incomingCallEnter',
-          // User-readable display name for the host. Required.
-          hostId: 'incomingCallEnter',
-          // Queue type (Bull or Bee - default Bull).
-          type: 'bee',  
-          redis: {
-            host: '127.0.0.1',
-            port: REDIS_SERVER_PORT,
-          },
-        },
-          {
-          // Required for each queue definition.
-          name: 'incomingCallVerify',
-          // User-readable display name for the host. Required.
-          hostId: 'incomingCallVerify',
-          // Queue type (Bull or Bee - default Bull).
-          type: 'bee',  
-          redis: {
-            host: '127.0.0.1',
-            port: REDIS_SERVER_PORT,
-          },
-        },
-         {
-          // Required for each queue definition.
-          name: 'waitinngToConnect',
-          // User-readable display name for the host. Required.
-          hostId: 'waitinngToConnect',
-          // Queue type (Bull or Bee - default Bull).
-          type: 'bee',  
-          redis: {
-            host: '127.0.0.1',
-            port: REDIS_SERVER_PORT,
-          },
         }
       ],
       customCssPath: 'https://example.com/custom-arena-style.css',
