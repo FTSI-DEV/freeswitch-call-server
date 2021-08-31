@@ -3,10 +3,11 @@ import { CHANNEL_VARIABLE } from 'src/helpers/constants/channel-variables.consta
 import { FS_ESL } from 'src/helpers/constants/fs-esl.constants';
 import { CallDispatchHelper } from 'src/helpers/fs-esl/callDispatch.helper';
 import { CDRHelper } from 'src/helpers/fs-esl/cdr.helper';
-import { FreeswitchConnectionHelper } from 'src/helpers/fs-esl/eslfreeswitch.connection';
+import { FreeswitchConnectionHelper, FreeswitchConnectionResult } from 'src/helpers/fs-esl/eslfreeswitch.connection';
 import { CDRModels } from 'src/models/cdr.models';
 import { WebhookClickToCallStatusCallBack } from 'src/utils/webhooks';
 import { IFSEslService } from './click-to-call.interface';
+
 const http = require('http');
 
 @Injectable()
@@ -16,69 +17,72 @@ export class FsEslService implements IFSEslService {
   private readonly _callDispatchHelper = new CallDispatchHelper();
   private readonly _fsConnection = new FreeswitchConnectionHelper();
 
-  clickToCall(
+  async clickToCall(
     phoneNumberTo: string,
     phoneNumberFrom: string,
     callerId: string,
-  ): string {
+  ): Promise<string> {
+
     let uid: string;
+      let connectionResult = FreeswitchConnectionResult;
 
-    this._fsConnection
-      .connect()
-      .then((connection) => {
-        console.log('EXECUTING CLICK-TO-CALL');
+      if (!connectionResult.isSuccess){
 
-        uid = this.triggerOriginateCall(
-          connection,
-          phoneNumberFrom,
-          phoneNumberTo,
-          callerId,
-        );
+        console.log('Connection Error -> No ESL Connection established');
+        return "Connection Error -> No ESL Connection established";
+      }
 
-        // this._onListenEvent(connection, uid);
+      console.log('EXECUTING CLICK-TO-CALL');
 
-        console.log('UID', uid);
-      })
-      .catch((err) => {
-        let errMessage = 'Error click to call ' + err;
-        console.log(errMessage);
-        return errMessage;
+      uid = await this.triggerOriginateCall(
+        connectionResult.connectionObj,
+        phoneNumberFrom,
+        phoneNumberTo,
+        callerId,
+      );
+
+      console.log('UID', uid);
+
+      return new Promise<string>((resolve,reject) => {
+        resolve(uid);
       });
-
-    return uid;
   }
 
-  private triggerOriginateCall(
+  triggerOriginateCall(
     connection,
     phoneNumberFrom: string,
     phoneNumberTo: string,
     callerId: string,
-  ): string {
-    let self = this;
-    let callUid: string = '';
+  ): Promise<string> {
 
-    let app_args = `sofia/gateway/fs-test1/${phoneNumberFrom}`;
-    let arg1 = `{ignore_early_media=true,origination_caller_id_number=${callerId}}${app_args}`;
-    let arg2 = `${arg1} &bridge({origination_caller_id_number=${callerId}}sofia/gateway/fs-test3/${phoneNumberTo})`;
+    return new Promise<any>((resolve,reject) => {
+      let self = this;
+    
+      let app_args = `sofia/gateway/fs-test1/${phoneNumberFrom}`;
+      let arg1 = `{ignore_early_media=true,origination_caller_id_number=${callerId}}${app_args}`;
+      let arg2 = `${arg1} &bridge({origination_caller_id_number=${callerId}}sofia/gateway/fs-test3/${phoneNumberTo})`;
+  
+      connection.api('originate', arg2, function (res) {
+  
+        let callUid = res.getBody().toString().replace('+OK ', '');
+  
+        console.log('callUid -> ', callUid);
+  
+        self._onListenEvent(connection, callUid, function() {
+          console.log('on listendevent ');
+          resolve(callUid);
+        });
+      });
+  
+      // let app_args = `sofia/gateway/sip_provider/${phoneNumberTo}`;
+      // let arg1 = `{ignore_early_media=true,origination_caller_id_number=${callerId}}${app_args}`;
+      // let arg2 = `${arg1} &bridge(sofia/gateway/sip_provider/${phoneNumberFrom})`;
 
-    // let app_args = `sofia/gateway/sip_provider/${phoneNumberTo}`;
-    // let arg1 = `{ignore_early_media=true,origination_caller_id_number=${callerId}}${app_args}`;
-    // let arg2 = `${arg1} &bridge(sofia/gateway/sip_provider/${phoneNumberFrom})`;
-
-    connection.api('originate', arg2, function (res) {
-      callUid = res.getBody().toString().replace('+OK ', '');
-
-      console.log('callUid -> ', callUid);
-
-      self._onListenEvent(connection, callUid);
     });
-
-    console.log('sss', callUid);
-
-    return callUid;
   }
 
-  private _onListenEvent(connection, uuid: string) {
+  _onListenEvent(connection, uuid: string, callback) {
+
     console.log('uid2 -> ', uuid);
 
     let self = this;
@@ -86,22 +90,31 @@ export class FsEslService implements IFSEslService {
     connection.subscribe('all');
 
     connection.on(FS_ESL.RECEIVED, (fsEvent) => {
+
       const eventName = fsEvent.getHeader('Event-Name');
 
       const callUids = fsEvent.getHeader(CHANNEL_VARIABLE.UNIQUE_ID);
+
       console.log('originate uid - >', callUids);
-      // console.log('testtest', uid);
+
       if (callUids === uuid.trim()) {
+
        console.log('LISTENING TO AN EVENT - CLICK-TO-CALL', eventName);
+
         if (eventName === 'CHANNEL_HANGUP_COMPLETE') {
+
           console.log('LISTENING TO AN EVENT ', eventName);
+
           let cdrModel = new CDRHelper().getCallRecords(fsEvent);
 
           console.log('CDR CLICKTOCALL', cdrModel);
 
           self.triggerClickToCallStatusCallBack(cdrModel);
+
+          callback();
         }
       }
+
     });
   }
 

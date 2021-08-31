@@ -2,40 +2,42 @@ import { FS_ESL } from "../constants/fs-esl.constants";
 import { FreeswitchConfigHelper } from "./freeswitchConfig.helper";
 const esl = require('modesl');
 
-let connection: any = null;
+interface ConnResult {
+    connectionObj: object;
+    isSuccess: boolean;
+    errorMessage: string
+}
+
+export const FreeswitchConnectionResult: ConnResult = {
+    connectionObj: null,
+    isSuccess: false,
+    errorMessage: null
+}
 
 export const fsConnect = (): any => {
+    
     return new Promise<any>((resolve,reject) => {
 
-        if (connection !== null && connection.connected()) {
-            console.log('TEST 1' );
-            resolve(connection);
-        }
-        else {
+        let fsConfig = new FreeswitchConfigHelper().getFreeswitchConfig();
             
-            let fsConfig = new FreeswitchConfigHelper().getFreeswitchConfig();
-            
-            connection = new esl.Connection(fsConfig.ip, fsConfig.port, fsConfig.password);
-            
-            connection.on(FS_ESL.CONNECTION.ERROR, () => {
-                console.log('TEST 1' );
-                reject('Connection Error');
-            });
+        let connection = new esl.Connection(fsConfig.ip, 
+            fsConfig.port, 
+            fsConfig.password);
+        
+        connection.on(FS_ESL.CONNECTION.ERROR, () => {
+            FreeswitchConnectionResult.errorMessage = "Connection Error";
+            reject(FreeswitchConnectionResult);
+        });
 
-            connection.on(FS_ESL.CONNECTION.CLOSED, () => {
-                console.log('TEST 1' );
-                reject('Connection Closed');
-            });
+        connection.on(FS_ESL.CONNECTION.READY, () => {
+            FreeswitchConnectionResult.isSuccess = true;
+            FreeswitchConnectionResult.connectionObj = connection;
+            resolve(FreeswitchConnectionResult);
+        })
 
-            connection.on(FS_ESL.CONNECTION.READY, () => {
-                console.log('TEST2' );
-                resolve(connection);
-            })
-        }
     }).catch(err => console.log(err))
 }
 
 export class FreeswitchConnectionHelper{
-    startConnection = connection;
     connect = fsConnect;
 }

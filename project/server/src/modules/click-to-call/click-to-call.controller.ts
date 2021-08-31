@@ -1,5 +1,13 @@
 import { InjectQueue } from '@nestjs/bull';
-import { Controller, Get, Inject, Logger, Param, Post, Query } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Inject,
+  Logger,
+  Param,
+  Post,
+  Query,
+} from '@nestjs/common';
 import { Queue } from 'bull';
 import { CDRModels } from 'src/models/cdr.models';
 import { FreeswitchPhoneNumberConfigService } from '../config/fs-phonenumber-config/services/phonenumber-config.service';
@@ -10,27 +18,23 @@ const http = require('http');
 
 @Controller('/api/freeswitch')
 export class FreeswitchController {
-
-  constructor(  
-              @Inject(FsEslService)
-              private _freeswitchService: IFSEslService,
-              private _freeswitchCallSystemService: FreeswitchCallSystemService,
-              private _freeswitchCallConfigService: FreeswitchPhoneNumberConfigService,
-              @InjectQueue('default')
-              private clickToCallJobQueue: Queue
-              ) {}
+  constructor(
+    @Inject(FsEslService)
+    private _freeswitchService: IFSEslService,
+    private _freeswitchCallSystemService: FreeswitchCallSystemService,
+    private _freeswitchCallConfigService: FreeswitchPhoneNumberConfigService,
+    @InjectQueue('default')
+    private clickToCallJobQueue: Queue,
+  ) {}
 
   @Post('clickToCall/:phoneNumberFrom/:phoneNumberTo/:callerId')
-  clickToCall(
+  async clickToCall(
     @Param('phoneNumberFrom') phoneNumberFrom: string,
     @Param('phoneNumberTo') phoneNumberTo: string,
     @Param('callerId') callerId: string,
-  ): string {
-    console.log(`CTC PARAM - ${phoneNumberFrom}, 
-                    phoneNumberTo - ${phoneNumberTo} , 
-                    callerId - ${callerId}`);
+  ): Promise<string> {
 
-    let result = this._freeswitchService.clickToCall(
+    let result = await this._freeswitchService.clickToCall(
       phoneNumberTo,
       phoneNumberFrom,
       callerId,
@@ -40,15 +44,29 @@ export class FreeswitchController {
   }
 
   @Get('clickToCallStatusCallBack')
-  clickToCallStatusCallBack(@Query() callData: CDRModels){
+  clickToCallStatusCallBack(@Query() callData: CDRModels) {
     console.log('CLICK TO CALL STATUS CALL BACK API', callData);
 
-    const job = this.clickToCallJobQueue.add(callData);
-    
-    // jobQueue.createJob(callData).save();
+    this.clickToCallJobQueue.add('click-to-call', 
+    {
+      data: callData
+    });
 
-    // new ClickToCallJob(this._freeswitchCallSystemService).trigger(callData);
+    return 'Successfully submitted to job queue';
+  }
 
-    return "Successfully submitted to job queue";
+  @Get('test')
+  TestSampleApi() {
+    // this.clickToCallJobQueue.add(1);
+
+    this.clickToCallJobQueue.add('job1', {
+      data: 1,
+    });
+
+    this.clickToCallJobQueue.add('job2', {
+      data: 2,
+    });
+
+    return 'Successfully submitted to job queue';
   }
 }

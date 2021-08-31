@@ -4,15 +4,15 @@ import { CDRModels } from "src/models/cdr.models";
 import { FreeswitchCallSystemService } from "src/modules/freeswitch-call-system/services/freeswitch-call-system.service";
 
 @Processor('default')
-export class ClickToCallJob{
+export class sampleJob{
 
     constructor(
         private readonly _freeswitchCallSystemService: FreeswitchCallSystemService
     ) {}
 
-    @Process('click-to-call')
+    @Process('job2')
     handleTranscode(parameter: Job){
-        console.log('Start transcoding...' , parameter.data);
+        console.log('TEST...');
         // console.log('PARAMETER', parameter);
 
         // this._freeswitchCallSystemService.saveCDR({
