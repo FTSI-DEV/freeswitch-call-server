@@ -33,6 +33,8 @@ export class EslServerHelper {
   //for InboundCall
   startEslServer() {
 
+    this._customLogger.info('Start esl Server..');
+
     let self = this;
 
     let esl = require('modesl');
@@ -85,7 +87,10 @@ export class EslServerHelper {
     let self = this;
 
     eslServerRes.on(ESL_SERVER.CONNECTION.READY, function (conn) {
+
       console.log('CONNECTION SERVER READY');
+
+      conn.subscribe('events::all');
 
       self._onListen(conn);
 
@@ -97,12 +102,12 @@ export class EslServerHelper {
 
       self.inboundCallExecute(conn, destinationNumber);
 
-      conn.on('esl::end', function (evt, body) {
-        console.log('ESL END');
-        console.log('CDR - END', CDR);
+      // conn.on('esl::end', function (evt, body) {
+      //   console.log('ESL END');
+      //   console.log('CDR - END', CDR);
 
-        http.get(WebhookIncomingStatusCallBack(CDR), function (res) {});
-      });
+      //   http.get(WebhookIncomingStatusCallBack(CDR), function (res) {});
+      // });
     });
   }
 
@@ -118,23 +123,31 @@ export class EslServerHelper {
 
       console.log('fs inbound call config', result);
 
+      // var crmRetval = this._executeTestCrmApi(conn);
+      
       let apiRetVal =  this.triggerWebhookURL(result);
 
-      apiRetVal.then((result) => {
+      console.log('RETVAL CRM -> ', apiRetVal);
+
+      // apiRetVal.then((result) => {
         
-        console.log('record crm api', result);
+      //   console.log('record crm api', result);
 
-        //EXECUTE XML PARSER HERE....
+      //   //EXECUTE XML PARSER HERE....
 
-        if (result != null){
-          let phoneNumberTo = result.PhoneNumberTo;
+      //   if (result != null){
+      //     let phoneNumberTo = result.PhoneNumberTo;
 
-          conn.execute('bridge', `sofia/gateway/sip_provider/${phoneNumberTo}`);
-        }
+      //     conn.execute('bridge', `sofia/gateway/sip_provider/${phoneNumberTo}`);
+      //   }
 
-      }).catch((err) => {
-        console.log('UNEXPECTED ERROR CALLING API -> ', err);
-      });
+      // }).catch((err) => {
+      //   console.log('UNEXPECTED ERROR CALLING API -> ', err);
+      // });
+
+      conn.execute('set', 'effective_caller_id_number=+17132633133');
+
+      conn.execute('bridge', 'sofia/gateway/fs-test3/1003');
       
       this.triggerIncomingStatusCallBack(CDR);
 
@@ -145,7 +158,10 @@ export class EslServerHelper {
 
   private triggerIncomingStatusCallBack(cdrModel: CDRModels){
 
-    if (cdrModel == null || cdrModel == undefined) return;
+    if (cdrModel == null || cdrModel == undefined){
+      console.log('null ->');
+      return;
+    };
 
     http.get(WebhookIncomingStatusCallBack(cdrModel));
   }
