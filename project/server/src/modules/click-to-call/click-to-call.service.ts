@@ -57,23 +57,26 @@ export class FsEslService implements IFSEslService {
       let self = this;
     
       let app_args = `sofia/gateway/fs-test1/${phoneNumberFrom}`;
-      let arg1 = `{ignore_early_media=true,origination_caller_id_number=${callerId},hangup_after_bridge=true}${app_args}`;
+      let arg1 = `{ignore_early_media=true,origination_caller_id_number=${phoneNumberFrom},hangup_after_bridge=true}${app_args}`;
       let arg2 = `${arg1} &bridge({origination_caller_id_number=${callerId}}sofia/gateway/fs-test3/${phoneNumberTo})`;
-      let arg3 = `bridge({origination_caller_id_number=${callerId}}sofia/gateway/fs-test3/${phoneNumberTo})`
+      let arg3 = `bridge({hangup_after_bridge=true,origination_caller_id_number=${callerId}}sofia/gateway/fs-test3/${phoneNumberTo})`
 
-      connection.originate({
-        profile: 'external',
-        number: `${phoneNumberFrom}`,
-        gateway: `192.168.18.68:5080`,
-        app: arg3
-      }, (res) => {
+      connection.api('originate', arg2, function(res){
 
         let callUid = res.getBody().toString().replace('+OK ', '');
 
         console.log('originate', callUid);
 
         resolve(callUid.trim());
-      })
+      });
+
+      // connection.originate({
+      //   profile: 'external',
+      //   number: `${phoneNumberFrom}`,
+      //   gateway: `192.168.18.68:5080`,
+      //   app: arg3
+      // }, (res) => {
+      // })
     });
   }
 
