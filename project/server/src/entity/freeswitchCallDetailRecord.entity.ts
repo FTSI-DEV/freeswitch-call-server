@@ -28,13 +28,15 @@ export class FsCallDetailRecordEntity{
 
     @Column({ nullable: true})
     RecordingUUID? : string;
+
+    @Column({ nullable: true})
+    ParentCallUid?: string;
 }
 
 @EntityRepository(FsCallDetailRecordEntity)
 export class FsCallDetailRecordRepository extends Repository<FsCallDetailRecordEntity>{
     
     saveCDR = async(cdr: FsCallDetailRecordEntity) => {
-        console.log('cdr2', cdr);
         return await this.save(cdr);
     }
 }

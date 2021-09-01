@@ -30,7 +30,7 @@ export class CDRHelper{
 
         console.log(eventName);
         
-        // console.log('JSON',JSON.stringify(fsEvent));
+        console.log('JSON',JSON.stringify(fsEvent));
 
         // console.log(`Name -> ${eventName}, 
         //             UUID -> ${uuid} ,

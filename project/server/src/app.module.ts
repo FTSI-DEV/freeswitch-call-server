@@ -58,7 +58,7 @@ export class AppModule {
     
     new EslServerHelper(_inboundCall, new CDRHelper()).startEslServer();
 
-    new FreeswitchConnectionHelper(_freeswitchCallSystem).startCon();
+    new FreeswitchConnectionHelper(_freeswitchCallSystem).startConnection();
 
     // new StartFreeswitchApplication().startFS();
 

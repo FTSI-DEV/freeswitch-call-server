@@ -1,7 +1,6 @@
 import { ALL_EVENTS, DTMF_EVENTS, FS_ESL } from "../constants/fs-esl.constants";
 import { CallDispatchHelper } from "./callDispatch.helper";
 import { CDRHelper } from "./cdr.helper";
-import { FreeswitchConnectionHelper, fsConnect } from "./eslfreeswitch.connection";
 
 export class StartFreeswitchApplication {
     

@@ -12,25 +12,44 @@ export class ClickToCallJob{
 
     @Process('click-to-call')
     async handleTranscode(parameter: Job){
-        console.log('Start transcoding...' , parameter.data);
-        // console.log('PARAMETER', parameter);
 
-        // console.log('callerId ->' ,parameter.data.data.CallerIdNumber);
+        let cdrRecord = await this._freeswitchCallSystemService.getByCallId(parameter.data.UUID);
 
-        await this._freeswitchCallSystemService.updateCDR({
-            UUID: parameter.data.UUID,
-            CallerIdNumber: parameter.data.CallerIdNumber,
-            CalleeIdNumber: parameter.data.CalleeIdNumber,
-            CallDirection: parameter.data.CallDirection,
-            StartedDate: parameter.data.StartedDate,
-            CallStatus: parameter.data.CallStatus,
-            CallDuration: parameter.data.Duration,
-            RecordingUUID: parameter.data.RecordingUUID,
-            Id: parameter.data.Id
-        });
+        if (cdrRecord === null || cdrRecord === undefined){
+            
+            console.log('Record does not exist', cdrRecord);
 
-        console.log('result', parameter.data);
+            await this._freeswitchCallSystemService.saveCDR({
+                UUID: parameter.data.UUID,
+                CallerIdNumber: parameter.data.CallerIdNumber,
+                CalleeIdNumber: parameter.data.CalleeIdNumber,
+                CallDirection: parameter.data.CallDirection,
+                StartedDate: parameter.data.StartedDate,
+                CallStatus: parameter.data.CallStatus,
+                CallDuration: parameter.data.Duration,
+                RecordingUUID: parameter.data.RecordingUUID,
+                ParentCallUid: parameter.data.ParentCallUid,
+                Id: parameter.data.Id
+            });
+        }
+        else{
+            console.log('Record exists');
 
+            console.log('UUID -> ', parameter.data.UUID);
+
+            await this._freeswitchCallSystemService.updateCDR({
+                UUID: parameter.data.UUID,
+                CallerIdNumber: parameter.data.CallerIdNumber,
+                CalleeIdNumber: parameter.data.CalleeIdNumber,
+                CallDirection: parameter.data.CallDirection,
+                StartedDate: parameter.data.StartedDate,
+                CallStatus: parameter.data.CallStatus,
+                CallDuration: parameter.data.Duration,
+                RecordingUUID: parameter.data.RecordingUUID,
+                ParentCallUid: parameter.data.ParentCallUid,
+                Id: parameter.data.Id
+            });
+        }
         console.log('Transcoding complete');
     }
 

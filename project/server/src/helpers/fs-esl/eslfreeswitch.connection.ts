@@ -1,87 +1,112 @@
-import { FreeswitchCallSystemService } from "src/modules/freeswitch-call-system/services/freeswitch-call-system.service";
-import { WebhookClickToCallStatusCallBack } from "src/utils/webhooks";
-import { CHANNEL_VARIABLE } from "../constants/channel-variables.constants";
-import { FS_ESL } from "../constants/fs-esl.constants";
-import { CDRHelper } from "./cdr.helper";
-import { FreeswitchConfigHelper } from "./freeswitchConfig.helper";
+import { Console } from 'console';
+import { FsCallDetailRecordEntity } from 'src/entity/freeswitchCallDetailRecord.entity';
+import { FreeswitchCallSystemService } from 'src/modules/freeswitch-call-system/services/freeswitch-call-system.service';
+import { WebhookClickToCallStatusCallBack } from 'src/utils/webhooks';
+import { CallTypes } from '../constants/call-type';
+import { CHANNEL_VARIABLE } from '../constants/channel-variables.constants';
+import { FS_ESL } from '../constants/fs-esl.constants';
+import { CDRHelper } from './cdr.helper';
+import { FreeswitchConfigHelper } from './freeswitchConfig.helper';
 const esl = require('modesl');
 const http = require('http');
 
 interface ConnResult {
-    connectionObj: any;
-    isSuccess: boolean;
-    errorMessage: string
+  connectionObj: any;
+  isSuccess: boolean;
+  errorMessage: string;
 }
 
 export const FreeswitchConnectionResult: ConnResult = {
-    connectionObj: null,
-    isSuccess: false,
-    errorMessage: null
-}
+  connectionObj: null,
+  isSuccess: false,
+  errorMessage: null,
+};
 
-export const fsConnect = (freeswitchCallSystemServicE: FreeswitchCallSystemService): any => {
+export class FreeswitchConnectionHelper {
+  constructor(
+    private readonly _freeswitchCallSystemService: FreeswitchCallSystemService,
+  ) {}
+
+  startConnection(){
 
     console.log('TRYING TO ESTABLISHED CONNECTION');
-    
-    let self = this;
-
+  
     let fsConfig = new FreeswitchConfigHelper().getFreeswitchConfig();
-        
-    let connection = new esl.Connection(fsConfig.ip, 
-        fsConfig.port, 
-        fsConfig.password);
-    
+  
+    let connection = new esl.Connection(
+      fsConfig.ip,
+      fsConfig.port,
+      fsConfig.password,
+    );
+
     connection.on(FS_ESL.CONNECTION.ERROR, () => {
-        FreeswitchConnectionResult.errorMessage = "Connection Error";
-      //  reject(FreeswitchConnectionResult);
+      FreeswitchConnectionResult.errorMessage = 'Connection Error';
     });
-
+  
     connection.on(FS_ESL.CONNECTION.READY, () => {
+      FreeswitchConnectionResult.isSuccess = true;
+      FreeswitchConnectionResult.connectionObj = connection;
+      connection.subscribe('all');
+      this._onListenEvent(connection);
+    });
+  }
 
-        FreeswitchConnectionResult.isSuccess = true;
-        FreeswitchConnectionResult.connectionObj = connection;
-        connection.subscribe('all');
-        connection.on('esl::event::*::*', async (fsEvent) => {
-            const eventName = fsEvent.getHeader('Event-Name');
+  private _onListenEvent(connection){
 
-            console.log('EVENT NAME -> ', eventName);
+    connection.on('esl::event::*::*', async (fsEvent) => {
 
-            const callUid = fsEvent.getHeader(CHANNEL_VARIABLE.UNIQUE_ID);
+      const eventName = fsEvent.getHeader('Event-Name');
 
-            console.log('uid - >', callUid);
+      console.log('EVENT NAME -> ', eventName);
 
-            let dbCallUid = await freeswitchCallSystemServicE.getByCallId(callUid);
+      const callUid = fsEvent.getHeader(CHANNEL_VARIABLE.UNIQUE_ID);
 
-            if (eventName === 'CHANNEL_HANGUP_COMPLETE' &&
-                dbCallUid) {
+      console.log('uid - >', callUid);
 
-                console.log('LISTENING TO AN EVENT ', dbCallUid);
+      if (eventName === 'CHANNEL_HANGUP_COMPLETE') {
+
+        let parentCall = await this._freeswitchCallSystemService.getByCallId(callUid);
       
-                let cdrModel = new CDRHelper().getCallRecords(fsEvent);
-      
-                console.log('CDR CLICKTOCALL', cdrModel);
-                
-                cdrModel.Id = dbCallUid.id;
+        if (parentCall != null)
+          await this.savedParentCall(fsEvent, parentCall);
+        else
+          this.savedChildCall(fsEvent, callUid);
+      }
+    });
+  }
 
-                if (dbCallUid.CallDirection === 'Inbound'){
-                    //call webhook inboundcall
-                }
-                else{
-                    http.get(WebhookClickToCallStatusCallBack(cdrModel));
-                }
-            }
-        });
+  private async savedParentCall(fsEvent:any,parentCall: FsCallDetailRecordEntity){
 
-    })
-}
+    let cdrModel = new CDRHelper().getCallRecords(fsEvent);
 
-export class FreeswitchConnectionHelper{
+    cdrModel.Id = parentCall.id;
 
-    constructor(
-        private readonly _freeswitchCallSystem : FreeswitchCallSystemService
-    ){}
+    if (parentCall.CallDirection === CallTypes.Inbound) {
+      //call webhook inboundcall
+    } 
+    else {
+      http.get(WebhookClickToCallStatusCallBack(cdrModel));
+    }
+  }
 
-        startCon() {
-             fsConnect(this._freeswitchCallSystem);
-        }
+  private savedChildCall(fsEvent, callUid:string){
+
+    let originator = fsEvent.getHeader('variable_originator');
+          
+    let cdrModel = new CDRHelper().getCallRecords(fsEvent);
+
+    cdrModel.ParentCallUid = originator;
+    
+      console.log('CHILD CALL -> ', callUid);
+
+      console.log('CALL DIRECTION -> ' ,cdrModel.CallDirection);
+
+      if (cdrModel.CallDirection === CallTypes.Inbound){
+          //call webhook inboundcall
+      }
+      else
+      {
+        http.get(WebhookClickToCallStatusCallBack(cdrModel));
+      }
+  }
 }

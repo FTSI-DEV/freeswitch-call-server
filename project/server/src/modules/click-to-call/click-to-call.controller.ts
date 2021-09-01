@@ -43,7 +43,7 @@ export class FreeswitchController {
 
     this._freeswitchCallSystemService.saveCDR({
       UUID: result,
-      CallDirection: 'Outbound',
+      CallDirection: 'outbound',
       StartedDate:  moment().format('YYYY-MM-DDTHH:mm:ss.SSS')
     });
 
@@ -52,7 +52,6 @@ export class FreeswitchController {
 
   @Get('clickToCallStatusCallBack')
   clickToCallStatusCallBack(@Query() callData: CDRModels) {
-    console.log('CLICK TO CALL STATUS CALL BACK API', callData);
 
     this.clickToCallJobQueue.add('click-to-call',callData);
 

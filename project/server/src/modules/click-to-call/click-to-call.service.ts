@@ -31,8 +31,6 @@ export class FsEslService implements IFSEslService {
         return "Connection Error -> No ESL Connection established";
       }
 
-      // console.log('EXECUTING CLICK-TO-CALL', connectionResult);
-
       uid = await this.triggerOriginateCall(
         connectionResult.connectionObj,
         phoneNumberFrom,
@@ -55,11 +53,11 @@ export class FsEslService implements IFSEslService {
   ): Promise<string> {
 
     return new Promise<any>((resolve,reject) => {
-      
+
       let self = this;
     
       let app_args = `sofia/gateway/fs-test1/${phoneNumberFrom}`;
-      let arg1 = `{ignore_early_media=true,origination_caller_id_number=${callerId}}${app_args}`;
+      let arg1 = `{ignore_early_media=true,origination_caller_id_number=${callerId},hangup_after_bridge=true}${app_args}`;
       let arg2 = `${arg1} &bridge({origination_caller_id_number=${callerId}}sofia/gateway/fs-test3/${phoneNumberTo})`;
       let arg3 = `bridge({origination_caller_id_number=${callerId}}sofia/gateway/fs-test3/${phoneNumberTo})`
 
@@ -76,7 +74,6 @@ export class FsEslService implements IFSEslService {
 
         resolve(callUid.trim());
       })
-      .catch(err => reject(err));
     });
   }
 

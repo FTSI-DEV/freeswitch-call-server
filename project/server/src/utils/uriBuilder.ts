@@ -7,7 +7,6 @@ export class URIBuilder {
   }
 
   incomingStatusCallBack(callData) {
-    console.log('STATUSCALLBACKDATA - trying to trigger ', callData);
 
     let api = `/NewInboundCall/IncomingStatusCallBack`;
 
@@ -17,13 +16,10 @@ export class URIBuilder {
   }
 
   clickToCallStatusCallBack(callData){
-    console.log('trying to trigger webhoook api', callData);
 
     let api = `/api/freeswitch/clickToCallStatusCallback`;
 
     let params = this.mappedCallDataParams(callData);
-
-    console.log(`url -> ${this.baseUrl}${api}?&${params}`);
 
     return `${this.baseUrl}${api}?${params}`;
   }
@@ -39,7 +35,8 @@ export class URIBuilder {
     let startedDate = `StartedDate=${callData.StartedDate}`;
     let duration = `Duration=${callData.CallDuration}`;
     let recordingUUID = `RecordingUUID=${callData.RecordingUUID}`;
+    let parentCallUUID = `ParentCallUid=${callData.ParentCallUid}`;
 
-    return `${callUUID}&${callerIdNumber}&${callerName}&${calleeIdNumber}&${callDirection}&${callStatus}&${startedDate}&${duration}&${recordingUUID}`;
+    return `${callUUID}&${callerIdNumber}&${callerName}&${calleeIdNumber}&${callDirection}&${callStatus}&${startedDate}&${duration}&${recordingUUID}&${parentCallUUID}`;
   }
 }

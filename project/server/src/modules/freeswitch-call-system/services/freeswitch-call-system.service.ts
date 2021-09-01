@@ -27,6 +27,7 @@ export class FreeswitchCallSystemService {
         cdr.PhoneNumberTo = cdrParam.CalleeIdNumber;
         cdr.CallDuration = cdrParam.CallDuration;
         cdr.CallDirection = cdrParam.CallDirection;
+        cdr.ParentCallUid = cdrParam.ParentCallUid;
 
         this.freeswitchCallSystemRepo.saveCDR(cdr);
 
@@ -35,19 +36,20 @@ export class FreeswitchCallSystemService {
 
     async updateCDR(cdrParam: CDRModels){
 
-        let result = await this.getRecordById(cdrParam.Id);
+        let result = await this.getByCallId(cdrParam.UUID);
 
         if (result == null || result == undefined){
             console.log('result2 ', result);
         };
 
-        console.log('result2 ', result);
+        console.log('CDR RECORD UPDATE -> ' , result);
 
         result.CallDuration = cdrParam.CallDuration;
         result.CallStatus = cdrParam.CallStatus;
         result.PhoneNumberFrom = cdrParam.CallerIdNumber;
         result.PhoneNumberTo = cdrParam.CalleeIdNumber;
         result.RecordingUUID = cdrParam.UUID;
+        result.ParentCallUid = cdrParam.ParentCallUid;
 
         await this.freeswitchCallSystemRepo.saveCDR(result);
     }
@@ -88,7 +90,8 @@ export class FreeswitchCallSystemService {
                         DateCreated: element.DateCreated,
                         Duration: element.CallDuration,
                         Id: element.id,
-                        RecordingUUID: element.RecordingUUID
+                        RecordingUUID: element.RecordingUUID,
+                        ParentCallUid: element.ParentCallUid
                     };
 
                     itemObjs.push(configModel);
@@ -128,7 +131,8 @@ export class FreeswitchCallSystemService {
                     Duration: result.CallDuration,
                     DateCreated: result.DateCreated,
                     RecordingUUID: result.RecordingUUID,
-                    CallDirection: result.CallDirection
+                    CallDirection: result.CallDirection,
+                    ParentCallUid: result.ParentCallUid
                 };
 
                 console.log('resolving ', cdrDTO);
