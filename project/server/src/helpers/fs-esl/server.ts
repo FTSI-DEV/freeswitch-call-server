@@ -12,6 +12,7 @@ import { TwiMLContants } from '../constants/twiml.constants';
 import { KeyValues, XMLParser } from '../parser/twimlXML.parser';
 import { CDRHelper } from './cdr.helper';
 const http = require('http');
+const esl = require('modesl');
 
 let eslServerRes = null;
 
@@ -37,8 +38,6 @@ export class EslServerHelper {
 
     let self = this;
 
-    let esl = require('modesl');
-
     let esl_server = new esl.Server(
       {
         port: process.env.ESL_SERVER_PORT,
@@ -59,55 +58,38 @@ export class EslServerHelper {
   }
 
   private _onListen(conn: any): any {
-
     conn.on(FS_ESL.RECEIVED, (fsEvent) => {
+      const eventName = fsEvent.getHeader(EVENT_LIST.EVENT_NAME);
 
-        const eventName = fsEvent.getHeader(EVENT_LIST.EVENT_NAME);
+      if (eventName === EVENT_LIST.CHANNEL_EXECUTE || eventName === EVENT_LIST.CHANNEL_CREATE){
+        callerDesinationNumber = this._callRecords.getCallerDestinationNumber(fsEvent);
+      }
 
-        console.log('EVEN-NAME -> ', eventName);
-
-        if (eventName === EVENT_LIST.CHANNEL_EXECUTE || eventName === EVENT_LIST.CHANNEL_CREATE){
-
-          callerDesinationNumber = this._callRecords.getCallerDestinationNumber(fsEvent);
-
-          console.log('CALLER-DESTINATION-NUMBER' , callerDesinationNumber);
-        }
-
-        if (eventName === EVENT_LIST.CHANNEL_HANGUP || eventName === EVENT_LIST.CHANNEL_HANGUP_COMPLETE){
-          CDR = this._callRecords.getCallRecords(fsEvent);
-
-          console.log('CALL-RECORD', CDR);
-
-          return CDR;
-        }
+      if (eventName === EVENT_LIST.CHANNEL_HANGUP || eventName === EVENT_LIST.CHANNEL_HANGUP_COMPLETE){
+        CDR = this._callRecords.getCallRecords(fsEvent);
+      }
     });
   }
 
-  private inboundCallEnter(): any {
+  private inboundCallEnter() {
     let self = this;
 
     eslServerRes.on(ESL_SERVER.CONNECTION.READY, function (conn) {
 
-      console.log('CONNECTION SERVER READY');
-
       conn.subscribe('events::all');
 
+      // Event channel observer
       self._onListen(conn);
 
       let eslInfo = conn.getInfo();
 
       let destinationNumber = eslInfo.getHeader('Caller-Destination-Number');
 
-      console.log('dest', destinationNumber);
-
       self.inboundCallExecute(conn, destinationNumber);
 
-      // conn.on('esl::end', function (evt, body) {
-      //   console.log('ESL END');
-      //   console.log('CDR - END', CDR);
-
-      //   http.get(WebhookIncomingStatusCallBack(CDR), function (res) {});
-      // });
+      conn.on('esl::end', function() {
+        self.triggerIncomingStatusCallBack(CDR);
+      });
     });
   }
 
@@ -115,76 +97,37 @@ export class EslServerHelper {
     let self = this;
 
     self._inboundCallConfig.getInboundConfigCallerId(callerId)
-    .then((result) => {
+    .then( async (result) => {
 
-      if (result == null || result == undefined){
-        conn.execute('playback', 'ivr/ivr-call_cannot_be_completed_as_dialed');
+      if (!result) conn.execute('playback', 'ivr/ivr-call_cannot_be_completed_as_dialed');
+      
+      let apiRetVal = await this.triggerWebhookURL(result);
+
+      if (apiRetVal) {
+
+        // XML PARSER
+        console.log('apiRetVal: ', apiRetVal);
+     
       }
-
-      console.log('fs inbound call config', result);
-
-      // var crmRetval = this._executeTestCrmApi(conn);
       
-      let apiRetVal =  this.triggerWebhookURL(result);
-
-      console.log('RETVAL CRM -> ', apiRetVal);
-
-      // apiRetVal.then((result) => {
-        
-      //   console.log('record crm api', result);
-
-      //   //EXECUTE XML PARSER HERE....
-
-      //   if (result != null){
-      //     let phoneNumberTo = result.PhoneNumberTo;
-
-      //     conn.execute('bridge', `sofia/gateway/sip_provider/${phoneNumberTo}`);
-      //   }
-
-      // }).catch((err) => {
-      //   console.log('UNEXPECTED ERROR CALLING API -> ', err);
-      // });
-
-      conn.execute('set', 'effective_caller_id_number=+17132633133');
-
-      conn.execute('bridge', 'sofia/gateway/fs-test3/1003');
-      
-      this.triggerIncomingStatusCallBack(CDR);
-
     }).catch((err) => {
       console.log('UNEXPECTED ERROR -> ', err);
     });
   }
 
   private triggerIncomingStatusCallBack(cdrModel: CDRModels){
-
-    if (cdrModel == null || cdrModel == undefined){
-      console.log('null ->');
-      return;
-    };
-
     http.get(WebhookIncomingStatusCallBack(cdrModel));
   }
 
-  private triggerWebhookURL(result):any{
-
+  async triggerWebhookURL(result) {
+    const { webhookUrl, httpMethod } = result;
     let record = null;
-
-    let webhookurl = result.webhookUrl;
-      
-    let httpMethod = result.httpMethod;
-
-    if (httpMethod == "POST")
-    {
-      record =  axios.post(webhookurl);
+    if ( httpMethod == "POST" ) {
+      record = await axios.post(webhookUrl);
+    } else {
+      record = await axios.get(webhookUrl);
     }
-    else if (httpMethod == "GET")
-    {
-      console.log('webhook URL', webhookurl);
-      record = axios.get(webhookurl);
-    }
-
-    return record;
+    return record.data;
   }
 
   private _executeTestCrmApi(conn: any) {
