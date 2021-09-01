@@ -20,6 +20,8 @@ export const FreeswitchConnectionResult: ConnResult = {
 }
 
 export const fsConnect = (freeswitchCallSystemServicE: FreeswitchCallSystemService): any => {
+
+    console.log('TRYING TO ESTABLISHED CONNECTION');
     
     let self = this;
 

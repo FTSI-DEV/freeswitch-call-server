@@ -55,6 +55,7 @@ export class FsEslService implements IFSEslService {
   ): Promise<string> {
 
     return new Promise<any>((resolve,reject) => {
+      
       let self = this;
     
       let app_args = `sofia/gateway/fs-test1/${phoneNumberFrom}`;
@@ -68,65 +69,15 @@ export class FsEslService implements IFSEslService {
         gateway: `192.168.18.68:5080`,
         app: arg3
       }, (res) => {
+
         let callUid = res.getBody().toString().replace('+OK ', '');
 
         console.log('originate', callUid);
 
         resolve(callUid.trim());
-      });
+      })
+      .catch(err => reject(err));
     });
   }
 
-  _onListenEvent(connection, uuid: string, callback) {
-
-    console.log('uid2 -> ', uuid);
-
-    let self = this;
-
-    connection.subscribe('all');
-
-    connection.on(FS_ESL.RECEIVED, (fsEvent) => {
-
-      const eventName = fsEvent.getHeader('Event-Name');
-
-      const callUids = fsEvent.getHeader(CHANNEL_VARIABLE.UNIQUE_ID);
-
-      console.log('originate uid - >', callUids);
-
-      if (callUids === uuid.trim()) {
-
-       console.log('LISTENING TO AN EVENT - CLICK-TO-CALL', eventName);
-
-        if (eventName === 'CHANNEL_HANGUP_COMPLETE') {
-
-          console.log('LISTENING TO AN EVENT ', eventName);
-
-          let cdrModel = new CDRHelper().getCallRecords(fsEvent);
-
-          console.log('CDR CLICKTOCALL', cdrModel);
-
-          self.triggerClickToCallStatusCallBack(cdrModel);
-
-          callback();
-        }
-      }
-
-    });
-  }
-
-  private _onListenEslEnd(connection, callrecord) {
-    connection.on('esl::end', function (evt, body) {
-      //call webhook click-to-call status callback
-
-      console.log('ESL ENDING');
-
-      http.get(WebhookClickToCallStatusCallBack(callrecord), function (res) {
-        // console.log('ENTERED GET ', res);
-      });
-    });
-  }
-
-  private triggerClickToCallStatusCallBack(cdrModel: CDRModels) {
-    http.get(WebhookClickToCallStatusCallBack(cdrModel));
-  }
 }
