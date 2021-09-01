@@ -6,27 +6,27 @@ export class FsCallDetailRecordEntity{
     id: number;
 
     @Column()
-    PhoneNumberTo?: string;
-
-    @Column()
-    PhoneNumberFrom?: string;
-
-    @Column()
-    CallStatus?: string;
-
-    @Column()
     CallUUID: string;
 
     @Column()
-    CallDuration: number;
+    CallDirection: string;
+
+    @Column({ nullable: true})
+    PhoneNumberTo?: string;
+
+    @Column({ nullable: true})
+    PhoneNumberFrom?: string;
+
+    @Column({ nullable: true})
+    CallStatus?: string;
+
+    @Column({ nullable: true})
+    CallDuration?: number;
 
     @Column()
     DateCreated: Date;
 
-    @Column()
-    CallDirection?: string;
-
-    @Column()
+    @Column({ nullable: true})
     RecordingUUID? : string;
 }
 

@@ -38,9 +38,6 @@ export class FreeswitchCallSystemService {
         let record = this.freeswitchCallSystemRepo.createQueryBuilder("CallDetailRecord")
                     .where("CallDetailRecord.CallUUID = :callUid", { callUid: callUid})
                     .getOne();
-
-        console.log('RECORD' , record);
-
         return record;
     }
 

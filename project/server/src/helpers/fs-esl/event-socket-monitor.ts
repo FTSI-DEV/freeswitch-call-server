@@ -5,26 +5,26 @@ import { FreeswitchConnectionHelper, fsConnect } from "./eslfreeswitch.connectio
 
 export class StartFreeswitchApplication {
     
-    private readonly _fsConnection = new FreeswitchConnectionHelper();
+    // private readonly _fsConnection = new FreeswitchConnectionHelper();
 
-    startFS():any{
-        let ff = this._fsConnection.connect().then((connection) => {
-            console.log('trying to subscribe to the event: ', connection.event);
+    // startFS():any{
+    //     let ff = this._fsConnection.connect().then((connection) => {
+    //         console.log('trying to subscribe to the event: ', connection.event);
 
-            new CallDispatchHelper().clickToCall(connection, {
-                phoneNumberFrom: '1000',
-                phoneNumberTo : '1000',
-                storeId: 60
-            });
-            //intercepting calls
-            connection.on(FS_ESL.RECEIVED, fsEvent => {
-               new CDRHelper().getCallRecords(fsEvent);
-            });
+    //         new CallDispatchHelper().clickToCall(connection, {
+    //             phoneNumberFrom: '1000',
+    //             phoneNumberTo : '1000',
+    //             storeId: 60
+    //         });
+    //         //intercepting calls
+    //         connection.on(FS_ESL.RECEIVED, fsEvent => {
+    //            new CDRHelper().getCallRecords(fsEvent);
+    //         });
 
-            return connection;
+    //         return connection;
 
-        }).catch((err) => {
-            console.log('UNEXPECTED ERROR ->', err);
-        });
-    }
+    //     }).catch((err) => {
+    //         console.log('UNEXPECTED ERROR ->', err);
+    //     });
+    // }
 }

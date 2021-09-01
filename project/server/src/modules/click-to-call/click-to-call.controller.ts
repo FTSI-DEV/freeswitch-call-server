@@ -14,6 +14,7 @@ import { FreeswitchPhoneNumberConfigService } from '../config/fs-phonenumber-con
 import { FreeswitchCallSystemService } from '../freeswitch-call-system/services/freeswitch-call-system.service';
 import { IFSEslService } from './click-to-call.interface';
 import { FsEslService } from './click-to-call.service';
+import * as moment from 'moment';
 const http = require('http');
 
 @Controller('/api/freeswitch')
@@ -39,6 +40,12 @@ export class FreeswitchController {
       phoneNumberFrom,
       callerId,
     );
+
+    this._freeswitchCallSystemService.saveCDR({
+      UUID: result,
+      CallDirection: 'Outbound',
+      StartedDate:  moment().format('YYYY-MM-DDTHH:mm:ss.SSS')
+    });
 
     return result;
   }

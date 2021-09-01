@@ -1,14 +1,14 @@
 export class CDRModels{
     UUID: string;
-    CallerIdNumber: string;
-    CallerName: string;
-    CalleeIdNumber: string;
-    CallDirection: string;
-    CallStatus: string;
+    CallerIdNumber?: string;
+    CallerName?: string;
+    CalleeIdNumber?: string;
+    CallDirection?: string;
+    CallStatus?: string;
     StartedDate: any;
-    CallDuration: any;
+    CallDuration?: any;
     Id?: number;
-    RecordingUUID: string;
+    RecordingUUID?: string;
 }
 
 export class CallDetailRecordDTO{

@@ -22,6 +22,7 @@ import { BullModule } from '@nestjs/bull';
 import { BullModuleQueue } from './bull-queue/bull.module';
 import { TestModule } from './modules/test/test.module';
 import { FreeswitchConnectionHelper } from './helpers/fs-esl/eslfreeswitch.connection';
+import { FreeswitchCallSystemService } from './modules/freeswitch-call-system/services/freeswitch-call-system.service';
 // import { ClickToCallJobModule } from './beequeue/jobs/clickToCall/clickToCallJob.module';
 
 @Module({
@@ -38,6 +39,7 @@ import { FreeswitchConnectionHelper } from './helpers/fs-esl/eslfreeswitch.conne
     InboundCallConfigModule,
     CustomLoggerModule,
     BullModuleQueue,
+    TestModule,
     BullModule.forRoot({
       redis:{
         host: process.env.REDIS_SERVER_HOST,
@@ -50,12 +52,13 @@ import { FreeswitchConnectionHelper } from './helpers/fs-esl/eslfreeswitch.conne
 })
 export class AppModule {
   constructor(private connection: Connection,
-              private _inboundCall: InboundCallConfigService) {
+              private _inboundCall: InboundCallConfigService,
+              private _freeswitchCallSystem: FreeswitchCallSystemService) {
 
     
     new EslServerHelper(_inboundCall, new CDRHelper()).startEslServer();
 
-    new FreeswitchConnectionHelper().connect();
+    new FreeswitchConnectionHelper(_freeswitchCallSystem).startCon();
 
     // new StartFreeswitchApplication().startFS();
 

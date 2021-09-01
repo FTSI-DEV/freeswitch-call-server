@@ -1,24 +1,20 @@
 import { InjectQueue } from "@nestjs/bull";
 import { Controller, Get } from "@nestjs/common";
 import { Queue } from "bull";
+import { response } from "express";
+import { TestService } from "./test.service";
 
 @Controller('test')
 export class TestController2{
     constructor(
-        @InjectQueue('default')
-        private testJob1: Queue
+        private readonly testService : TestService
     ){}
 
-    @Get('testApi')
-    testApi()
+    @Get('testSofiaStatus')
+    async testSofiaStatus(): Promise<string>
     {
-        this.testJob1.add('job1', {
-            data: 1
-        });
+       let result = await this.testService.triggerSofiaStatus();
 
-        this.testJob1.add('job2' , {
-            data: 2
-        });
-    
+       return result;
     }
 }
