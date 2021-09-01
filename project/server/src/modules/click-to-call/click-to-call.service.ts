@@ -64,41 +64,16 @@ export class FsEslService implements IFSEslService {
 
       connection.originate({
         profile: 'external',
-        number: '1000',
-        gateway: '192.168.18.68:5080',
+        number: `${phoneNumberFrom}`,
+        gateway: `192.168.18.68:5080`,
         app: arg3
       }, (res) => {
         let callUid = res.getBody().toString().replace('+OK ', '');
 
         console.log('originate', callUid);
 
-        // connection.on('esl::end', (res) => {
-        //   console.log('END ', res);
-        // });
-
-        // this._onListenEvent(connection, callUid, () => {
-
-        // });
-
-
         resolve(callUid.trim());
       });
-      // connection.api('originate', arg2, function (res) {
-  
-      //   let callUid = res.getBody().toString().replace('+OK ', '');
-  
-      //   console.log('callUid -> ', callUid);
-  
-      //   self._onListenEvent(connection, callUid, function() {
-      //     console.log('on listendevent ');
-      //     resolve(callUid);
-      //   });
-      // });
-  
-      // let app_args = `sofia/gateway/sip_provider/${phoneNumberTo}`;
-      // let arg1 = `{ignore_early_media=true,origination_caller_id_number=${callerId}}${app_args}`;
-      // let arg2 = `${arg1} &bridge(sofia/gateway/sip_provider/${phoneNumberFrom})`;
-
     });
   }
 

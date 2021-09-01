@@ -33,6 +33,25 @@ export class FreeswitchCallSystemService {
         console.log('fs', cdr);
     }
 
+    async updateCDR(cdrParam: CDRModels){
+
+        let result = await this.getRecordById(cdrParam.Id);
+
+        if (result == null || result == undefined){
+            console.log('result2 ', result);
+        };
+
+        console.log('result2 ', result);
+
+        result.CallDuration = cdrParam.CallDuration;
+        result.CallStatus = cdrParam.CallStatus;
+        result.PhoneNumberFrom = cdrParam.CallerIdNumber;
+        result.PhoneNumberTo = cdrParam.CalleeIdNumber;
+        result.RecordingUUID = cdrParam.UUID;
+
+        await this.freeswitchCallSystemRepo.saveCDR(result);
+    }
+
     getByCallId(callUid:string): Promise<FsCallDetailRecordEntity>{
 
         let record = this.freeswitchCallSystemRepo.createQueryBuilder("CallDetailRecord")
@@ -124,4 +143,8 @@ export class FreeswitchCallSystemService {
             console.log('Error', err);
         });
     }
+
+    private getRecordById = (id:number) : Promise<FsCallDetailRecordEntity> => {
+        return this.freeswitchCallSystemRepo.findOneOrFail(id);
+    } 
 }

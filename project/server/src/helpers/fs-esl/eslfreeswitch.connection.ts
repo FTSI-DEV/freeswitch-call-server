@@ -46,7 +46,7 @@ export const fsConnect = (freeswitchCallSystemServicE: FreeswitchCallSystemServi
 
             const callUid = fsEvent.getHeader(CHANNEL_VARIABLE.UNIQUE_ID);
 
-            console.log('originate uid - >', callUid);
+            console.log('uid - >', callUid);
 
             let dbCallUid = await freeswitchCallSystemServicE.getByCallId(callUid);
 
@@ -58,6 +58,8 @@ export const fsConnect = (freeswitchCallSystemServicE: FreeswitchCallSystemServi
                 let cdrModel = new CDRHelper().getCallRecords(fsEvent);
       
                 console.log('CDR CLICKTOCALL', cdrModel);
+                
+                cdrModel.Id = dbCallUid.id;
 
                 if (dbCallUid.CallDirection === 'Inbound'){
                     //call webhook inboundcall

@@ -11,21 +11,23 @@ export class ClickToCallJob{
     ) {}
 
     @Process('click-to-call')
-    handleTranscode(parameter: Job){
+    async handleTranscode(parameter: Job){
         console.log('Start transcoding...' , parameter.data);
         // console.log('PARAMETER', parameter);
 
-        // this._freeswitchCallSystemService.saveCDR({
-        //     UUID: parameter.data.UUID,
-        //     CallerIdNumber: parameter.data.CallerIdNumber,
-        //     CallerName: parameter.data.CallerIdNumber,
-        //     CalleeIdNumber: parameter.data.CalleeIdNumber,
-        //     CallDirection: parameter.data.CallDirection,
-        //     StartedDate: parameter.data.StartedDate,
-        //     CallStatus: parameter.data.CallStatus,
-        //     CallDuration: parameter.data.Duration,
-        //     RecordingUUID: parameter.data.RecordingUUID
-        // });
+        // console.log('callerId ->' ,parameter.data.data.CallerIdNumber);
+
+        await this._freeswitchCallSystemService.updateCDR({
+            UUID: parameter.data.UUID,
+            CallerIdNumber: parameter.data.CallerIdNumber,
+            CalleeIdNumber: parameter.data.CalleeIdNumber,
+            CallDirection: parameter.data.CallDirection,
+            StartedDate: parameter.data.StartedDate,
+            CallStatus: parameter.data.CallStatus,
+            CallDuration: parameter.data.Duration,
+            RecordingUUID: parameter.data.RecordingUUID,
+            Id: parameter.data.Id
+        });
 
         console.log('result', parameter.data);
 

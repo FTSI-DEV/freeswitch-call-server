@@ -54,10 +54,7 @@ export class FreeswitchController {
   clickToCallStatusCallBack(@Query() callData: CDRModels) {
     console.log('CLICK TO CALL STATUS CALL BACK API', callData);
 
-    this.clickToCallJobQueue.add('click-to-call', 
-    {
-      data: callData
-    });
+    this.clickToCallJobQueue.add('click-to-call',callData);
 
     return 'Successfully submitted to job queue';
   }
