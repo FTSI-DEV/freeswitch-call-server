@@ -2,7 +2,6 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import ArenaConfig from './bull-queue/arenaConfig';
-import { CustomLogger } from './logger/logger';
 const Arena = require('bull-arena');
 
 async function bootstrap() {
@@ -22,7 +21,7 @@ async function bootstrap() {
   // BullQueue Arena initialization
   Arena(ArenaConfig);
 
-  app.useLogger(app.get(CustomLogger));
+  // app.useLogger(app.get(CustomLogger));
 
   await app.listen(3000);
 }

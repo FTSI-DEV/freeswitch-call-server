@@ -37,7 +37,6 @@ import { FreeswitchCallSystemService } from './modules/freeswitch-call-system/se
     FreeswitchCallSystemModule,
     ClickToCallModule,
     InboundCallConfigModule,
-    CustomLoggerModule,
     BullModuleQueue,
     TestModule,
     BullModule.forRoot({
