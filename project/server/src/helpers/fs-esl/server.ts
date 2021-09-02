@@ -94,9 +94,24 @@ export class EslServerHelper {
 
       if (apiRetVal) {
 
-        // XML PARSER
-        console.log('apiRetVal: ', apiRetVal);
-     
+        // Parse xml to json
+        let xmlParserResult = new XMLParser().tryParseXMLBody(apiRetVal);
+
+        // Converted xml
+        let dialplan_taskList = this.XmlConversionTaskValues(xmlParserResult);
+
+        console.log('dialplan_taskList: ', dialplan_taskList);
+
+        const executeTask = (element) => {
+
+          // test execute
+          conn.execute('bridge', 'sofia/gateway/fs-test3/1005');
+
+          console.log('element:', element)
+        }
+
+        dialplan_taskList.forEach(executeTask);
+
       }
       
     }).catch((err) => {
@@ -114,7 +129,7 @@ export class EslServerHelper {
     if ( httpMethod == "POST" ) {
       record = await axios.post(webhookUrl);
     } else {
-      record = await axios.get(webhookUrl);
+      record = await axios.get(webhookUrl, { params: { StoreId: 60, SystemId: 1355983 } });
     }
     return record.data;
   }
