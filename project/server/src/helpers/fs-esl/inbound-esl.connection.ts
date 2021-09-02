@@ -22,7 +22,7 @@ export const FreeswitchConnectionResult: ConnResult = {
   errorMessage: null,
 };
 
-export class FreeswitchConnectionHelper {
+export class InboundEslConnectionHelper {
   constructor(
     private readonly _freeswitchCallSystemService: FreeswitchCallSystemService,
   ) {}

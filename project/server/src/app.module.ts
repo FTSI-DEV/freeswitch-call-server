@@ -21,7 +21,7 @@ import { CustomLoggerModule } from './logger/logger.module';
 import { BullModule } from '@nestjs/bull';
 import { BullModuleQueue } from './bull-queue/bull.module';
 import { TestModule } from './modules/test/test.module';
-import { FreeswitchConnectionHelper } from './helpers/fs-esl/eslfreeswitch.connection';
+import { InboundEslConnectionHelper } from './helpers/fs-esl/inbound-esl.connection';
 import { FreeswitchCallSystemService } from './modules/freeswitch-call-system/services/freeswitch-call-system.service';
 // import { ClickToCallJobModule } from './beequeue/jobs/clickToCall/clickToCallJob.module';
 
@@ -55,9 +55,9 @@ export class AppModule {
               private _freeswitchCallSystem: FreeswitchCallSystemService) {
 
     
-    new EslServerHelper(_inboundCall, new CDRHelper()).startEslServer();
+    // new EslServerHelper(_inboundCall, new CDRHelper()).startEslServer();
 
-    new FreeswitchConnectionHelper(_freeswitchCallSystem).startConnection();
+    new InboundEslConnectionHelper(_freeswitchCallSystem).startConnection();
 
     // new StartFreeswitchApplication().startFS();
 

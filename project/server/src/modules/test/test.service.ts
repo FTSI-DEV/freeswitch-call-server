@@ -1,5 +1,5 @@
 import { Injectable } from "@nestjs/common";
-import { FreeswitchConnectionResult } from "src/helpers/fs-esl/eslfreeswitch.connection";
+import { FreeswitchConnectionResult } from "src/helpers/fs-esl/inbound-esl.connection";
 
 @Injectable()
 export class TestService {

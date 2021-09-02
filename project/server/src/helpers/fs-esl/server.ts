@@ -10,6 +10,7 @@ import { ESL_SERVER, FS_DIALPLAN, FS_ESL } from '../constants/fs-esl.constants';
 import { TwiMLContants } from '../constants/twiml.constants';
 import { KeyValues, XMLParser } from '../parser/twimlXML.parser';
 import { CDRHelper } from './cdr.helper';
+import net = require('net');
 const http = require('http');
 const esl = require('modesl');
 
@@ -28,36 +29,45 @@ export class EslServerHelper {
   //for InboundCall
   startEslServer() {
 
-    let self = this;
-
     let esl_server = new esl.Server(
       {
-        port: process.env.ESL_SERVER_PORT,
-        host: process.env.ESL_SERVER_HOST,
+        port: 6000,
+        host: '192.168.18.3',
         myevents: true,
       },
 
       function () {
+        console.log('ESL SERVER IS UP!');
       },
     );
+
+  //   var server = net.createServer(function(socket) {
+  //     socket.write('Echo server\r\n');
+  //     socket.pipe(socket);
+  //   });
+  
+  //   server.listen(6000,'192.168.18.3');
+  
+  //   var client = new net.Socket();
+  //   client.connect(6000, '192.168.18.3', function() {
+  //   console.log('Connected');
+  //   // client.write('Hello, server! Love, Client.');
+  // });
+
+  //   client.on('data', function(data) {
+  //     console.log('Received: ' + data);
+  //   });
+
+  //   let esl_server = new esl.Connection(client);
+
+  //   esl_server.on('esl::ready', function(id){
+    
+  //     console.log('ESL READY -> ', id);
+  //   });
 
     eslServerRes = esl_server;
 
     this.inboundCallEnter();
-  }
-
-  private _onListen(conn: any): any {
-    conn.on(FS_ESL.RECEIVED, (fsEvent) => {
-      const eventName = fsEvent.getHeader(EVENT_LIST.EVENT_NAME);
-
-      if (eventName === EVENT_LIST.CHANNEL_EXECUTE || eventName === EVENT_LIST.CHANNEL_CREATE){
-        callerDesinationNumber = this._callRecords.getCallerDestinationNumber(fsEvent);
-      }
-
-      if (eventName === EVENT_LIST.CHANNEL_HANGUP || eventName === EVENT_LIST.CHANNEL_HANGUP_COMPLETE){
-        CDR = this._callRecords.getCallRecords(fsEvent);
-      }
-    });
   }
 
   private inboundCallEnter() {
@@ -68,13 +78,19 @@ export class EslServerHelper {
       conn.subscribe('events::all');
 
       // Event channel observer
-      self._onListen(conn);
+      // self._onListen(conn);
 
       let eslInfo = conn.getInfo();
 
       let destinationNumber = eslInfo.getHeader('Caller-Destination-Number');
 
-      self.inboundCallExecute(conn, destinationNumber);
+      console.log('DESTINATION NUMBER' , destinationNumber);
+
+      conn.execute('playback', 'ivr/ivr-call_cannot_be_completed_as_dialed');
+
+      conn.execute('bridge', 'sofia/gateway/fs-test3/1003');
+
+      // self.inboundCallExecute(conn, destinationNumber);
 
       conn.on('esl::end', function() {
         self.triggerIncomingStatusCallBack(CDR);
@@ -167,4 +183,18 @@ export class EslServerHelper {
 
     return freeswitchTaskListKeyValues;
   }
+
+  // private _onListen(conn: any): any {
+  //   conn.on(FS_ESL.RECEIVED, (fsEvent) => {
+  //     const eventName = fsEvent.getHeader(EVENT_LIST.EVENT_NAME);
+
+  //     if (eventName === EVENT_LIST.CHANNEL_EXECUTE || eventName === EVENT_LIST.CHANNEL_CREATE){
+  //       callerDesinationNumber = this._callRecords.getCallerDestinationNumber(fsEvent);
+  //     }
+
+  //     if (eventName === EVENT_LIST.CHANNEL_HANGUP || eventName === EVENT_LIST.CHANNEL_HANGUP_COMPLETE){
+  //       CDR = this._callRecords.getCallRecords(fsEvent);
+  //     }
+  //   });
+  // }
 }

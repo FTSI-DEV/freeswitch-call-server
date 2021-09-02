@@ -3,7 +3,7 @@ import { CHANNEL_VARIABLE } from 'src/helpers/constants/channel-variables.consta
 import { FS_ESL } from 'src/helpers/constants/fs-esl.constants';
 import { CallDispatchHelper } from 'src/helpers/fs-esl/callDispatch.helper';
 import { CDRHelper } from 'src/helpers/fs-esl/cdr.helper';
-import { FreeswitchConnectionHelper, FreeswitchConnectionResult } from 'src/helpers/fs-esl/eslfreeswitch.connection';
+import { InboundEslConnectionHelper, FreeswitchConnectionResult } from 'src/helpers/fs-esl/inbound-esl.connection';
 import { CDRModels } from 'src/models/cdr.models';
 import { WebhookClickToCallStatusCallBack } from 'src/utils/webhooks';
 import { IFSEslService } from './click-to-call.interface';

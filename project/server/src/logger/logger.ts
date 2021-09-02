@@ -9,7 +9,6 @@ import { Console, DailyRotateFile } from "winston/lib/winston/transports";
 const util = require('util');
 
 
-
 // export class CustomLogger implements LoggerService{
 
 //     constructor(context?:string) {}
