@@ -69,14 +69,6 @@ export class FsEslService implements IFSEslService {
 
         resolve(callUid.trim());
       });
-
-      // connection.originate({
-      //   profile: 'external',
-      //   number: `${phoneNumberFrom}`,
-      //   gateway: `192.168.18.68:5080`,
-      //   app: arg3
-      // }, (res) => {
-      // })
     });
   }
 

@@ -41,30 +41,6 @@ export class EslServerHelper {
       },
     );
 
-  //   var server = net.createServer(function(socket) {
-  //     socket.write('Echo server\r\n');
-  //     socket.pipe(socket);
-  //   });
-  
-  //   server.listen(6000,'192.168.18.3');
-  
-  //   var client = new net.Socket();
-  //   client.connect(6000, '192.168.18.3', function() {
-  //   console.log('Connected');
-  //   // client.write('Hello, server! Love, Client.');
-  // });
-
-  //   client.on('data', function(data) {
-  //     console.log('Received: ' + data);
-  //   });
-
-  //   let esl_server = new esl.Connection(client);
-
-  //   esl_server.on('esl::ready', function(id){
-    
-  //     console.log('ESL READY -> ', id);
-  //   });
-
     eslServerRes = esl_server;
 
     this.inboundCallEnter();
@@ -75,7 +51,7 @@ export class EslServerHelper {
 
     eslServerRes.on(ESL_SERVER.CONNECTION.READY, function (conn) {
 
-      conn.subscribe('events::all');
+      // conn.subscribe('events::all');
 
       // Event channel observer
       // self._onListen(conn);
@@ -92,7 +68,8 @@ export class EslServerHelper {
 
       // self.inboundCallExecute(conn, destinationNumber);
 
-      conn.on('esl::end', function() {
+      conn.on('esl::end', function(res) {
+        console.log('res -> ', res);
         self.triggerIncomingStatusCallBack(CDR);
       });
     });
