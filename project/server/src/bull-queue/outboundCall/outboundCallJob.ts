@@ -1,19 +1,18 @@
 import { OnQueueActive, Process, Processor } from "@nestjs/bull";
 import { Job } from "bull";
-import { CDRModels } from "src/models/cdr.models";
 import { FreeswitchCallSystemService } from "src/modules/freeswitch-call-system/services/freeswitch-call-system.service";
 
 @Processor('default')
-export class ClickToCallJob{
+export class OutboundCallJob{
 
     constructor(
         private readonly _freeswitchCallSystemService: FreeswitchCallSystemService
     ) {}
 
-    @Process('click-to-call')
+    @Process('outboundCall')
     async handleTranscode(parameter: Job){
 
-        let cdrRecord = await this._freeswitchCallSystemService.getByCallId(parameter.data.UUID);
+        let cdrRecord = await this._freeswitchCallSystemService.getByCallUid(parameter.data.UUID);
 
         if (cdrRecord === null || cdrRecord === undefined){
             
@@ -50,7 +49,8 @@ export class ClickToCallJob{
                 Id: parameter.data.Id
             });
         }
-        console.log('Transcoding complete');
+
+        console.log('Transcoding complete OutboundCall');
     }
 
     @OnQueueActive()

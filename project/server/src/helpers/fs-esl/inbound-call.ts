@@ -1,7 +1,7 @@
 import axios from "axios";
 import { CDRModels } from "src/models/cdr.models";
 import { InboundCallConfigService } from "src/modules/config/inbound-call-config/services/inbound-call-config.service";
-import { WebhookIncomingStatusCallBack } from "src/utils/webhooks";
+import { WebhookInboundCallStatusCallBack } from "src/utils/webhooks";
 import { CHANNEL_VARIABLE } from "../constants/channel-variables.constants";
 import { ESL_SERVER, FS_DIALPLAN } from "../constants/fs-esl.constants";
 import { TwiMLContants } from "../constants/twiml.constants";
@@ -35,7 +35,7 @@ export class InboundCallHelper{
       
             conn.execute('playback', 'https://crm.dealerownedsoftware.com/hosted-files/audio/ConvertedSalesService.wav');
            
-            self.inboundCallExecute(conn, destinationNumber);
+            // self.inboundCallExecute(conn, destinationNumber);
         });
     }
 
@@ -108,6 +108,6 @@ export class InboundCallHelper{
 
     //callwebhook when call ends
     private triggerIncomingStatusCallBack(cdrModel: CDRModels){
-        http.get(WebhookIncomingStatusCallBack(cdrModel));
+        http.get(WebhookInboundCallStatusCallBack(cdrModel));
       }
 }

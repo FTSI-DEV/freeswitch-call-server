@@ -12,6 +12,7 @@ export class CDRHelper{
     }
 
     getCallRecords(fsEvent):CDRModels{
+        
         const uuid = this.getHeader(CHANNEL_VARIABLE.UNIQUE_ID, fsEvent);
         const callerId = this.getHeader(CHANNEL_VARIABLE.CALLER_CALLER_ID_NUMBER, fsEvent);
         const callerName = this.getHeader(CHANNEL_VARIABLE.CALLER_CALLER_ID_NAME, fsEvent);
@@ -36,7 +37,6 @@ export class CDRHelper{
             Id: null,
             RecordingUUID: uuid
         };
-
     }
 
     private getHeader(variableName: string, fsEvent):string{

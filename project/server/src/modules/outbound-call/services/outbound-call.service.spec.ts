@@ -1,15 +1,15 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { FsEslService } from './click-to-call.service';
+import { OutboundCallService } from './outbound-call.service';
 
-describe('FsEslService', () => {
-  let service: FsEslService;
+describe('OutboundCallService', () => {
+  let service: OutboundCallService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [FsEslService],
+      providers: [OutboundCallService],
     }).compile();
 
-    service = module.get<FsEslService>(FsEslService);
+    service = module.get<OutboundCallService>(OutboundCallService);
   });
 
   it('should be defined', () => {

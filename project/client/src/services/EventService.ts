@@ -41,7 +41,7 @@ export default {
     },
     clickToCall(params: any) {
         console.log('params: ', params);
-        return apiClient.post(`/api/freeswitch/clickToCall/${params.phoneNumberFrom}/${params.phoneNumberTo}/${params.callerId}`, );
+        return apiClient.post(`/api/outbound-call/clickToCall/${params.phoneNumberFrom}/${params.phoneNumberTo}/${params.callerId}`, );
     },
     getInboundCallConfigs(params: any) {
         return apiClient.get(`/api/inbound-call-config/getInboundCallConfigs`);

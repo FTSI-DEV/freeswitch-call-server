@@ -1,15 +1,14 @@
+import { CDRModels } from 'src/models/cdr.models';
 import { URIBuilder } from './uriBuilder';
 
 require('dotenv').config();
 
 const uriBuilder = new URIBuilder(process.env.BASE_URL);
 
-export function WebhookIncomingStatusCallBack(callData) {
-    console.log('webhook entered -> ', callData);
-    return uriBuilder.incomingStatusCallBack(callData)
+export function WebhookInboundCallStatusCallBack(callData:CDRModels) {
+    return uriBuilder.inboundCallStatusCallBack(callData)
 }
 
-//CLICK-TO-CALL STATUS CALLBACK
-export function WebhookClickToCallStatusCallBack(callData){
-    return uriBuilder.clickToCallStatusCallBack(callData);
+export function WebhookOutboundCallStatusCallBack(callData:CDRModels){
+    return uriBuilder.outboundCallStatusCallBack(callData);
 }

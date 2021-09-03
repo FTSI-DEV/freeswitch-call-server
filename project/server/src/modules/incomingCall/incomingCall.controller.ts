@@ -21,7 +21,7 @@ export class IncomingCallController {
 
     console.log('IncomingCall/IncomingStatusCallBack' , callData);
 
-    this.incomingCallJob.add(callData);
+    this.incomingCallJob.add('inboundCall', callData);
     
     return "Successfully submitted to job queue";
   }

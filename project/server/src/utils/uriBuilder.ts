@@ -1,3 +1,4 @@
+import { CDRModels } from "src/models/cdr.models";
 
 export class URIBuilder {
   baseUrl: string;
@@ -6,7 +7,7 @@ export class URIBuilder {
     this.baseUrl = baseUrl;
   }
 
-  incomingStatusCallBack(callData) {
+  inboundCallStatusCallBack(callData:CDRModels) {
 
     let api = `/NewInboundCall/IncomingStatusCallBack`;
 
@@ -15,16 +16,16 @@ export class URIBuilder {
     return `${this.baseUrl}${api}?${params}`;
   }
 
-  clickToCallStatusCallBack(callData){
+  outboundCallStatusCallBack(callData:CDRModels){
 
-    let api = `/api/freeswitch/clickToCallStatusCallback`;
+    let api = `/api/outbound-call/outboundCallStatusCallBack`;
 
     let params = this.mappedCallDataParams(callData);
 
     return `${this.baseUrl}${api}?${params}`;
   }
 
-  private mappedCallDataParams(callData):string{
+  private mappedCallDataParams(callData:CDRModels):string{
 
     let callUUID = `UUID=${callData.UUID}`;
     let callerIdNumber = `CallerIdNumber=${callData.CallerIdNumber}`;

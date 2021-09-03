@@ -4,7 +4,7 @@ import { TestController2 } from "./test.controller";
 import { TestService } from "./test.service";
 
 @Module({
-    imports: [TestService],
+    imports: [TestService, BullModuleQueue],
     exports: [TestService],
     providers: [TestService],
     controllers: [TestController2]

@@ -36,7 +36,7 @@ export class FreeswitchCallSystemService {
 
     async updateCDR(cdrParam: CDRModels){
 
-        let result = await this.getByCallId(cdrParam.UUID);
+        let result = await this.getByCallUid(cdrParam.UUID);
 
         if (result == null || result == undefined){
             console.log('result2 ', result);
@@ -54,7 +54,7 @@ export class FreeswitchCallSystemService {
         await this.freeswitchCallSystemRepo.saveCDR(result);
     }
 
-    getByCallId(callUid:string): Promise<FsCallDetailRecordEntity>{
+    getByCallUid(callUid:string): Promise<FsCallDetailRecordEntity>{
 
         let record = this.freeswitchCallSystemRepo.createQueryBuilder("CallDetailRecord")
                     .where("CallDetailRecord.CallUUID = :callUid", { callUid: callUid})

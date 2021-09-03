@@ -7,7 +7,9 @@ import { TestService } from "./test.service";
 @Controller('test')
 export class TestController2{
     constructor(
-        private readonly testService : TestService
+        private readonly testService : TestService,
+        @InjectQueue('default')
+        private readonly _inboundCall: Queue
     ){}
 
     @Get('testSofiaStatus')
@@ -16,5 +18,12 @@ export class TestController2{
        let result = await this.testService.triggerSofiaStatus();
 
        return result;
+    }
+
+    @Get('testJob')
+    testJob(){
+        let sample = this._inboundCall.add('outhere', {
+            data: 'hellow'
+        });
     }
 }

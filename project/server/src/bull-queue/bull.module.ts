@@ -2,8 +2,8 @@ import { BullModule } from '@nestjs/bull';
 import { Module } from '@nestjs/common';
 import { FreeswitchCallSystemModule } from 'src/modules/freeswitch-call-system/freeswitch-call-system.module';
 import { IncomingCallModule } from 'src/modules/incomingCall/incomingCall.module';
-import { ClickToCallJob as ClickToCallProcessor } from './clickToCall/click-to-call.job';
-import { sampleJob } from './clickToCall/sampleJob';
+import { IncomingCallJob as IncomingCallProcessor } from './incomingCall/incomingCall.job';
+import { OutboundCallJob as OutboundCallProcessor } from './outboundCall/outboundCallJob';
 import { TestController } from './test.controller';
 
 @Module({
@@ -13,8 +13,8 @@ import { TestController } from './test.controller';
     }),
     FreeswitchCallSystemModule
   ],
-  providers: [ClickToCallProcessor, sampleJob],
-  exports: [ClickToCallProcessor, BullModule],
+  providers: [OutboundCallProcessor, IncomingCallProcessor],
+  exports: [OutboundCallProcessor, IncomingCallProcessor, BullModule],
   controllers: [TestController]
 })
 export class BullModuleQueue {}

@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
-import { CallRecordingController } from './call-recording.controller';
-import { CallRecordingService } from './call-recording.service';
+import { CallRecordingController } from './controllers/call-recording.controller';
+import { CallRecordingService } from './services/call-recording.service';
 
 @Module({
   controllers: [CallRecordingController],

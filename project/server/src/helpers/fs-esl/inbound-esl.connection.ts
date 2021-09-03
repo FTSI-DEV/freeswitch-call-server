@@ -1,7 +1,7 @@
 import { Console } from 'console';
 import { FsCallDetailRecordEntity } from 'src/entity/freeswitchCallDetailRecord.entity';
 import { FreeswitchCallSystemService } from 'src/modules/freeswitch-call-system/services/freeswitch-call-system.service';
-import { WebhookClickToCallStatusCallBack } from 'src/utils/webhooks';
+import { WebhookInboundCallStatusCallBack, WebhookOutboundCallStatusCallBack } from 'src/utils/webhooks';
 import { CallTypes } from '../constants/call-type';
 import { CHANNEL_VARIABLE } from '../constants/channel-variables.constants';
 import { FS_ESL } from '../constants/fs-esl.constants';
@@ -40,6 +40,7 @@ export class InboundEslConnectionHelper {
     );
 
     connection.on(FS_ESL.CONNECTION.ERROR, () => {
+      console.log('ESL INBOUND CONNECTION ERROR!');
       FreeswitchConnectionResult.errorMessage = 'Connection Error';
     });
   
@@ -47,14 +48,14 @@ export class InboundEslConnectionHelper {
       console.log('ESL INBOUND CONNECTION READY!');
       FreeswitchConnectionResult.isSuccess = true;
       FreeswitchConnectionResult.connectionObj = connection;
-      // connection.subscribe('all');
+      connection.subscribe('all');
       this._onListenEvent(connection);
     });
   }
 
   private _onListenEvent(connection){
 
-    connection.on('esl::event::*::*', async (fsEvent) => {
+    connection.on('esl::event::CHANNEL_HANGUP_COMPLETE::**', async (fsEvent) => {
 
       const eventName = fsEvent.getHeader('Event-Name');
 
@@ -66,7 +67,7 @@ export class InboundEslConnectionHelper {
 
       if (eventName === 'CHANNEL_HANGUP_COMPLETE') {
 
-        let parentCall = await this._freeswitchCallSystemService.getByCallId(callUid);
+        let parentCall = await this._freeswitchCallSystemService.getByCallUid(callUid);
       
         if (parentCall != null)
           await this.savedParentCall(fsEvent, parentCall);
@@ -83,10 +84,10 @@ export class InboundEslConnectionHelper {
     cdrModel.Id = parentCall.id;
 
     if (parentCall.CallDirection === CallTypes.Inbound) {
-      //call webhook inboundcall
+      http.get(WebhookInboundCallStatusCallBack(cdrModel));
     } 
     else {
-      http.get(WebhookClickToCallStatusCallBack(cdrModel));
+      http.get(WebhookOutboundCallStatusCallBack(cdrModel));
     }
   }
 
@@ -103,11 +104,11 @@ export class InboundEslConnectionHelper {
       console.log('CALL DIRECTION -> ' ,cdrModel.CallDirection);
 
       if (cdrModel.CallDirection === CallTypes.Inbound){
-          //call webhook inboundcall
+        http.get(WebhookInboundCallStatusCallBack(cdrModel));
       }
       else
       {
-        http.get(WebhookClickToCallStatusCallBack(cdrModel));
+        http.get(WebhookOutboundCallStatusCallBack(cdrModel));
       }
   }
 }

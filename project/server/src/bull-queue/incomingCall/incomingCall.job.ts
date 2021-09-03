@@ -5,28 +5,52 @@ import { IncomingCallService } from 'src/modules/incomingCall/incomingCall.servi
 
 @Processor('default')
 export class IncomingCallJob {
-  constructor(private readonly _freeswitchSystemService: FreeswitchCallSystemService) {}
+  constructor(private readonly _freeswitchCallSystemService: FreeswitchCallSystemService) {}
 
-  @Process()
-  handleTranscode(parameter: Job) {
-    console.log('Start transcoding incoming call...');
-    console.log('PARAMETER', parameter);
+  @Process('inboundCall')
+  async handleTranscode(parameter: Job){
 
-    this._freeswitchSystemService.saveCDR({
-      UUID: parameter.data.UUID,
-      CallerIdNumber: parameter.data.CallerIdNumber,
-      CallerName: parameter.data.CallerIdNumber,
-      CalleeIdNumber: parameter.data.CalleeIdNumber,
-      CallDirection: parameter.data.CallDirection,
-      StartedDate: parameter.data.StartedDate,
-      CallStatus: parameter.data.CallStatus,
-      CallDuration: parameter.data.Duration,
-      RecordingUUID: parameter.data.RecordingUUID,
-    });
+    let cdrRecord = await this._freeswitchCallSystemService.getByCallUid(parameter.data.UUID);
 
-    console.log('result', parameter.data);
+    if (cdrRecord === null || cdrRecord === undefined){
+            
+      console.log('Record does not exist', cdrRecord);
 
-    console.log('Transcoding complete');
+      await this._freeswitchCallSystemService.saveCDR({
+          UUID: parameter.data.UUID,
+          CallerIdNumber: parameter.data.CallerIdNumber,
+          CalleeIdNumber: parameter.data.CalleeIdNumber,
+          CallDirection: parameter.data.CallDirection,
+          StartedDate: parameter.data.StartedDate,
+          CallStatus: parameter.data.CallStatus,
+          CallDuration: parameter.data.Duration,
+          RecordingUUID: parameter.data.RecordingUUID,
+          ParentCallUid: parameter.data.ParentCallUid,
+          Id: parameter.data.Id
+      });
+  }
+  else{
+      console.log('Record exists');
+
+      console.log('UUID -> ', parameter.data.UUID);
+
+      await this._freeswitchCallSystemService.updateCDR({
+          UUID: parameter.data.UUID,
+          CallerIdNumber: parameter.data.CallerIdNumber,
+          CalleeIdNumber: parameter.data.CalleeIdNumber,
+          CallDirection: parameter.data.CallDirection,
+          StartedDate: parameter.data.StartedDate,
+          CallStatus: parameter.data.CallStatus,
+          CallDuration: parameter.data.Duration,
+          RecordingUUID: parameter.data.RecordingUUID,
+          ParentCallUid: parameter.data.ParentCallUid,
+          Id: parameter.data.Id
+      });
+  }
+    
+
+  console.log('Transcoding complete InboundCall',); 
+  
   }
 
   @OnQueueActive()
