@@ -14,16 +14,14 @@ import { FreeswitchModule } from './modules/freeswitch/freeswitch.module';
 import { ClickToCallModule } from './modules/click-to-call/click-to-call.module';
 import { InboundCallConfigModule } from './modules/config/inbound-call-config/inbound-call-config.module';
 import { EslServerHelper } from './helpers/fs-esl/server';
-import { StartFreeswitchApplication } from './helpers/fs-esl/event-socket-monitor';
 import { InboundCallConfigService } from './modules/config/inbound-call-config/services/inbound-call-config.service';
 import { CDRHelper } from './helpers/fs-esl/cdr.helper';
-import { CustomLoggerModule } from './logger/logger.module';
 import { BullModule } from '@nestjs/bull';
 import { BullModuleQueue } from './bull-queue/bull.module';
 import { TestModule } from './modules/test/test.module';
 import { InboundEslConnectionHelper } from './helpers/fs-esl/inbound-esl.connection';
 import { FreeswitchCallSystemService } from './modules/freeswitch-call-system/services/freeswitch-call-system.service';
-// import { ClickToCallJobModule } from './beequeue/jobs/clickToCall/clickToCallJob.module';
+import { CallRecordingModule } from './modules/call-recording/call-recording.module';
 
 @Module({
   imports: [
@@ -44,7 +42,8 @@ import { FreeswitchCallSystemService } from './modules/freeswitch-call-system/se
         host: process.env.REDIS_SERVER_HOST,
         port: 6379
       }
-    })
+    }),
+    CallRecordingModule
   ],
   controllers: [AppController],
   providers: [AppService],

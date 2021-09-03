@@ -10,7 +10,9 @@ require('dotenv').config();
 
 @Injectable()
 export class ConfigService implements IConfigService{
+    
     constructor(private env: { [key: string]: string | undefined }) { }
+
     private getValue(key: string, throwOnMissing = true): string{
         const value = this.env[key];
         if (!value && throwOnMissing){

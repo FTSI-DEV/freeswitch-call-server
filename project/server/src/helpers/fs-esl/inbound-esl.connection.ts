@@ -44,9 +44,10 @@ export class InboundEslConnectionHelper {
     });
   
     connection.on(FS_ESL.CONNECTION.READY, () => {
+      console.log('ESL INBOUND CONNECTION READY!');
       FreeswitchConnectionResult.isSuccess = true;
       FreeswitchConnectionResult.connectionObj = connection;
-      connection.subscribe('all');
+      // connection.subscribe('all');
       this._onListenEvent(connection);
     });
   }

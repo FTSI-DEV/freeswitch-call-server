@@ -1,0 +1,1 @@
+export { default as modesl } from 'modesl';

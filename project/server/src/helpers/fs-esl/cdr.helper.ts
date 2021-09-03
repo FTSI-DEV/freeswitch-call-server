@@ -1,4 +1,3 @@
-import { stringify } from "querystring";
 import { CDRModels } from "src/models/cdr.models";
 import { CHANNEL_VARIABLE } from "../constants/channel-variables.constants";
 
