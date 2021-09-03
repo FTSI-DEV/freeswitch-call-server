@@ -67,12 +67,27 @@ export class InboundEslConnectionHelper {
 
       if (eventName === 'CHANNEL_HANGUP_COMPLETE') {
 
-        let parentCall = await this._freeswitchCallSystemService.getByCallUid(callUid);
-      
-        if (parentCall != null)
-          await this.savedParentCall(fsEvent, parentCall);
+        let cdrModel = new CDRHelper().getCallRecords(fsEvent);
+
+        let uid = await this._freeswitchCallSystemService.getByCallUid(callUid);
+
+        if (uid != null){
+          
+          cdrModel.Id = uid.id;
+        }
         else
-          this.savedChildCall(fsEvent, callUid);
+        {
+          let originator = fsEvent.getHeader('variable_originator');
+
+          cdrModel.ParentCallUid = originator;
+        }
+
+        if (cdrModel.CallDirection === CallTypes.Inbound){
+          http.get(WebhookInboundCallStatusCallBack(cdrModel));
+        }
+        else{
+          http.get(WebhookOutboundCallStatusCallBack(cdrModel));
+        }
       }
     });
   }
@@ -98,17 +113,15 @@ export class InboundEslConnectionHelper {
     let cdrModel = new CDRHelper().getCallRecords(fsEvent);
 
     cdrModel.ParentCallUid = originator;
-    
-      console.log('CHILD CALL -> ', callUid);
 
-      console.log('CALL DIRECTION -> ' ,cdrModel.CallDirection);
+    console.log('CALL DIRECTION -> ' ,cdrModel.CallDirection);
 
-      if (cdrModel.CallDirection === CallTypes.Inbound){
+    if (cdrModel.CallDirection === CallTypes.Inbound){
         http.get(WebhookInboundCallStatusCallBack(cdrModel));
-      }
-      else
-      {
+    }
+    else
+    {
         http.get(WebhookOutboundCallStatusCallBack(cdrModel));
-      }
+     }
   }
 }
