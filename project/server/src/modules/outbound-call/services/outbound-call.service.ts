@@ -55,7 +55,6 @@ export class OutboundCallService {
 
             let sample = `originate {origination_caller_id_number=${phoneNumberFrom},ignore_early_media=true,call_timeout=60,hang_up_after_bridge=true,ringback=\'%(2000,440,480)\'}sofia/gateway/fs-test3/${phoneNumberFrom} `;
 
-
             connection.api('originate', arg4 , function(result) {
                 
                 let callUid = result.getBody().toString().replace('+OK ', '').trim();

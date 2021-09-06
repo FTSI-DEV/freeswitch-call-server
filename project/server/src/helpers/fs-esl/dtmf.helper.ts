@@ -1,3 +1,5 @@
+import { combineLatest } from "rxjs";
+
 const dtmfArray = [];
 
 export class DTMFHelper{
@@ -10,6 +12,17 @@ export class DTMFHelper{
         try{
             console.log('STARTING DTMF...');
             conn.execute('start_dtmf');
+        }
+        catch(err){
+            console.log('ERROR -> ', err);
+        }
+    }
+
+    stopDTMF(conn){
+        try
+        {
+            console.log('STOP DTMF...');
+            conn.execute('stop_dtmf');
         }
         catch(err){
             console.log('ERROR -> ', err);

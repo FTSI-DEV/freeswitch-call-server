@@ -65,9 +65,14 @@ export class InboundEslConnectionHelper {
 
     //   this._onListenEvent(connection);
     // })
+
+    connection.on('esl::end', () => {
+      console.log('ESL END ');
+      dtmf.stopDTMF(connection);
+    })
   }
 
-  private _onListenEvent(connection,dtmf: DTMFHelper){
+  private _onListenEvent(connection, dtmf: DTMFHelper){
 
     connection.on('esl::event::CHANNEL_HANGUP_COMPLETE::**', (fsEvent) => {
 
