@@ -1,21 +1,21 @@
 import { Column, Entity, EntityRepository, PrimaryGeneratedColumn, Repository } from "typeorm";
 
 @Entity('FreeswitchCallConfig')
-export class FreeswitchCallConfig{
+export class FreeswitchCallConfigEntity{
     @PrimaryGeneratedColumn()
     Id: number;
 
-    @Column()
+    @Column( { type:"varchar",  nullable: true } )
     Name: string;
 
-    @Column()
+    @Column( { type: "varchar", nullable: true })
     Value: string;
 }
 
-@EntityRepository(FreeswitchCallConfig)
-export class FreeswitchCallConfigRepository extends Repository<FreeswitchCallConfig>{
+@EntityRepository(FreeswitchCallConfigEntity)
+export class FreeswitchCallConfigRepository extends Repository<FreeswitchCallConfigEntity>{
 
-    saveUpdateRecord = async (fsCallConfig: FreeswitchCallConfig) => {
+    saveUpdateRecord = async (fsCallConfig: FreeswitchCallConfigEntity) => {
         return await this.save(fsCallConfig);
     }
 

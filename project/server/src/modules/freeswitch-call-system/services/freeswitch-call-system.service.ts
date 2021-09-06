@@ -89,7 +89,7 @@ export class FreeswitchCallSystemService {
                         CallStatus: element.CallStatus,
                         DateCreated: element.DateCreated,
                         Duration: element.CallDuration,
-                        Id: element.id,
+                        Id: element.Id,
                         RecordingUUID: element.RecordingUUID,
                         ParentCallUid: element.ParentCallUid
                     };
@@ -123,7 +123,7 @@ export class FreeswitchCallSystemService {
             .then(result => {
 
                 let cdrDTO: CallDetailRecordDTO = {
-                    Id: result.id,
+                    Id: result.Id,
                     PhoneNumberTo: result.PhoneNumberTo,
                     PhoneNumberFrom: result.PhoneNumberFrom,
                     CallStatus: result.CallStatus,

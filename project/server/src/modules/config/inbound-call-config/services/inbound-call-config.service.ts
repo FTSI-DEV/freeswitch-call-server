@@ -1,14 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { IPaginationMeta, IPaginationOptions, paginate, Pagination } from 'nestjs-typeorm-paginate';
-import { InboundCallConfig, InboundCallConfigRepository } from 'src/entity/inboundCallConfig.entity';
+import { InboundCallConfigEntity, InboundCallConfigRepository } from 'src/entity/inboundCallConfig.entity';
 import { InboundCallConfigModel, InboundCallConfigParam } from '../models/inbound-call-config.model';
 
 @Injectable()
 export class InboundCallConfigService {
 
     constructor(
-        @InjectRepository(InboundCallConfig)
+        @InjectRepository(InboundCallConfigEntity)
         private _inboundCallConfigRepo: InboundCallConfigRepository,
         
     ) {}
@@ -16,7 +16,7 @@ export class InboundCallConfigService {
     add(param: InboundCallConfigParam){
 
         console.log('parma', param);
-        let inboundCallConfig = new InboundCallConfig();
+        let inboundCallConfig = new InboundCallConfigEntity();
 
         inboundCallConfig.WebhookUrl = param.webhookUrl;
         inboundCallConfig.CallerId = param.callerId;
@@ -87,7 +87,7 @@ export class InboundCallConfigService {
     getInboundCallConfigs(options: IPaginationOptions): Promise<any>{
         return new Promise<Pagination<InboundCallConfigModel>>((resolve,reject) => {
 
-            let pageRecords = paginate<InboundCallConfig>(this._inboundCallConfigRepo, options);
+            let pageRecords = paginate<InboundCallConfigEntity>(this._inboundCallConfigRepo, options);
 
             pageRecords.then(result => {
 
@@ -129,7 +129,7 @@ export class InboundCallConfigService {
     }
 
     private getConfigByCallerId = (callerId:string) : any => {
-        return new Promise<InboundCallConfig>((resolve,reject) => {
+        return new Promise<InboundCallConfigEntity>((resolve,reject) => {
             
             this._inboundCallConfigRepo.createQueryBuilder("public.InboundCallConfig")
                 .where("public.InboundCallConfig.CallerId = :callerId" , { callerId : callerId })
@@ -148,7 +148,7 @@ export class InboundCallConfigService {
         })
     }
 
-    private getRecordById = (id:number) : Promise<InboundCallConfig> => {
+    private getRecordById = (id:number) : Promise<InboundCallConfigEntity> => {
         return this._inboundCallConfigRepo.findOneOrFail(id);
     } 
 

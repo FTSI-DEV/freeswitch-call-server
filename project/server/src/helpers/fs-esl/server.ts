@@ -1,6 +1,5 @@
 import { InboundCallConfigService } from 'src/modules/config/inbound-call-config/services/inbound-call-config.service';
 import { InboundCallHelper } from './inbound-call';
-import { modesl } from '../libs/modesl';
 const esl = require('modesl');
 
 export let eslServerRes = null;
@@ -17,7 +16,7 @@ export class EslServerHelper {
     let esl_server = new esl.Server(
       {
         port: 6000,
-        host: '192.168.18.3',
+        host: '0.0.0.0',
         myevents: true,
       },
 

@@ -1,35 +1,35 @@
-import { Column, Entity, EntityRepository, PrimaryGeneratedColumn, Repository } from "typeorm";
+import { Column, CreateDateColumn, Entity, EntityRepository, PrimaryGeneratedColumn, Repository } from "typeorm";
 
 @Entity('CallDetailRecord')
 export class FsCallDetailRecordEntity{
     @PrimaryGeneratedColumn()
-    id: number;
+    Id: number;
 
-    @Column()
+    @Column( { length: 200 , nullable: true})
     CallUUID: string;
 
-    @Column()
+    @Column( { length: 50, nullable: true})
     CallDirection: string;
 
-    @Column({ nullable: true})
+    @Column({ length:50, nullable: true})
     PhoneNumberTo?: string;
 
-    @Column({ nullable: true})
+    @Column({ length:50, nullable: true})
     PhoneNumberFrom?: string;
 
-    @Column({ nullable: true})
+    @Column({ length:300, nullable: true})
     CallStatus?: string;
 
     @Column({ nullable: true})
     CallDuration?: number;
 
-    @Column()
+    @CreateDateColumn()
     DateCreated: Date;
 
-    @Column({ nullable: true})
+    @Column({ length:200, nullable: true})
     RecordingUUID? : string;
 
-    @Column({ nullable: true})
+    @Column({ length:200, nullable: true})
     ParentCallUid?: string;
 }
 

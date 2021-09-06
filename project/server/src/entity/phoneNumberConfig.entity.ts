@@ -2,40 +2,40 @@ import { async } from "rxjs";
 import { Column, Entity, EntityRepository, getRepository, Index, PrimaryGeneratedColumn, Repository } from "typeorm";
 
 @Entity('PhoneNumberConfig')
-export class PhoneNumberConfig{
+export class PhoneNumberConfigEntity{
 
     @Index()
     @PrimaryGeneratedColumn()
     Id: number;
 
-    @Column()
+    @Column({ type:"varchar", length: 200})
     FriendlyName: string;
 
-    @Column()
+    @Column({ type:"varchar", length: 100})
     HttpMethod: string;
 
-    @Column()
+    @Column( { type:"varchar", length: 100, nullable:true})
     WebhookUrl: string;
 
-    @Column()
+    @Column( { type:"varchar", length: 200 })
     PhoneNumber: string;
 
     @Column( { default: false })
     IsDeleted: boolean;
 }
 
-@EntityRepository(PhoneNumberConfig)
-export class PhoneNumberConfigRepository extends Repository<PhoneNumberConfig>{
+@EntityRepository(PhoneNumberConfigEntity)
+export class PhoneNumberConfigRepository extends Repository<PhoneNumberConfigEntity>{
 
-    saveUpdateRecord = async (config : PhoneNumberConfig) => {
+    saveUpdateRecord = async (config : PhoneNumberConfigEntity) => {
         return await this.save(config);
     }
 
-    deleteRecord = async(config:PhoneNumberConfig) => {
+    deleteRecord = async(config:PhoneNumberConfigEntity) => {
         console.log('config', config);
 
         await this.createQueryBuilder()
-        .update(PhoneNumberConfig)
+        .update(PhoneNumberConfigEntity)
         .set({ IsDeleted : config.IsDeleted})
         .where("Id = :Id ", { Id: config.Id })
         .execute();

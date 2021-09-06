@@ -20,6 +20,20 @@ export class InboundCallHelper{
         let self = this;
 
         eslServerRes.on(ESL_SERVER.CONNECTION.READY, function(conn){
+
+            console.log('bridge executed');
+
+            // conn.execute('playback', 'https://crm.dealerownedsoftware.com/hosted-files/ivr-rec-2/WelcomeMessage.mp3');
+
+            conn.execute('sleep', '5000');
+
+            conn.execute('set', 'hangup_after_bridge=true');
+
+            // conn.execute('export', 'execute_on_answer=record_session $${recordings_dir}/${strftime(%Y-%m-%d-%H-%M-%S)}_${uuid}_${caller_id_number}.wav');
+
+            conn.execute('bridge', 'sofia/gateway/fs-test1/1000');
+
+            conn.execute('playback', 'https://crm.dealerownedsoftware.com/hosted-files/audio/ConvertedSalesService.wav');
             
             let eslInfo = conn.getInfo();
 
@@ -27,13 +41,16 @@ export class InboundCallHelper{
 
             console.log('DESTINATION NUMBER -> ', destinationNumber);
 
-            conn.execute('set', 'hangup_after_bridge=true');
+            // 
 
-            conn.execute('export', 'execute_on_answer=record_session $${recordings_dir}/${strftime(%Y-%m-%d-%H-%M-%S)}_${uuid}_${caller_id_number}.wav');
+            // 
 
-            conn.execute('bridge', 'sofia/gateway/fs-test3/1000');
+            // console.log('GetINFO -> ', conn.getInfo());
+
+
+            // conn.execute('bridge', 'sofia/gateway/fs-test3/1000');
       
-            conn.execute('playback', 'https://crm.dealerownedsoftware.com/hosted-files/audio/ConvertedSalesService.wav');
+          
            
             // self.inboundCallExecute(conn, destinationNumber);
         });

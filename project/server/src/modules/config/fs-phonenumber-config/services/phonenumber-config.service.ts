@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { rejects } from 'assert';
 import { IPaginationMeta, IPaginationOptions, paginate, Pagination } from 'nestjs-typeorm-paginate';
-import { PhoneNumberConfig, PhoneNumberConfigRepository } from 'src/entity/phoneNumberConfig.entity';
+import { PhoneNumberConfigEntity, PhoneNumberConfigRepository } from 'src/entity/phoneNumberConfig.entity';
 import { FreeswitchPhoneNumberConfigParam } from 'src/models/freeswitchCallConfigModel';
 import { IFreeswitchPhoneNumberConfigService as IFreeswitchPhoneNumberConfigService } from './iphonenumber-config.interface';
 
@@ -15,7 +15,7 @@ export class FreeswitchPhoneNumberConfigService{
 
     add(param: FreeswitchPhoneNumberConfigParam){
 
-        let phoneNumberConfig = new PhoneNumberConfig();
+        let phoneNumberConfig = new PhoneNumberConfigEntity();
 
         phoneNumberConfig.FriendlyName = param.friendlyName;
         phoneNumberConfig.HttpMethod = param.httpMethod;
@@ -118,7 +118,7 @@ export class FreeswitchPhoneNumberConfigService{
 
     private getById = (id: number): any => {
 
-        return new Promise<PhoneNumberConfig>((resolve,reject) => {
+        return new Promise<PhoneNumberConfigEntity>((resolve,reject) => {
             console.log('id', id);
             this._phoneNumberConfigRepo.findOneOrFail({ where: { Id: id } })
             .then(result => {
@@ -143,7 +143,7 @@ export class FreeswitchPhoneNumberConfigService{
 
         return new Promise<Pagination<FreeswitchPhoneNumberConfigParam>>((resolve, reject) => {
 
-            let pageRecords = paginate<PhoneNumberConfig>(this._phoneNumberConfigRepo, options);
+            let pageRecords = paginate<PhoneNumberConfigEntity>(this._phoneNumberConfigRepo, options);
 
             pageRecords.then(result => {
                 let itemsObjs: FreeswitchPhoneNumberConfigParam[] = [];

@@ -12,5 +12,6 @@ export const CHANNEL_VARIABLE = {
     END_STAMP: "variable_end_stamp",
     ANSWER_EPOCH: "variable_answer_epoch",
     START_EPOCH: "variable_start_epoch",
-    END_EPOCH : "variable_end_epoch"
+    END_EPOCH : "variable_end_epoch",
+    CHANNEL_CALL_UID: "Channel-Call-UUID"
 };

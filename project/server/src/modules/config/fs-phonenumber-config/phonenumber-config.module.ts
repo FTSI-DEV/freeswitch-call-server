@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { PhoneNumberConfig, PhoneNumberConfigRepository } from 'src/entity/phoneNumberConfig.entity';
+import { PhoneNumberConfigEntity, PhoneNumberConfigRepository } from 'src/entity/phoneNumberConfig.entity';
 import { FreeswitchPhoneNumberConfigController } from './controllers/phonenumber-config.controller';
 import { FreeswitchPhoneNumberConfigService } from './services/phonenumber-config.service';
 
@@ -8,7 +8,7 @@ import { FreeswitchPhoneNumberConfigService } from './services/phonenumber-confi
 @Module({
   providers: [FreeswitchPhoneNumberConfigService],
   imports: [
-    TypeOrmModule.forFeature([PhoneNumberConfig, PhoneNumberConfigRepository])],
+    TypeOrmModule.forFeature([PhoneNumberConfigEntity, PhoneNumberConfigRepository])],
   exports: [FreeswitchPhoneNumberConfigService],
   controllers: [FreeswitchPhoneNumberConfigController]
 })

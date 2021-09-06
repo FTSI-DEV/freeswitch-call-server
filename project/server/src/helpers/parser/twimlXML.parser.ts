@@ -10,6 +10,7 @@ export interface KeyValues {
 export class XMLParser {
 
   tryParseXMLBody(xmlText: string):KeyValues[] {
+
     let keyValues: KeyValues[] = [];
 
     let xmlDocResult = new xmldoc.XmlDocument(xmlText);
@@ -36,3 +37,8 @@ export class XMLParser {
     return keyValues;
   }
 }
+
+// class XMLParserContextObject{
+//   arrayConExecute = [key,value,order],
+//   arrayConApi = [key,value]
+// }

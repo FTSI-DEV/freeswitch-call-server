@@ -51,16 +51,26 @@ export class OutboundCallService {
             
             let arg3 = `bridge({hangup_after_bridge=true,origination_caller_id_number=${callerId}}sofia/gateway/fs-test1/${phoneNumberTo})`
 
-            connection.api('originate', arg2 , function(result) {
+            let arg4 = `${arg1} &socket(192.168.18.3:6000 sync full)`;
+
+            let sample = `originate {origination_caller_id_number=${phoneNumberFrom},ignore_early_media=true,call_timeout=60,hang_up_after_bridge=true,ringback=\'%(2000,440,480)\'}sofia/gateway/fs-test3/${phoneNumberFrom} `;
+
+
+            connection.api('originate', arg4 , function(result) {
                 
                 let callUid = result.getBody().toString().replace('+OK ', '').trim();
 
-                connection.execute('record_session', '$${recordings_dir}/${strftime(%Y-%m-%d-%H-%M-%S)}_${uuid}_${caller_id_number}.wav', callUid);
+                // connection.execute('record_session', '$${recordings_dir}/${strftime(%Y-%m-%d-%H-%M-%S)}_${uuid}_${caller_id_number}.wav', callUid);
 
                 console.log('originate', callUid);
         
                 resolve(callUid.trim());
             });
+
+            // connection.api(sample, (res) => {
+            //     console.log('RESULT ', res);
+            // })
+
         });
     }
 }

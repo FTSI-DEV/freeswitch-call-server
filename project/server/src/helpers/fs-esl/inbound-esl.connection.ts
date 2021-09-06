@@ -4,11 +4,14 @@ import { FreeswitchCallSystemService } from 'src/modules/freeswitch-call-system/
 import { WebhookInboundCallStatusCallBack, WebhookOutboundCallStatusCallBack } from 'src/utils/webhooks';
 import { CallTypes } from '../constants/call-type';
 import { CHANNEL_VARIABLE } from '../constants/channel-variables.constants';
+import { EVENT_LIST } from '../constants/event-list.constants';
 import { FS_ESL } from '../constants/fs-esl.constants';
 import { CDRHelper } from './cdr.helper';
+import { DTMFHelper } from './dtmf.helper';
 import { FreeswitchConfigHelper } from './freeswitchConfig.helper';
 const esl = require('modesl');
 const http = require('http');
+
 
 interface ConnResult {
   connectionObj: any;
@@ -39,8 +42,10 @@ export class InboundEslConnectionHelper {
       fsConfig.password,
     );
 
+    let dtmf = new DTMFHelper();
+
     connection.on(FS_ESL.CONNECTION.ERROR, () => {
-      console.log('ESL INBOUND CONNECTION ERROR!');
+      // console.log('ESL INBOUND CONNECTION ERROR!');
       FreeswitchConnectionResult.errorMessage = 'Connection Error';
     });
   
@@ -48,80 +53,54 @@ export class InboundEslConnectionHelper {
       console.log('ESL INBOUND CONNECTION READY!');
       FreeswitchConnectionResult.isSuccess = true;
       FreeswitchConnectionResult.connectionObj = connection;
-      connection.subscribe('all');
-      this._onListenEvent(connection);
+      connection.subscribe('CHANNEL_HANGUP_COMPLETE');
+      connection.subscribe('CHANNEL_ANSWER');
+      connection.subscribe('DTMF');
+      dtmf.startDTMF(connection);
     });
+  
+    this._onListenEvent(connection, dtmf);
+    // connection.subscribe('CHANNEL_HANGUP_COMPLETE', (evt) => {
+    //   console.log('ALL -> ', evt);
+
+    //   this._onListenEvent(connection);
+    // })
   }
 
-  private _onListenEvent(connection){
+  private _onListenEvent(connection,dtmf: DTMFHelper){
 
-    connection.on('esl::event::CHANNEL_HANGUP_COMPLETE::**', async (fsEvent) => {
+    connection.on('esl::event::CHANNEL_HANGUP_COMPLETE::**', (fsEvent) => {
 
-      const eventName = fsEvent.getHeader('Event-Name');
+      // console.log('EVENTS -> ', JSON.stringify(fsEvent));
+      
+      console.log('EVENT-NAME ->' , fsEvent.getHeader(EVENT_LIST.EVENT_NAME));
 
-      console.log('EVENT NAME -> ', eventName);
+      let callId = fsEvent.getHeader(CHANNEL_VARIABLE.UNIQUE_ID);
 
-      const callUid = fsEvent.getHeader(CHANNEL_VARIABLE.UNIQUE_ID);
+      let channelId = fsEvent.getHeader('Channel-Call-UUID');
 
-      console.log('uid - >', callUid);
+      console.log('CHANNEL ID -> ', channelId);
 
-      if (eventName === 'CHANNEL_HANGUP_COMPLETE') {
-
-        let cdrModel = new CDRHelper().getCallRecords(fsEvent);
-
-        let uid = await this._freeswitchCallSystemService.getByCallUid(callUid);
-
-        if (uid != null){
-          
-          cdrModel.Id = uid.id;
-        }
-        else
-        {
-          let originator = fsEvent.getHeader('variable_originator');
-
-          cdrModel.ParentCallUid = originator;
-        }
-
-        if (cdrModel.CallDirection === CallTypes.Inbound){
-          http.get(WebhookInboundCallStatusCallBack(cdrModel));
-        }
-        else{
-          http.get(WebhookOutboundCallStatusCallBack(cdrModel));
-        }
+      if (callId === channelId){
+        console.log('Call : ' , callId);
+      }
+      else{
+        console.log('Call : ' , callId);
+        console.log('Parent Call : ', channelId);
       }
     });
-  }
 
-  private async savedParentCall(fsEvent:any,parentCall: FsCallDetailRecordEntity){
+    connection.on('esl::event::CHANNEL_ANSWER::**', (evt) => {
 
-    let cdrModel = new CDRHelper().getCallRecords(fsEvent);
+      console.log('EVENT-NAME ->' , evt.getHeader(EVENT_LIST.EVENT_NAME));
 
-    cdrModel.Id = parentCall.id;
+      let callId = evt.getHeader(CHANNEL_VARIABLE.UNIQUE_ID);
 
-    if (parentCall.CallDirection === CallTypes.Inbound) {
-      http.get(WebhookInboundCallStatusCallBack(cdrModel));
-    } 
-    else {
-      http.get(WebhookOutboundCallStatusCallBack(cdrModel));
-    }
-  }
+      let channelId = evt.getHeader('Channel-Call-UUID');
 
-  private savedChildCall(fsEvent, callUid:string){
+      console.log('CHANNEL ID -> ', channelId);
 
-    let originator = fsEvent.getHeader('variable_originator');
-          
-    let cdrModel = new CDRHelper().getCallRecords(fsEvent);
-
-    cdrModel.ParentCallUid = originator;
-
-    console.log('CALL DIRECTION -> ' ,cdrModel.CallDirection);
-
-    if (cdrModel.CallDirection === CallTypes.Inbound){
-        http.get(WebhookInboundCallStatusCallBack(cdrModel));
-    }
-    else
-    {
-        http.get(WebhookOutboundCallStatusCallBack(cdrModel));
-     }
+      dtmf.captureDTMF(connection, callId);
+    });
   }
 }

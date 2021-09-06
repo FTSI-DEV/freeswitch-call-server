@@ -2,34 +2,34 @@ import { truncate } from "fs/promises";
 import { Column, Entity, EntityRepository, Index, PrimaryGeneratedColumn, Repository } from "typeorm";
 
 @Entity('InboundCallConfig')
-export class InboundCallConfig{
+export class InboundCallConfigEntity{
     @Index()
     @PrimaryGeneratedColumn()
     Id: number;
 
-    @Column()
+    @Column( { nullable: true , length: 200 })
     CallerId: string;
 
-    @Column( { nullable: true } )
+    @Column( { type: "varchar" } )
     WebhookUrl :string;
 
-    @Column( {nullable:true})
+    @Column( { type:"varchar", length: 100, nullable:true})
     HTTPMethod: string;
 
     @Column( {default: false} )
     IsDeleted: boolean;
 }
 
-@EntityRepository(InboundCallConfig)
-export class InboundCallConfigRepository extends Repository<InboundCallConfig>{
+@EntityRepository(InboundCallConfigEntity)
+export class InboundCallConfigRepository extends Repository<InboundCallConfigEntity>{
 
-    saveUpdateRecord = async (inboundCallConfig: InboundCallConfig) => {
+    saveUpdateRecord = async (inboundCallConfig: InboundCallConfigEntity) => {
         return await this.save(inboundCallConfig);
     }
 
-    deleteRecord = async(config:InboundCallConfig) => {
+    deleteRecord = async(config:InboundCallConfigEntity) => {
         await this.createQueryBuilder()
-            .update(InboundCallConfig)
+            .update(InboundCallConfigEntity)
             .set({ IsDeleted : config.IsDeleted })
             .where("Id = :Id ", { Id: config.Id } )
             .execute();
