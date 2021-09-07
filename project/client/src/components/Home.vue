@@ -23,14 +23,17 @@
 <script lang="ts">
 // import { LaptopOutlined, NotificationOutlined } from '@ant-design/icons-vue';
 import { defineComponent, ref } from "vue";
-
+import { useStore } from 'vuex';
 export default defineComponent({
   setup() {
+    const store = useStore();
+    console.log(store);
     return {
       selectedKeys1: ref<string[]>(["2"]),
       selectedKeys2: ref<string[]>(["1"]),
       collapsed: ref<boolean>(false),
       openKeys: ref<string[]>(["sub1"]),
+      store
     };
   },
 });
