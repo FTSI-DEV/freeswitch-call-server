@@ -1,4 +1,6 @@
 import { TwiMLContants } from '../constants/twiml.constants';
+import { XMLParserContext, CreateCommandObject } from './XMLCommandObject';
+import { isPhoneNumberValid } from '../../utils/phoneNumberValidation';
 
 const xmldoc = require('xmldoc');
 
@@ -38,6 +40,34 @@ export class XMLParser {
   }
 }
 
+export class XMLParserHelper {
+  tryParseXMLBody(xmlText): XMLParserContext {
+
+    let context = new XMLParserContext();
+
+    const xmlDocResult = new xmldoc.XmlDocument(xmlText);
+
+    const xmlChildren = xmlDocResult.children;
+
+    for (let i = 0; i < xmlChildren.length; i++) { 
+      const element = xmlChildren[i];
+      if (element.name === TwiMLContants.Say) {
+        context.finalInstructionList.push(context.createCommandObject = new CreateCommandObject(element.name, 'exec', element.attr, element.val, element.children));
+      } else if (element.name  === TwiMLContants.Dial) {
+        if (isPhoneNumberValid(element.val)){
+          context.finalInstructionList.push(context.createCommandObject = new CreateCommandObject(element.name, 'exec', element.attr, element.val, element.children));
+        }
+      } else if (element.name ===  TwiMLContants.Reject) {
+        context.finalInstructionList.push(context.createCommandObject = new CreateCommandObject(element.name, 'exec', element.attr, element.val, element.children));
+      } else if (element.name === TwiMLContants.Pause) {
+        context.finalInstructionList.push(context.createCommandObject = new CreateCommandObject(element.name, 'exec', element.attr, element.val, element.children));
+      } else if (element.name === TwiMLContants.Gather) {
+        context.finalInstructionList.push(context.createCommandObject = new CreateCommandObject(element.name, 'exec', element.attr, element.val, element.children));
+      }
+    }
+    return context;
+  }
+}
 // class XMLParserContextObject{
 //   arrayConExecute = [key,value,order],
 //   arrayConApi = [key,value]
