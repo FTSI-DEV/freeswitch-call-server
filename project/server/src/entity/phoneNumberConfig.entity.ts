@@ -8,17 +8,17 @@ export class PhoneNumberConfigEntity{
     @PrimaryGeneratedColumn()
     Id: number;
 
-    @Column({ type:"varchar", length: 200})
-    FriendlyName: string;
+    @Column({ type:"varchar", length: 200, nullable:true})
+    FriendlyName?: string;
 
-    @Column({ type:"varchar", length: 100})
-    HttpMethod: string;
+    @Column({ type:"varchar", length: 100, nullable:true})
+    HttpMethod?: string;
 
     @Column( { type:"varchar", length: 100, nullable:true})
-    WebhookUrl: string;
+    WebhookUrl?: string;
 
-    @Column( { type:"varchar", length: 200 })
-    PhoneNumber: string;
+    @Column( { type:"varchar", length: 200, nullable:true })
+    PhoneNumber?: string;
 
     @Column( { default: false })
     IsDeleted: boolean;

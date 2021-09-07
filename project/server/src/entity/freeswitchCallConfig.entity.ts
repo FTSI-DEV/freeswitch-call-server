@@ -6,10 +6,10 @@ export class FreeswitchCallConfigEntity{
     Id: number;
 
     @Column( { type:"varchar",  nullable: true } )
-    Name: string;
+    Name?: string;
 
     @Column( { type: "varchar", nullable: true })
-    Value: string;
+    Value?: string;
 }
 
 @EntityRepository(FreeswitchCallConfigEntity)

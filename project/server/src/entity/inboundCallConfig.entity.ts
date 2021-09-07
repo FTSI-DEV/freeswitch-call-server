@@ -8,13 +8,13 @@ export class InboundCallConfigEntity{
     Id: number;
 
     @Column( { nullable: true , length: 200 })
-    CallerId: string;
+    CallerId?: string;
 
-    @Column( { type: "varchar" } )
-    WebhookUrl :string;
+    @Column( { type: "varchar", nullable:true } )
+    WebhookUrl? :string;
 
     @Column( { type:"varchar", length: 100, nullable:true})
-    HTTPMethod: string;
+    HTTPMethod?: string;
 
     @Column( {default: false} )
     IsDeleted: boolean;
