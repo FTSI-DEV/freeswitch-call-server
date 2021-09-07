@@ -3,5 +3,6 @@ export const TwiMLContants = {
     Dial: 'Dial',
     Reject: 'Reject',
     Gather: 'Gather',
-    Hangup: 'Hangup'
+    Hangup: 'Hangup',
+    Pause: 'Pause'
 }

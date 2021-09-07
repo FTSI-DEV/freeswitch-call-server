@@ -5,9 +5,10 @@ import { WebhookInboundCallStatusCallBack } from "src/utils/webhooks";
 import { CHANNEL_VARIABLE } from "../constants/channel-variables.constants";
 import { ESL_SERVER, FS_DIALPLAN } from "../constants/fs-esl.constants";
 import { TwiMLContants } from "../constants/twiml.constants";
-import { KeyValues, XMLParser } from "../parser/twimlXML.parser";
+import { KeyValues, XMLParser, XMLParserHelper } from "../parser/twimlXML.parser";
 import { http } from "../libs/http";
 import { eslServerRes } from "./server";
+import { Instructions } from '../../helpers/parser/xmlCommandObject';
 
 export class InboundCallHelper{
 
@@ -22,7 +23,7 @@ export class InboundCallHelper{
         eslServerRes.on(ESL_SERVER.CONNECTION.READY, function(conn){
 
             console.log('bridge executed');
-
+            
             // conn.execute('playback', 'https://crm.dealerownedsoftware.com/hosted-files/ivr-rec-2/WelcomeMessage.mp3');
 
             conn.execute('sleep', '5000');
@@ -126,5 +127,21 @@ export class InboundCallHelper{
     //callwebhook when call ends
     private triggerIncomingStatusCallBack(cdrModel: CDRModels){
         http.get(WebhookInboundCallStatusCallBack(cdrModel));
-      }
+    }
+
+    private executeTaskList(instructionsList: Instructions[], conn) {
+       if (instructionsList.length) {
+            for (let i = 0; i < instructionsList.length; i++) {
+                const element = instructionsList[i];
+                if (element.command === 'Say') {
+                    conn.execute('say', 'en name_spelled pronounced john');
+                    //conn.execute('say', 'en messaged pronounced john');
+                  } else if (element.command === 'Reject') {
+                    conn.execute('hangup');
+                  }
+            }
+       } else {
+        conn.execute('hangup');
+       }
+    }
 }
