@@ -1,96 +1,127 @@
-import { combineLatest } from "rxjs";
+import { combineLatest } from 'rxjs';
 
 const dtmfArray = [];
 
-export class DTMFHelper{
+export class DTMFHelper {
+  constructor() {}
 
-    constructor(
-    ){}
-
-    startDTMF(conn)
-    {
-        try{
-            console.log('STARTING DTMF...');
-            conn.execute('start_dtmf');
-        }
-        catch(err){
-            console.log('ERROR -> ', err);
-        }
+  startDTMF(conn) {
+    try {
+      console.log('STARTING DTMF...');
+      conn.execute('start_dtmf');
+    } catch (err) {
+      console.log('ERROR -> ', err);
     }
+  }
 
-    stopDTMF(conn){
-        try
-        {
-            console.log('STOP DTMF...');
-            conn.execute('stop_dtmf');
-        }
-        catch(err){
-            console.log('ERROR -> ', err);
-        }
+  stopDTMF(conn) {
+    try {
+      console.log('STOP DTMF...');
+      conn.execute('stop_dtmf');
+    } catch (err) {
+      console.log('ERROR -> ', err);
     }
+  }
 
-    processDTMF(dtmfDigit){
-        // insert logic here on how you want to process the 
-        // dtmf-digit received.
+  processDTMF(dtmfDigit) {
+    // insert logic here on how you want to process the
+    // dtmf-digit received.
+
+    if (dtmfDigit === "#"){
+        const ext = dtmfArray.join('');
+        console.log(`Ext process -> ${ext}`);
+
+        //clear the dtmfArray after call is dispatched
+        dtmfArray.splice(0, dtmfArray.length);
+    }
+    else{
         dtmfArray.push(dtmfDigit);
         console.log('DTMF digit -> ', dtmfDigit);
         console.log('DTMF array -> ', dtmfArray);
     }
+  }
 
-    captureDTMF(conn, uuid:string){
+  captureDTMF(conn, uuid: string) {
+    conn.on('esl::event::DTMF::*', (evt) => {
+      const dtmfDigit = evt.getHeader('DTMF-Digit');
 
-        conn.on("esl::event::DTMF::*", (evt) => {
-            
-            const dtmfDigit = evt.getHeader('DTMF-Digit');
-
-            console.log(`UUID -> ${uuid} , 
+      console.log(`UUID -> ${uuid} , 
                         DIGIT -> ${dtmfDigit} , 
                         DTMF ARRAY LENGTH -> ${dtmfArray}`);
 
-            switch(dtmfDigit){
-                case '2' : 
-                    if (dtmfArray.length === 0){
+    // conn.execute('bind_digit_action' , 
+    //             'my_digits, 1500, exec:playback,https://crm.dealerownedsoftware.com/hosted-files/audio/ConvertedSalesService.wav', uuid, () => {
+    //                 console.log('executed digit');
 
-                        console.log('TRYING TO BRIDGE THE CALL...');
+    //     conn.execute('digit_action_set_realm', 'my_digits', uuid, () => {
+    //         conn.execute('set', 'bind_digit_input_timeout=5000', uuid, () => {
+    //             console.log('timeout -> ');
+    //         });
+    //     });
+    // });
+    
+    //   conn.execute('digit_action_set_realm', 'my_digits', uuid, () => {
 
-                        //insert bridge here...
+    //     conn.execute('set', 'bind_digit_input_timeout=5000', uuid, () => {
+    //         console.log('TIMEOUT');
+    //     });
 
-                        dtmfArray.splice(0, dtmfArray.length);
+    //     conn.execute(
+    //         'bind_digit_action',
+    //         'my_digits, 1500, exec:playback,https://crm.dealerownedsoftware.com/hosted-files/audio/ConvertedSalesService.wav', uuid, (r) => {
+    //             // console.log('DIG' , r);
+    //     });
+    //   });
 
-                        break;
-                    }
 
-                case '3' :
-                    if (dtmfArray.length === 0){
-                        console.log('TRYING TO CONNECT TO IVR...');
-                        
-                        //execute IVR
-                        conn.execute('ivr', 'vena-ivr', uuid);
+    //conn.execute('play_and_get_digits', `1 5 1 3000 * ivr/ivr-finished_pound_hash_key.wav ivr/ivr-that_was_an_invalid_entry.wav '' 1 5000`, uuid);
 
-                        dtmfArray.splice(0, dtmfArray.length);
+    //    conn.execute('play_and_get_digits',`1 3 2 3000 # ivr/ivr-that_was_an_invalid_entry.wav silence_stream://250 res \\dt+`, uuid);
 
-                        break;
-                    }
-                
-                case '4' :
-                    if (dtmfArray.length === 0){
+    //   switch(dtmfDigit){
+    //       case '2' :
+    //           if (dtmfArray.length === 0){
 
-                        console.log('PLAY RECORDING...');
+    //               console.log('TRYING TO BRIDGE THE CALL...');
 
-                        // conn.execute('playback', 'http://crm.dealerownedsoftware.com/hosted-files/ivr-rec-2/WelcomeMessage.mp3');
+    //               //insert bridge here...
 
-                        conn.execute('playback', 'https://crm.dealerownedsoftware.com/hosted-files/audio/ConvertedSalesService.wav', uuid);
+    //               dtmfArray.splice(0, dtmfArray.length);
 
-                        break;
-                    }
-                
-                default:
-                    this.processDTMF(dtmfDigit);
+    //               break;
+    //           }
 
-                    conn.execute('playback', 'http://crm.dealerownedsoftware.com/hosted-files/ivr-rec-2/FailedRetryMessage.mp3', uuid);
+    //       case '3' :
+    //           if (dtmfArray.length === 0){
+    //               console.log('TRYING TO CONNECT TO IVR...');
 
-                    break;
-            }
-        })
-    }
+    //               //execute IVR
+    //               conn.execute('ivr', 'vena-ivr', uuid);
+
+    //               dtmfArray.splice(0, dtmfArray.length);
+
+    //               break;
+    //           }
+
+    //       case '4' :
+    //           if (dtmfArray.length === 0){
+
+    //               console.log('PLAY RECORDING...');
+
+    //               // conn.execute('playback', 'http://crm.dealerownedsoftware.com/hosted-files/ivr-rec-2/WelcomeMessage.mp3');
+
+    //               conn.execute('playback', 'https://crm.dealerownedsoftware.com/hosted-files/audio/ConvertedSalesService.wav', uuid);
+
+    //               break;
+    //           }
+
+    //       default:
+    //           this.processDTMF(dtmfDigit);
+
+    //           conn.execute('playback', 'http://crm.dealerownedsoftware.com/hosted-files/ivr-rec-2/FailedRetryMessage.mp3', uuid);
+
+    //           break;
+    //   }
+    });
+  }
 }

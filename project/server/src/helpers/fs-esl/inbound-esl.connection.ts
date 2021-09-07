@@ -33,9 +33,9 @@ export class InboundEslConnectionHelper {
   startConnection(){
 
     console.log('TRYING TO ESTABLISHED CONNECTION');
-  
+
     let fsConfig = new FreeswitchConfigHelper().getFreeswitchConfig();
-  
+
     let connection = new esl.Connection(
       fsConfig.ip,
       fsConfig.port,
@@ -48,7 +48,7 @@ export class InboundEslConnectionHelper {
       // console.log('ESL INBOUND CONNECTION ERROR!');
       FreeswitchConnectionResult.errorMessage = 'Connection Error';
     });
-  
+
     connection.on(FS_ESL.CONNECTION.READY, () => {
       console.log('ESL INBOUND CONNECTION READY!');
       FreeswitchConnectionResult.isSuccess = true;
@@ -58,7 +58,7 @@ export class InboundEslConnectionHelper {
       connection.subscribe('DTMF');
       dtmf.startDTMF(connection);
     });
-  
+
     this._onListenEvent(connection, dtmf);
     // connection.subscribe('CHANNEL_HANGUP_COMPLETE', (evt) => {
     //   console.log('ALL -> ', evt);
@@ -77,7 +77,7 @@ export class InboundEslConnectionHelper {
     connection.on('esl::event::CHANNEL_HANGUP_COMPLETE::**', (fsEvent) => {
 
       // console.log('EVENTS -> ', JSON.stringify(fsEvent));
-      
+
       console.log('EVENT-NAME ->' , fsEvent.getHeader(EVENT_LIST.EVENT_NAME));
 
       let callId = fsEvent.getHeader(CHANNEL_VARIABLE.UNIQUE_ID);
@@ -105,7 +105,14 @@ export class InboundEslConnectionHelper {
 
       console.log('CHANNEL ID -> ', channelId);
 
-      dtmf.captureDTMF(connection, callId);
+      if (callId === channelId){
+        console.log('Call : ' , callId);
+      }
+      else{
+        console.log('Call : ' , callId);
+        console.log('Parent Call : ', channelId);
+        dtmf.captureDTMF(connection, callId);
+      }
     });
   }
 }

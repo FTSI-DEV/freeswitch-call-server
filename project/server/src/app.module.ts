@@ -21,6 +21,7 @@ import { InboundEslConnectionHelper } from './helpers/fs-esl/inbound-esl.connect
 import { FreeswitchCallSystemService } from './modules/freeswitch-call-system/services/freeswitch-call-system.service';
 import { CallRecordingModule } from './modules/call-recording/call-recording.module';
 import { OutboundCallModule } from './modules/outbound-call/outbound-call.module';
+import { ClickToCallServerHelper } from './helpers/fs-esl/click-to-call.server';
 
 @Module({
   imports: [
@@ -57,7 +58,6 @@ export class AppModule {
 
     new InboundEslConnectionHelper(_freeswitchCallSystem).startConnection();
 
-    // new StartFreeswitchApplication().startFS();
-
+    new ClickToCallServerHelper().startClickToCallServer();
   }
 }

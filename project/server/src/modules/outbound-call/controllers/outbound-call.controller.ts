@@ -28,11 +28,11 @@ export class OutboundCallController {
           callerId,
         );
     
-        this._freeswitchCallSystemService.saveCDR({
-          UUID: result,
-          CallDirection: 'outbound',
-          StartedDate:  moment().format('YYYY-MM-DDTHH:mm:ss.SSS')
-        });
+        // this._freeswitchCallSystemService.saveCDR({
+        //   UUID: result,
+        //   CallDirection: 'outbound',
+        //   StartedDate:  moment().format('YYYY-MM-DDTHH:mm:ss.SSS')
+        // });
     
         return result;
     }
