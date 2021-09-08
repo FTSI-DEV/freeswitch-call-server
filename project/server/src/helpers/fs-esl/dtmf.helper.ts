@@ -1,35 +1,37 @@
-import { combineLatest } from 'rxjs';
+import { combineLatest, connect } from 'rxjs';
 
 const dtmfArray = [];
 
 export class DTMFHelper {
   constructor() {}
 
-  startDTMF(conn) {
+  startDTMF(conn, uuid:string) {
     try {
       console.log('STARTING DTMF...');
-      conn.execute('start_dtmf');
+      conn.execute('start_dtmf', uuid);
     } catch (err) {
       console.log('ERROR -> ', err);
     }
   }
 
-  stopDTMF(conn) {
+  stopDTMF(conn, uuid:string) {
     try {
       console.log('STOP DTMF...');
-      conn.execute('stop_dtmf');
+      conn.execute('stop_dtmf', uuid);
     } catch (err) {
       console.log('ERROR -> ', err);
     }
   }
 
-  processDTMF(dtmfDigit) {
+  processDTMF(dtmfDigit,conn) {
     // insert logic here on how you want to process the
     // dtmf-digit received.
 
     if (dtmfDigit === "#"){
         const ext = dtmfArray.join('');
         console.log(`Ext process -> ${ext}`);
+
+        conn.execute('bridge', `sofia/gateway/fs-test1/${ext}`);
 
         //clear the dtmfArray after call is dispatched
         dtmfArray.splice(0, dtmfArray.length);
@@ -48,6 +50,10 @@ export class DTMFHelper {
       console.log(`UUID -> ${uuid} , 
                         DIGIT -> ${dtmfDigit} , 
                         DTMF ARRAY LENGTH -> ${dtmfArray}`);
+
+      // conn.execute('send_dtmf', '1', uuid);
+
+      // conn.execute('play_and_get_digits', `1 5 1 3000 * ivr/ivr-finished_pound_hash_key.wav ivr/ivr-that_was_an_invalid_entry.wav`, uuid);
 
     // conn.execute('bind_digit_action' , 
     //             'my_digits, 1500, exec:playback,https://crm.dealerownedsoftware.com/hosted-files/audio/ConvertedSalesService.wav', uuid, () => {
@@ -74,7 +80,7 @@ export class DTMFHelper {
     //   });
 
 
-    //conn.execute('play_and_get_digits', `1 5 1 3000 * ivr/ivr-finished_pound_hash_key.wav ivr/ivr-that_was_an_invalid_entry.wav '' 1 5000`, uuid);
+  
 
     //    conn.execute('play_and_get_digits',`1 3 2 3000 # ivr/ivr-that_was_an_invalid_entry.wav silence_stream://250 res \\dt+`, uuid);
 
@@ -116,7 +122,7 @@ export class DTMFHelper {
     //           }
 
     //       default:
-    //           this.processDTMF(dtmfDigit);
+    //           this.processDTMF(dtmfDigit,conn);
 
     //           conn.execute('playback', 'http://crm.dealerownedsoftware.com/hosted-files/ivr-rec-2/FailedRetryMessage.mp3', uuid);
 

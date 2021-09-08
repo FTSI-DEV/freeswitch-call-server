@@ -3,12 +3,15 @@ import { CDRModels } from "src/models/cdr.models";
 import { InboundCallConfigService } from "src/modules/config/inbound-call-config/services/inbound-call-config.service";
 import { WebhookInboundCallStatusCallBack } from "src/utils/webhooks";
 import { CHANNEL_VARIABLE } from "../constants/channel-variables.constants";
-import { ESL_SERVER, FS_DIALPLAN } from "../constants/fs-esl.constants";
+import { ESL_SERVER, FS_DIALPLAN, FS_ESL } from "../constants/fs-esl.constants";
 import { TwiMLContants } from "../constants/twiml.constants";
 import { KeyValues, XMLParser, XMLParserHelper } from "../parser/twimlXML.parser";
 import { http } from "../libs/http";
 import { eslServerRes } from "./inboundCall.server";
 import { Instructions } from '../../helpers/parser/xmlCommandObject';
+import { EVENT_LIST } from "../constants/event-list.constants";
+import { chownSync } from "fs";
+import { InboundCallDTMFHelper } from "./inbound-call.dtmf.helper";
 
 export class InboundCallHelper{
 
@@ -22,37 +25,68 @@ export class InboundCallHelper{
 
         eslServerRes.on(ESL_SERVER.CONNECTION.READY, function(conn){
 
-            console.log('bridge executed');
-            
-            // conn.execute('playback', 'https://crm.dealerownedsoftware.com/hosted-files/ivr-rec-2/WelcomeMessage.mp3');
+            console.log('Inbound Call - server ready');
 
-            conn.execute('sleep', '5000');
+            var dtmfHelper = new InboundCallDTMFHelper();
 
-            conn.execute('set', 'hangup_after_bridge=true');
+            var legId = conn.getInfo().getHeader(CHANNEL_VARIABLE.UNIQUE_ID);
+
+            console.log('LEG ID - ', legId);
+
+            let legStop = false;
+
+            let dtmfEvent = 'esl::event::DTMF::' + legId;
+
+            let hangupEvent = 'esl::event::CHANNEL_HANGUP_COMPLETE::' + legId;
+
+            conn.subscribe('CHANNEL_HANGUP_COMPLETE');
+
+            let hangupCompleteWrapper = (esl) => {
+                legStop = true;
+                // dtmfHelper.stopDTMF(conn);
+                console.log('Leg-A hangup');
+                conn.removeListener(hangupEvent, hangupCompleteWrapper);
+            }
+
+            conn.on('error', (err) => {
+                console.log('ERROR - ', err);
+            });
+
+            conn.on(hangupEvent,hangupCompleteWrapper);
+
+            conn.subscribe('DTMF');
+
+            dtmfHelper.captureDTMF(conn, dtmfEvent);
+
+            if (!legStop){
+                
+                conn.execute("start_dtmf" , () => {
+                    console.log('STARTING DTMF'); 
+                    conn.execute('sleep', '5000', () => {
+                        console.log('1. Sleep executed - 5 seconds - ' + new Date());
+        
+                        if (legStop){
+                            console.log('Leg has stop');
+                            return;
+                        }
+        
+                        conn.execute('playback', 'https://crm.dealerownedsoftware.com/hosted-files/ivr-rec-2/WelcomeMessage.mp3', () => {
+                            console.log('PLAYBACK EXECUTED');
+    
+                            conn.execute('sleep', '2000', () => {
+                                console.log('2. Sleep executed - 2 seconds - ' + new Date());
+
+                                conn.execute('play_and_get_digits', '1 5 1 10000 # ivr/ivr-enter_destination_telephone_number.wav ivr/ivr-that_was_an_invalid_entry.wav target_num 2 2000', () => {
+                                   console.log('digit executed...');
+                                });
+                            });
+                        });
+                    });
+                });
+            }
+            // conn.execute('set', 'hangup_after_bridge=true');
 
             // conn.execute('export', 'execute_on_answer=record_session $${recordings_dir}/${strftime(%Y-%m-%d-%H-%M-%S)}_${uuid}_${caller_id_number}.wav');
-
-            conn.execute('bridge', 'sofia/gateway/fs-test1/1000');
-
-            conn.execute('playback', 'https://crm.dealerownedsoftware.com/hosted-files/audio/ConvertedSalesService.wav');
-            
-            let eslInfo = conn.getInfo();
-
-            let destinationNumber = eslInfo.getHeader(CHANNEL_VARIABLE.CALLER_DESTINATION_NUMBER);
-
-            console.log('DESTINATION NUMBER -> ', destinationNumber);
-
-            // 
-
-            // 
-
-            // console.log('GetINFO -> ', conn.getInfo());
-
-
-            // conn.execute('bridge', 'sofia/gateway/fs-test3/1000');
-      
-          
-           
             // self.inboundCallExecute(conn, destinationNumber);
         });
     }
