@@ -56,7 +56,7 @@ export class InboundCallHelper{
 
             conn.subscribe('DTMF');
 
-            dtmfHelper.captureDTMF(conn, dtmfEvent);
+            // dtmfHelper.captureDTMF(conn, dtmfEvent);
 
             if (!legStop){
                 
@@ -72,12 +72,30 @@ export class InboundCallHelper{
         
                         conn.execute('playback', 'https://crm.dealerownedsoftware.com/hosted-files/ivr-rec-2/WelcomeMessage.mp3', () => {
                             console.log('PLAYBACK EXECUTED');
+
+                            let regex = 'regex';
     
                             conn.execute('sleep', '2000', () => {
                                 console.log('2. Sleep executed - 2 seconds - ' + new Date());
 
-                                conn.execute('play_and_get_digits', '1 5 1 10000 # ivr/ivr-enter_destination_telephone_number.wav ivr/ivr-that_was_an_invalid_entry.wav target_num 2 2000', () => {
-                                   console.log('digit executed...');
+                                conn.execute('play_and_get_digits', `1 5 1 10000 # ivr/ivr-enter_destination_telephone_number.wav ivr/ivr-that_was_an_invalid_entry.wav ${regex} 1000 2000`, (e) => {
+
+                                    let validValue = e.getHeader(`variable_${regex}`);
+
+                                    let invalidValue = e.getHeader(`variable_${regex}_invalid`);
+
+                                    if (validValue != null || validValue != undefined){
+                                        console.log('VALID -> ', validValue);
+                                        conn.execute('bridge', 'sofia/gateway/fs-test3/${regex}');
+                                    }
+                                    else
+                                    {
+                                        console.log('INVALID -> ', invalidValue);
+
+                                        conn.execute('sleep', '3000', () => {
+                                            console.log('3. Sleep executed . ' + new Date());
+                                        });
+                                    }
                                 });
                             });
                         });
