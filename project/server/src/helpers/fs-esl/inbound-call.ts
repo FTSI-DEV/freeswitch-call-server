@@ -12,6 +12,8 @@ import { Instructions } from '../../helpers/parser/xmlCommandObject';
 import { EVENT_LIST } from "../constants/event-list.constants";
 import { chownSync } from "fs";
 import { InboundCallDTMFHelper } from "./inbound-call.dtmf.helper";
+import { start, XmlParserSample } from "../parser/xmlParserSample";
+import { combineLatest, concatAll } from "rxjs";
 
 export class InboundCallHelper{
 
@@ -72,21 +74,33 @@ export class InboundCallHelper{
         
                         conn.execute('playback', 'https://crm.dealerownedsoftware.com/hosted-files/ivr-rec-2/WelcomeMessage.mp3', () => {
                             console.log('PLAYBACK EXECUTED');
-
-                            let regex = 'regex';
     
                             conn.execute('sleep', '2000', () => {
                                 console.log('2. Sleep executed - 2 seconds - ' + new Date());
 
-                                conn.execute('play_and_get_digits', `1 5 1 10000 # ivr/ivr-enter_destination_telephone_number.wav ivr/ivr-that_was_an_invalid_entry.wav ${regex} 1000 2000`, (e) => {
+                                let minValue = '4'; // minimum number of digits to collect;
+                                let maxValue = '11'; // maximum number of digits to collecct; 
+                                let tries = '2'; // number of attempts to play the file and collect digits 
+                                let timeout = '10000'; // number of milliseconds to wait before assuming the caller is done entering digits
+                                let terminator = '#'; // digits used to end input
+                                let soundFile = 'ivr/ivr-enter_destination_telephone_number.wav'; // sound file to play while digits are fetched. 
+                                let invalidFile = 'ivr/ivr-that_was_an_invalid_entry.wav'; // sound file to play when digits don't match the regex
+                                let regexValue = '1000'; // regular expression to match digits
+                                let digit_timeout = '3000'; // (optional) number of milliseconds to wait between digits
+                                let var_name = "target_num"; // channel variable that digits should be placed in
 
-                                    let validValue = e.getHeader(`variable_${regex}`);
+                                conn.execute('play_and_get_digits', 
+                                        `${minValue} ${maxValue} ${tries} ${timeout} ${terminator} ${soundFile} ${invalidFile} ${var_name} ${regexValue} ${digit_timeout}`, (e) => {
 
-                                    let invalidValue = e.getHeader(`variable_${regex}_invalid`);
+                                    let validValue = e.getHeader(`variable_${var_name}`);
 
-                                    if (validValue != null || validValue != undefined){
+                                    let invalidValue = e.getHeader(`variable_${var_name}_invalid`);
+
+                                    if (validValue !== undefined){
+                                        
                                         console.log('VALID -> ', validValue);
-                                        conn.execute('bridge', 'sofia/gateway/fs-test3/${regex}');
+
+                                        conn.execute('bridge', 'sofia/gateway/fs-test3/${target_num}');
                                     }
                                     else
                                     {
@@ -96,6 +110,69 @@ export class InboundCallHelper{
                                             console.log('3. Sleep executed . ' + new Date());
                                         });
                                     }
+
+                                    conn.execute('sleep', '5000', () => {
+                                        console.log('4. Sleep executed - ' + new Date());
+
+                                        conn.execute('play_and_get_digits', `1 5 2 10000 # ivr/ivr-enter_destination_telephone_number.wav ivr/ivr-that_was_an_invalid_entry.wav target_num 3 2000`, (e) => {
+                                            
+                                                let validValue = e.getHeader(`variable_target_num`);
+
+                                                let invalidValue = e.getHeader(`variable_target_num_invalid`);
+
+                                                if (validValue != null || validValue != undefined){
+                                                    console.log('VALID -> ', validValue);
+                                                    conn.execute('playback', 'https://crm.dealerownedsoftware.com/hosted-files/ivr-rec-2/WelcomeMessage.mp3', () => {
+                                                    
+                                                    });
+                                                }
+                                                else
+                                                {
+                                                    console.log('INVALID -> ', invalidValue);
+
+                                                    conn.execute('sleep', '3000', () => {
+                                                        console.log('3. Sleep executed . ' + new Date());
+                                                    });
+                                                }
+
+                                                conn.execute('sleep', '5000', () => {
+                                                    console.log('4. SLEEP EXECUTED - ' + new Date());
+
+                                                    var sampleVal = `<Respond><Say>Please press 1 to connect</Say><Gather numDigits="1" action="http://localhost:3000/api" method="POST" timeout="10"></Gather><Say>No input received</Say></Respond>`;
+
+                                                    let sampel = new XmlParserSample().tryParse(sampleVal);
+
+                                                    var vaa = 0;
+                                                    for (let i = 0; i < sampel.length; i ++ ){
+
+                                                        let val = sampel[i];
+
+                                                        if (val.type === "exec"){
+                                                            
+                                                            console.log('value -> ' , val.dp);
+
+                                                            if (val.dp === "say"){
+                                                                conn.execute('playback', 'https://crm.dealerownedsoftware.com/hosted-files/ivr-rec-2/WelcomeMessage.mp3', () => {
+                                                                    console.log('executed playback');
+                                                                });
+                                                            }
+                                                            else if (val.dp === "play_and_get_digits")
+                                                            {
+                                                                console.log('EXECUTED PLAY DIGITS');
+
+                                                                conn.execute('play_and_get_digits', `${minValue} ${maxValue} ${tries} ${val.attrib.timeout}00 ${terminator} ${soundFile} ${invalidFile} ${val.attrib.numDigits} ${digit_timeout} ${var_name}`, () => {
+
+                                                                    if (val.attrib.action){
+                                                                        console.log('TRIGGER WEBHOOK HERE');
+                                                                        //trigger webhook;
+                                                                    }
+                                                                });
+                                                            }
+                                                        }
+                                                    }
+                                                });
+                                        });
+                                    });
                                 });
                             });
                         });
