@@ -46,14 +46,8 @@ export class OutboundCallService {
             let app_args = `sofia/gateway/fs-test1/${phoneNumberFrom}`;
             
             let arg1 = `{ignore_early_media=true,origination_caller_id_number=${phoneNumberFrom},hangup_after_bridge=true}${app_args}`;
-           
-            let arg2 = `${arg1} &bridge({origination_caller_id_number=${callerId}}sofia/gateway/fs-test1/${phoneNumberTo})`;
-            
-            let arg3 = `bridge({hangup_after_bridge=true,origination_caller_id_number=${callerId}}sofia/gateway/fs-test1/${phoneNumberTo})`
 
             let arg4 = `${arg1} &socket(192.168.18.3:8000 async full)`;
-
-            let sample = `originate {origination_caller_id_number=${phoneNumberFrom},ignore_early_media=true,call_timeout=60,hang_up_after_bridge=true,ringback=\'%(2000,440,480)\'}sofia/gateway/fs-test3/${phoneNumberFrom} `;
 
             connection.api('originate', arg4 , function(result) {
                 
@@ -63,7 +57,6 @@ export class OutboundCallService {
         
                 resolve(callUid.trim());
             });
-
         });
     }
 }

@@ -56,19 +56,12 @@ export class InboundEslConnectionHelper {
       connection.subscribe('CHANNEL_HANGUP_COMPLETE');
       connection.subscribe('CHANNEL_ANSWER');
       connection.subscribe('DTMF');
-      dtmf.startDTMF(connection);
     });
 
     this._onListenEvent(connection, dtmf);
-    // connection.subscribe('CHANNEL_HANGUP_COMPLETE', (evt) => {
-    //   console.log('ALL -> ', evt);
-
-    //   this._onListenEvent(connection);
-    // })
 
     connection.on('esl::end', () => {
       console.log('ESL END ');
-      dtmf.stopDTMF(connection);
     })
   }
 
@@ -83,7 +76,6 @@ export class InboundEslConnectionHelper {
       let callId = fsEvent.getHeader(CHANNEL_VARIABLE.UNIQUE_ID);
 
       let channelId = fsEvent.getHeader('Channel-Call-UUID');
-
       console.log('CHANNEL ID -> ', channelId);
 
       if (callId === channelId){
@@ -91,6 +83,7 @@ export class InboundEslConnectionHelper {
       }
       else{
         console.log('Call : ' , callId);
+        dtmf.stopDTMF(connection, callId);
         console.log('Parent Call : ', channelId);
       }
     });
@@ -111,6 +104,7 @@ export class InboundEslConnectionHelper {
       else{
         console.log('Call : ' , callId);
         console.log('Parent Call : ', channelId);
+        dtmf.startDTMF(connection, callId);
         dtmf.captureDTMF(connection, callId);
       }
     });

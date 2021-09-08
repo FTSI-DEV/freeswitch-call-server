@@ -18,11 +18,7 @@ export class EslServerHelper {
         port: 6000,
         host: '0.0.0.0',
         myevents: true,
-      },
-
-      function () {
-        console.log('ESL SERVER - OUTBOUND ESL IS UP!');
-      },
+      }
     );
 
     eslServerRes = esl_server;
