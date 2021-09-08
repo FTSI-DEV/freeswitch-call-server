@@ -64,7 +64,6 @@
   </a-layout>
 </template>
 <script>
-import EventService from "../services/EventService.ts";
 export default {
   data() {
     return {
@@ -89,8 +88,7 @@ export default {
         phoneNumberTo: this.to,
         callerId: this.callerId,
       };
-      console.log("click to call params: ", params);
-      EventService.clickToCall(params);
+      this.$store.dispatch("clickToCall", params);
     },
   },
 };

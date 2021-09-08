@@ -99,9 +99,9 @@
             </div>
           </a-col>
         </a-row>
-        <b-row v-if="configList">
+        <b-row v-if="phoneNumberConfig.length">
           <b-col>
-            <a-table :data-source="configList.list" :columns="columns">
+            <a-table :data-source="phoneNumberConfig" :columns="columns">
               <template #action="{ record }">
                 <a title="Edit" @click="editConfig(record)"
                   ><EditOutlined style="font-size: 1.2em; margin-right: 15px"
@@ -170,13 +170,11 @@
   </a-layout>
 </template>
 <script>
-import EventService from "../services/EventService.ts";
 import {
   DownOutlined,
   EditOutlined,
   DeleteOutlined,
 } from "@ant-design/icons-vue";
-// import OutboundCall from './OutboundCall.vue';
 export default {
   data() {
     return {
@@ -231,6 +229,9 @@ export default {
     selectedHttpMethod() {
       return this.httpMethod === "POST" ? "HTTP POST" : "HTTP GET";
     },
+    phoneNumberConfig() {
+      return this.$store.getters['getPhoneNumberConfig']
+    }
   },
   methods: {
     setMethodUpdate(val) {
@@ -238,10 +239,8 @@ export default {
     },
     deleteConfig(val) {
       if (confirm("Are you sure you want to delete this config?")) {
-        EventService.deletePhoneNumberConfig(val.id).then((res) => {
-          if (res.status === 201) {
-            this.getPhoneNumberConfigs();
-          }
+        this.$store.dispatch("deletePhoneNumberConfig", val.id).then(() => {
+          this.getPhoneNumberConfigs();
         });
       }
     },
@@ -249,7 +248,7 @@ export default {
       this.selectedConfig.friendlyName = null;
       this.selectedConfig.phoneNumber = null;
       this.selectedConfig.webhookUrl = null;
-      EventService.getPhoneNumberConfigById({ id: val.id }).then((res) => {
+      this.$store.dispatch("getPhoneNumberConfigById", { id: val.id }).then((res) => {
         if (res.status === 200) {
           const { friendlyName, phoneNumber, httpMethod, webhookUrl } =
             res.data;
@@ -263,11 +262,8 @@ export default {
       console.log("val: ", val.id);
     },
     handleOk() {
-      EventService.updatePhoneNumberConfig(this.selectedConfig).then((res) => {
-        if (res.status === 201) {
-          this.getPhoneNumberConfigs();
-          this.modleVisibility = false;
-        }
+      this.$store.dispatch('updatePhoneNumberConfig', this.selectedConfig).then((res) => {
+         this.modleVisibility = false;
       });
     },
     isInvalid(value) {
@@ -295,31 +291,16 @@ export default {
         httpMethod: this.httpMethod,
         webhookUrl: this.webhookURL,
       };
-      console.log("saveConfig params:", params);
 
-      EventService.addPhoneNumberConfig(params).then((res) => {
-        console.log("RESPONSE: ", res);
-        if (res.status === 201) {
-          this.friendlyName = null;
-          this.phoneNumber = null;
-          this.webhookURL = null;
-          this.isSaved = true;
-          this.getPhoneNumberConfigs();
-        } else {
-          this.isServerError = true;
-        }
+      this.$store.dispatch('addPhoneNumberConfig', params).then((res) => {
+        this.friendlyName = null;
+        this.phoneNumber = null;
+        this.webhookURL = null;
+        this.isSaved = true;
       });
     },
     getPhoneNumberConfigs() {
-      EventService.getPhoneNumberConfigs().then((res) => {
-        if (res.status === 200) {
-          this.configList = {
-            list: res.data.items,
-            pager: res.data.meta,
-          };
-        }
-        console.log("configList: ", this.configList);
-      });
+      this.$store.dispatch('getPhoneNumberConfigs');
     },
   },
   created() {

@@ -23,19 +23,19 @@
               </template>
               <span>Home</span>
             </a-menu-item>
-            <a-menu-item key="2" @click="setCurrentCompnent('OutboundCall')">
+            <a-menu-item key="2" @click="setCurrentCompnent('ClickToCall')">
               <template #icon>
                 <NumberOutlined />
               </template>
               <span>Click To Call</span>
             </a-menu-item>
-            <a-menu-item key="3" @click="setCurrentCompnent('InboundCall')">
+            <a-menu-item key="3" @click="setCurrentCompnent('InboundCallConfig')">
               <template #icon>
                 <PhoneOutlined />
               </template>
               <span>Inbound Call Config</span>
             </a-menu-item>
-            <a-menu-item key="4" @click="setCurrentCompnent('Config')">
+            <a-menu-item key="4" @click="setCurrentCompnent('PhoneNumberConfig')">
               <template #icon>
                 <SettingOutlined />
               </template>
@@ -51,36 +51,23 @@
   </div>
 </template>
 <script lang="ts">
-const routes = [
-  {
-    path: "index",
-    breadcrumbName: "First-level Menu",
-  },
-  {
-    path: "first",
-    breadcrumbName: "Second-level Menu",
-  },
-  {
-    path: "second",
-    breadcrumbName: "Third-level Menu",
-  },
-];
-import { defineComponent, reactive, toRefs, watch } from "vue";
+import PhoneNumberConfig from "./phoneNumberConfig/PhoneNumberConfig.vue";
+import Home from './Home.vue';
+import ClickToCall from "./clickToCall/ClickToCall.vue";
+import InboundCallConfig from "./inboundCallConfig/InboundCallConfig.vue";
+import { 
+  defineComponent, 
+  reactive, 
+  toRefs, 
+  watch 
+} from "vue";
 import {
-  // MenuUnfoldOutlined,
   HomeOutlined,
-  // UserOutlined,
-  // DesktopOutlined,
   NumberOutlined,
-  // AppstoreOutlined,
   PhoneOutlined,
   SettingOutlined,
-  //  FileTextOutlined
 } from "@ant-design/icons-vue";
-import Config from "./Config.vue";
-import Home from './Home.vue';
-import OutboundCall from "./OutboundCall.vue";
-import InboundCall from "./InboundCall.vue";
+
 export default defineComponent({
   setup() {
     const state = reactive({
@@ -109,22 +96,17 @@ export default defineComponent({
       ...toRefs(state),
       toggleCollapsed,
       setCurrentCompnent,
-      routes,
     };
   },
   components: {
-    Config,
+    PhoneNumberConfig,
     HomeOutlined,
-    // UserOutlined,
-    // DesktopOutlined,
     NumberOutlined,
-    // AppstoreOutlined,
     PhoneOutlined,
     SettingOutlined,
-    OutboundCall,
-    InboundCall,
+    ClickToCall,
+    InboundCallConfig,
     Home
-    //  FileTextOutlined
   },
 });
 </script>

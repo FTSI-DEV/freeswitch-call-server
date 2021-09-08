@@ -1,11 +1,6 @@
 <template>
   <a-layout>
     <a-layout style="padding: 24px 24px 24px">
-      <!-- <a-breadcrumb style="margin: 16px 0">
-        <a-breadcrumb-item>Home</a-breadcrumb-item>
-        <a-breadcrumb-item>List</a-breadcrumb-item>
-        <a-breadcrumb-item>App</a-breadcrumb-item>
-      </a-breadcrumb> -->
       <a-layout-content
         :style="{
           background: '#fff',
@@ -21,7 +16,6 @@
   </a-layout>
 </template>
 <script lang="ts">
-// import { LaptopOutlined, NotificationOutlined } from '@ant-design/icons-vue';
 import { defineComponent, ref } from "vue";
 import { useStore } from 'vuex';
 export default defineComponent({

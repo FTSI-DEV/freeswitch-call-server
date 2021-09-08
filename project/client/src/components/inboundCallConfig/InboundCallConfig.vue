@@ -85,9 +85,9 @@
             </div>
           </a-col>
         </a-row>
-        <b-row v-if="configList">
+        <b-row v-if="inboundCallConfigData.items">
           <b-col>
-            <a-table :dataSource="configList.list" :columns="columns">
+            <a-table :dataSource="inboundCallConfigData.items" :columns="columns">
               <template #action="{ record }">
                 <a title="Edit" @click="editConfig(record)"
                   ><EditOutlined style="font-size: 1.2em; margin-right: 15px"
@@ -143,7 +143,6 @@
   </a-layout>
 </template>
 <script>
-import EventService from "../services/EventService.ts";
 import { EditOutlined, DownOutlined, DeleteOutlined } from "@ant-design/icons-vue";
 
 export default {
@@ -191,37 +190,33 @@ export default {
   computed: {
     selectedHttpMethod(){
       return this.httpMethod === "POST" ? "HTTP POST" : "HTTP GET";
+    },
+    inboundCallConfigData() {
+      return this.$store.getters['inboundCallConfigData']
+    },
+    inboundCallConfigById() {
+      return this.$store.getters['inboundConfigById'].inboundConfigById
     }
   },
   methods: {
     deleteConfig(val) {
       if (confirm("Are you sure you want to delete this config?")) {
-        EventService.deleteInboundCallConfig(val.id).then((res) => {
-          if (res.status === 201) {
-            this.getInboundCallConfigs();
-          }
-        });
+        this.$store.dispatch("deleteInboundCallConfig", val.id);
       }
     },
     editConfig(val) {
       this.selectedConfig.callerId = null;
       this.selectedConfig.webhookUrl = null;
-      EventService.getInboundCallConfigById(val.id).then((res) => {
-        if (res.status === 200) {
-          this.modleVisibility = true;
-          const { callerId, webhookUrl, httpMethod } = res.data;
-          this.selectedConfig.callerId = callerId;
-          this.selectedConfig.webhookUrl = webhookUrl;
-          this.selectedConfig.httpMethod = httpMethod || "GET";
-        }
+      this.$store.dispatch("getInboundCallConfigById", val.id).then(() => {
+          this.modleVisibility = true
+          this.selectedConfig.callerId = this.inboundCallConfigById.callerId;
+          this.selectedConfig.webhookUrl = this.inboundCallConfigById.webhookUrl;
+          this.selectedConfig.httpMethod = this.inboundCallConfigById.httpMethod || "GET";
       });
     },
     handleOk() {
-      EventService.updateInboundCallConfig(this.selectedConfig).then(res => {
-        if (res.status === 201) {
-          this.getInboundCallConfigs();
-          this.modleVisibility = false;
-        }
+      this.$store.dispatch("updateInboundCallConfig", this.selectedConfig).then(res => {
+        this.modleVisibility = false;
       });
     },
     isInvalid(value) {
@@ -238,28 +233,14 @@ export default {
         webhookUrl: this.webhookUrl,
         httpMethod: this.httpMethod
       };
-      console.log("inbound call params: ", params);
-      EventService.addInboundCallConfig(params).then((res) => {
-        console.log("RESPONSE: ", res);
-        if (res.status === 201) {
+      this.$store.dispatch("addInboundCallConfig", params).then(res => {
           this.callerId = null;
           this.webhookUrl = null;
           this.isSaved = true;
-          this.getInboundCallConfigs();
-        } else {
-          this.isServerError = true;
-        }
       });
     },
     getInboundCallConfigs() {
-      EventService.getInboundCallConfigs().then((res) => {
-        if (res.status) {
-          this.configList = {
-            list: res.data.items,
-            pager: res.data.meta,
-          };
-        }
-      });
+      this.$store.dispatch("getInboundCallConfigs");
     },
     setMethodUpdate(val){
       this.selectedConfig.httpMethod = val;

@@ -1,6 +1,12 @@
 import { createStore } from 'vuex';
-import InboundConfig from './inboundConfig';
+import InboundCallConfig from './inboundCallConfig/inboundCallConfig';
+import PhoneNumberConfig from './phoneNumberConfig/phoneNumberConfig';
+import ClickToCall from './clickToCall/clickToCall';
 
 export default createStore({
-    modules: {InboundConfig}
+    modules: {
+        InboundCallConfig, 
+        PhoneNumberConfig,
+        ClickToCall
+    }
 });
