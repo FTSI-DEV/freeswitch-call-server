@@ -7,7 +7,7 @@ import { ESL_SERVER, FS_DIALPLAN } from "../constants/fs-esl.constants";
 import { TwiMLContants } from "../constants/twiml.constants";
 import { KeyValues, XMLParser, XMLParserHelper } from "../parser/twimlXML.parser";
 import { http } from "../libs/http";
-import { eslServerRes } from "./server";
+import { eslServerRes } from "./inboundCall.server";
 import { Instructions } from '../../helpers/parser/xmlCommandObject';
 
 export class InboundCallHelper{

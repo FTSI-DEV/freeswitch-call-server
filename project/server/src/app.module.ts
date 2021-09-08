@@ -12,7 +12,7 @@ import { IncomingCallModule } from './modules/incomingCall/incomingCall.module';
 import { FreeswitchCallSystemModule } from './modules/freeswitch-call-system/freeswitch-call-system.module';
 import { FreeswitchModule } from './modules/freeswitch/freeswitch.module';
 import { InboundCallConfigModule } from './modules/config/inbound-call-config/inbound-call-config.module';
-import { EslServerHelper } from './helpers/fs-esl/server';
+import { EslServerHelper } from './helpers/fs-esl/inboundCall.server';
 import { InboundCallConfigService } from './modules/config/inbound-call-config/services/inbound-call-config.service';
 import { BullModule } from '@nestjs/bull';
 import { BullModuleQueue } from './bull-queue/bull.module';

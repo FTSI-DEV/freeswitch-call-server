@@ -1,5 +1,5 @@
 import { Controller } from '@nestjs/common';
-import { EslServerHelper } from 'src/helpers/fs-esl/server';
+import { EslServerHelper } from 'src/helpers/fs-esl/inboundCall.server';
 
 @Controller('fs-inbound-call')
 export class FsInboundCallController {
