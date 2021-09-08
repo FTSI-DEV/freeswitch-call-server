@@ -24,9 +24,9 @@ export default {
         }
     } as InboundConfig,
     getters: {
-        inboundCallConfigData: (state: InboundConfigItem): InboundConfigItem => state,
-        inboundCallConfigPager: (state: InboundConfigPager): InboundConfigPager => state,
-        inboundConfigById: (state: InboundConfigItem): InboundConfigItem => state
+        inboundCallConfigData: (state: InboundConfig): Array<InboundConfigItem> => state.items,
+        inboundCallConfigPager: (state: InboundConfig): InboundConfigPager => state.meta,
+        inboundConfigById: (state: InboundConfig): InboundConfigItem => state.inboundConfigById
     },
     mutations: {    
         setInboundCallConfig(state: InboundConfig, payload: InboundConfig) {

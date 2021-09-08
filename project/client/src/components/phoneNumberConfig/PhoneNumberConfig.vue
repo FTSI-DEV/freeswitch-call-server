@@ -98,10 +98,10 @@
               </a-row>
             </div>
           </a-col>
-        </a-row>
-        <b-row v-if="phoneNumberConfig.length">
+        </a-row> 
+        <b-row v-if="phoneNumberConfigs.length">
           <b-col>
-            <a-table :data-source="phoneNumberConfig" :columns="columns">
+            <a-table :data-source="phoneNumberConfigs" :columns="columns">
               <template #action="{ record }">
                 <a title="Edit" @click="editConfig(record)"
                   ><EditOutlined style="font-size: 1.2em; margin-right: 15px"
@@ -229,8 +229,11 @@ export default {
     selectedHttpMethod() {
       return this.httpMethod === "POST" ? "HTTP POST" : "HTTP GET";
     },
-    phoneNumberConfig() {
+    phoneNumberConfigs() {
       return this.$store.getters['getPhoneNumberConfig']
+    },
+    phoneNumberConfig() {
+      return this.$store.getters['getPhoneNumberConfigById']
     }
   },
   methods: {
@@ -248,16 +251,12 @@ export default {
       this.selectedConfig.friendlyName = null;
       this.selectedConfig.phoneNumber = null;
       this.selectedConfig.webhookUrl = null;
-      this.$store.dispatch("getPhoneNumberConfigById", { id: val.id }).then((res) => {
-        if (res.status === 200) {
-          const { friendlyName, phoneNumber, httpMethod, webhookUrl } =
-            res.data;
+      this.$store.dispatch("getPhoneNumberConfigById", { id: val.id }).then(() => {
           this.modleVisibility = true;
-          this.selectedConfig.friendlyName = friendlyName;
-          this.selectedConfig.phoneNumber = phoneNumber;
-          this.selectedConfig.httpMethod = httpMethod || "GET";
-          this.selectedConfig.webhookUrl = webhookUrl;
-        }
+          this.selectedConfig.friendlyName = this.phoneNumberConfig.friendlyName;
+          this.selectedConfig.phoneNumber = this.phoneNumberConfig.phoneNumber;
+          this.selectedConfig.httpMethod = this.phoneNumberConfig.httpMethod || "GET";
+          this.selectedConfig.webhookUrl = this.phoneNumberConfig.webhookUrl;
       });
       console.log("val: ", val.id);
     },

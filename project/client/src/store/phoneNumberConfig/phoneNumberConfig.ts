@@ -71,8 +71,8 @@ export default {
                 }
             });
         },
-        getPhoneNumberConfigById({ commit }: { commit: Commit }, params: number) {
-            return HTTP.get('/api/freeswitch-phonenumber-config/getPhoneNumberConfigById', { params: params })
+        getPhoneNumberConfigById({ commit }: { commit: Commit }, params: any) {
+            return HTTP.get(`/api/freeswitch-phonenumber-config/getPhoneNumberConfigById/${params.id}`)
                 .then(res => {
                     if (res.status === Status.OK) {
                         commit('setPhoneNumberConfigById', res.data)
@@ -82,17 +82,21 @@ export default {
         addPhoneNumberConfig({ dispatch }: { dispatch: Dispatch }, params: PhoneNumberConfigItem) {
             return HTTP.post('/api/freeswitch-phonenumber-config/add', params).then(res => {
                 if (res.status === 201) {
-                    dispatch('getPhoneNumberConfigs')
+                    dispatch('getPhoneNumberConfigs');
                 }
             });
         },
         updatePhoneNumberConfig({ dispatch }: { dispatch: Dispatch }, params: PhoneNumberConfigItem){
-            return HTTP.post('/api/freeswitch-phonenumber-config/update', params);
+            return HTTP.post('/api/freeswitch-phonenumber-config/update', params).then(res => {
+                 if (res.status === 201) {
+                    dispatch('getPhoneNumberConfigs');
+                }
+            });
         },
         deletePhoneNumberConfig({ dispatch }: { dispatch: Dispatch }, params: number) {
             return HTTP.post(`/api/freeswitch-phonenumber-config/deleteConfig/${params}`).then(res => {
                 if (res.status === Status.OK) {
-                    dispatch('getPhoneNumberConfigs')
+                    dispatch('getPhoneNumberConfigs');
                 }
             });
         },

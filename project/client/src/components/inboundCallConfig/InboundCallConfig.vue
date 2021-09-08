@@ -85,9 +85,9 @@
             </div>
           </a-col>
         </a-row>
-        <b-row v-if="inboundCallConfigData.items">
+        <b-row v-if="inboundCallConfigData.length">
           <b-col>
-            <a-table :dataSource="inboundCallConfigData.items" :columns="columns">
+            <a-table :dataSource="inboundCallConfigData" :columns="columns">
               <template #action="{ record }">
                 <a title="Edit" @click="editConfig(record)"
                   ><EditOutlined style="font-size: 1.2em; margin-right: 15px"
