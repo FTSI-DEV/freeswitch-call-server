@@ -30,14 +30,6 @@ export class ClickToCallServerHelper {
 
       let hangupEvent = 'esl::event::CHANNEL_HANGUP::' + legId;
 
-      conn.subscribe('DTMF');
-
-      conn.subscribe('events:all');
-
-      conn.on(FS_ESL.RECEIVED, (evt) => {
-        console.log('CLICK TO CALL -> ', evt.headers.find(e => e.name === EVENT_LIST.EVENT_NAME));
-      });
-
       let hangupCompleteWrapper = (esl) => {
         legStop = true;
         console.log('Leg-A hangup');
@@ -56,16 +48,16 @@ export class ClickToCallServerHelper {
   
         // dtmfHelper.startDTMF(conn);
 
-        conn.execute('sleep', '5000', () => {
+        conn.execute('playback', 'https://crm.dealerownedsoftware.com/hosted-files/audio/ConvertedSalesService.wav', () => {
 
-          console.log('1. sleep executed ' + new Date());
+          console.log('playback executed');
 
           conn.execute(
-            'playback',
-            'https://crm.dealerownedsoftware.com/hosted-files/audio/ConvertedSalesService.wav',
+            'sleep',
+            '5000',
             () => {
 
-              console.log('playback executed');
+            console.log('1. sleep executed ' + new Date());
 
               if (legStop) {
                 console.log('Leg has stop', legStop);
@@ -81,11 +73,26 @@ export class ClickToCallServerHelper {
                   return;
                 }
 
-                conn.execute('bridge', 'sofia/gateway/fs-test3/1000', (cb) => {
+                let regex = 'regex';
 
-                  console.log('bridge execute complete');
+                conn.execute('play_and_get_digits', `1 5 2 10000 # ivr/ivr-enter_destination_telephone_number.wav ivr/ivr-that_was_an_invalid_entry.wav ${regex} 1000 2000`, (e) => {
 
-                  console.log('B-Leg ', cb.getHeader(CHANNEL_VARIABLE.UNIQUE_ID));
+                  let validValue = e.getHeader(`variable_${regex}`);
+
+                  let invalidValue = e.getHeader(`variable_${regex}_invalid`);
+
+                  if (validValue != null || validValue != undefined){
+                      console.log('VALID -> ', validValue);
+                      conn.execute('bridge', 'sofia/gateway/fs-test3/${regex}');
+                  }
+                  else
+                  {
+                      console.log('INVALID -> ', invalidValue);
+
+                      conn.execute('sleep', '3000', () => {
+                          console.log('3. Sleep executed . ' + new Date());
+                      });
+                  }
                 });
               });
             },
@@ -93,102 +100,5 @@ export class ClickToCallServerHelper {
         });
       }
     });
-
-    // server.on(ESL_SERVER.CONNECTION.READY, (conn) => {
-
-    //   console.log('OUTBOUND ESL - CLICK-TO-CALL - server ready');
-
-    //   var legId = conn.getInfo().getHeader(CHANNEL_VARIABLE.UNIQUE_ID);
-
-    //   console.log('LEG ID - ', legId);
-
-    //   let legStop = false;
-
-    //   let hangupEvent = 'esl::event::CHANNEL_HANGUP::' + legId;
-
-    //   let hangupCompleteWrapper = (esl) => {
-    //     legStop = true;
-    //     console.log('Leg-A hangup');
-    //     // conn.on('stop_dtmf');
-    //     conn.removeListener(hangupEvent, hangupCompleteWrapper);
-    //   };
-
-    //   conn.on(hangupEvent, hangupCompleteWrapper);
-
-    //   // conn.subscribe('all');
-
-    //   // conn.on('esl::event::*::*', (evt) => {
-    //   //   console.log('OUTBOUND ESL EVENT NAME -> ', evt);
-    //   // });
-
-    //   // conn.on('esl::event::DTMF::*', (evt) => {
-    //   //   console.log('DTMF -> ', evt);
-    //   //   conn.execute(
-    //   //     'play_and_get_digits',
-    //   //     `1 5 1 3000 # ivr/ivr-finished_pound_hash_key.wav '' 2 5000 1000 XML default`,
-    //   //     (e) => {
-    //   //       console.log('TEST -> ', e);
-    //   //     },
-    //   //   );
-    //   // });
-
-    //   // conn.subscribe('DTMF');
-
-    //   conn.subscribe('CHANNEL_HANGUP_COMPLETE');
-
-    //   conn.on('error', (err) => {
-    //     console.log('ERROR - ', err);
-    //   });
-
-    //   if (!legStop) {
-
-    //     console.log('LEG' , legStop);
-
-    //       conn.execute('sleep', '3000', () => {
-
-    //       conn.execute('playback','https://crm.dealerownedsoftware.com/hosted-files/audio/ConvertedSalesService.wav',() => {
-    //           if (legStop) {
-    //             console.log('Leg has stop', legStop);
-    //             return;
-    //           }
-
-    //           console.log('playback executed', legStop);
-
-    //           conn.execute('sleep', '5000', () => {
-    //             if (legStop) {
-    //               console.log('Execution break', legStop);
-    //               return;
-    //             }
-
-    //             console.log('1. executed sleep', new Date());
-
-    //             conn.execute('sleep', '2000', () => {
-    //               if (legStop) {
-    //                 console.log('Execution break', legStop);
-    //                 return;
-    //               }
-
-    //               console.log('2. executed sleep', new Date());
-
-    //               conn.execute(
-    //                 'bridge',
-    //                 'sofia/gateway/fs-test3/1000',
-    //                 (cb) => {
-    //                   console.log('bridge execute complete');
-    //                   console.log(
-    //                     'B-Leg ',
-    //                     cb.getHeader(CHANNEL_VARIABLE.UNIQUE_ID),
-    //                   );
-    //                 },
-    //               );
-
-    //               console.log('HEELO WORLD');
-    //             });
-    //           });
-    //         },
-    //       );
-    //       });
-    //   }
-    // });
   }
 }
