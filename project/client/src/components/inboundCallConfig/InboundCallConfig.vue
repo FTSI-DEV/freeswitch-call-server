@@ -85,9 +85,9 @@
             </div>
           </a-col>
         </a-row>
-        <b-row v-if="inboundCallConfigData.items">
+        <b-row v-if="inboundCallConfigData.length">
           <b-col>
-            <a-table :dataSource="inboundCallConfigData.items" :columns="columns">
+            <a-table :dataSource="inboundCallConfigData" :columns="columns">
               <template #action="{ record }">
                 <a title="Edit" @click="editConfig(record)"
                   ><EditOutlined style="font-size: 1.2em; margin-right: 15px"
@@ -142,117 +142,61 @@
     </a-layout>
   </a-layout>
 </template>
-<script>
-import { EditOutlined, DownOutlined, DeleteOutlined } from "@ant-design/icons-vue";
+<script lang="ts">
+import { 
+  defineComponent, 
+  toRefs,
+} from "vue";
+import { 
+  EditOutlined, 
+  DownOutlined, 
+  DeleteOutlined 
+} from "@ant-design/icons-vue";
+import gettersObj from './helper/getters';
+import methodsObj from './helper/methods';
 
-export default {
-  components: { EditOutlined , DownOutlined, DeleteOutlined},
-  data() {
+export default defineComponent({
+  components: { 
+    EditOutlined , 
+    DownOutlined, 
+    DeleteOutlined,
+  },
+  setup() {
+    const { 
+      inboundCallConfigData, 
+      inboundCallConfigById 
+    } = gettersObj();
+    const {
+      state,
+      editConfig,
+      deleteConfig,
+      isInvalid,
+      handleOk,
+      saveConfig,
+      setMethodUpdate,
+      setMethod,
+      fetchInitialData,
+      selectedHttpMethod
+    } = methodsObj();
+
+    fetchInitialData();
+
     return {
-      from: null,
-      to: null,
-      hasError: false,
-      callerId: null,
-      webhookUrl: null,
-      httpMethod: "POST",
-      isSaved: false,
-      isServerError: false,
-      configList: null,
-      columns: [
-        {
-          title: "Caller Id",
-          dataIndex: "callerId",
-          key: "callerId",
-        },
-        {
-          title: "HTTP Method",
-          dataIndex: "httpMethod",
-          key: "httpMethod"
-        },
-        {
-          title: "Webhook URL",
-          dataIndex: "webhookUrl",
-          key: "webhookUrl",
-        },
-        {
-          title: "Action",
-          slots: { customRender: "action" },
-        },
-      ],
-      modleVisibility: false,
-      selectedConfig: {
-        callerId: null,
-        webhookUrl: null,
-        httpMethod: "GET"
-      },
-    };
-  },
-  computed: {
-    selectedHttpMethod(){
-      return this.httpMethod === "POST" ? "HTTP POST" : "HTTP GET";
-    },
-    inboundCallConfigData() {
-      return this.$store.getters['inboundCallConfigData']
-    },
-    inboundCallConfigById() {
-      return this.$store.getters['inboundConfigById'].inboundConfigById
+      ...toRefs(state),
+      selectedHttpMethod,
+      inboundCallConfigData,
+      inboundCallConfigById,
+      editConfig,
+      deleteConfig,
+      isInvalid,
+      handleOk,
+      saveConfig,
+      setMethodUpdate,
+      setMethod,
+      fetchInitialData,
     }
-  },
-  methods: {
-    deleteConfig(val) {
-      if (confirm("Are you sure you want to delete this config?")) {
-        this.$store.dispatch("deleteInboundCallConfig", val.id);
-      }
-    },
-    editConfig(val) {
-      this.selectedConfig.callerId = null;
-      this.selectedConfig.webhookUrl = null;
-      this.$store.dispatch("getInboundCallConfigById", val.id).then(() => {
-          this.modleVisibility = true
-          this.selectedConfig.callerId = this.inboundCallConfigById.callerId;
-          this.selectedConfig.webhookUrl = this.inboundCallConfigById.webhookUrl;
-          this.selectedConfig.httpMethod = this.inboundCallConfigById.httpMethod || "GET";
-      });
-    },
-    handleOk() {
-      this.$store.dispatch("updateInboundCallConfig", this.selectedConfig).then(res => {
-        this.modleVisibility = false;
-      });
-    },
-    isInvalid(value) {
-      return !value && this.hasError ? "invalid" : "";
-    },
-    saveConfig() {
-      if (!this.callerId || !this.webhookUrl) {
-        this.hasError = true;
-        return;
-      }
-      this.hasError = false;
-      const params = {
-        callerId: this.callerId,
-        webhookUrl: this.webhookUrl,
-        httpMethod: this.httpMethod
-      };
-      this.$store.dispatch("addInboundCallConfig", params).then(res => {
-          this.callerId = null;
-          this.webhookUrl = null;
-          this.isSaved = true;
-      });
-    },
-    getInboundCallConfigs() {
-      this.$store.dispatch("getInboundCallConfigs");
-    },
-    setMethodUpdate(val){
-      this.selectedConfig.httpMethod = val;
-    },
-     setMethod(val) {
-      this.httpMethod = val;
-    },
-  },
-  created() {
-    this.getInboundCallConfigs();
-  },
-};
+  }
+});
 </script>
 <style scoped>
 .call-config {

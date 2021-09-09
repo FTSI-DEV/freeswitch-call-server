@@ -77,7 +77,6 @@ export default defineComponent({
       preOpenKeys: ["sub1"],
       currentComponent: "Home",
     });
-
     watch(
       () => state.openKeys,
       (val, oldVal) => {

@@ -5,7 +5,7 @@ import {
     InboundConfigItem, 
     InboundConfigPager, 
     InboundConfig 
-} from '../../interface/InbounCallConfig'
+} from '../../types/InbounCallConfig'
 
 export default {
     state: {
@@ -24,9 +24,9 @@ export default {
         }
     } as InboundConfig,
     getters: {
-        inboundCallConfigData: (state: InboundConfigItem): InboundConfigItem => state,
-        inboundCallConfigPager: (state: InboundConfigPager): InboundConfigPager => state,
-        inboundConfigById: (state: InboundConfigItem): InboundConfigItem => state
+        inboundCallConfigData: (state: InboundConfig): Array<InboundConfigItem> => state.items,
+        inboundCallConfigPager: (state: InboundConfig): InboundConfigPager => state.meta,
+        inboundConfigById: (state: InboundConfig): InboundConfigItem => state.inboundConfigById
     },
     mutations: {    
         setInboundCallConfig(state: InboundConfig, payload: InboundConfig) {
@@ -65,11 +65,12 @@ export default {
           })
         },
         getInboundCallConfigById({commit}: { commit: Commit }, params: number) {
-            return HTTP.get(`/api/inbound-call-config/getInboundCallConfigById/${params}`).then(res => {
-                if (res.status === Status.OK) {
-                    commit("setInboundConfigById", res.data);
-                }
-            });
+            return HTTP.get(`/api/inbound-call-config/getInboundCallConfigById/${params}`)
+            // .then(res => {
+            //     if (res.status === Status.OK) {
+            //         commit("setInboundConfigById", res.data);
+            //     }
+            // });
         },
         addInboundCallConfig({ dispatch }: { dispatch: Dispatch }, params: InboundConfigItem) {
             return HTTP.post(`/api/inbound-call-config/add/${params.callerId}/${params.webhookUrl}/${params.httpMethod}`)

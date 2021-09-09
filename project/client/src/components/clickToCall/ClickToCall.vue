@@ -63,35 +63,44 @@
     </a-layout>
   </a-layout>
 </template>
-<script>
-export default {
-  data() {
-    return {
+<script lang="ts">
+
+import { reactive, toRefs, defineComponent } from "vue";
+import { useStore } from 'vuex';
+
+export default defineComponent({
+  setup() {
+    const store = useStore();
+    const state = reactive({
       from: null,
       to: null,
       callerId: null,
       hasError: false,
-    };
-  },
-  methods: {
-    isInvalid(value) {
-      return !value && this.hasError ? "invalid" : "";
-    },
-    clickToCall() {
-      if (!this.from || !this.to || !this.callerId) {
-        this.hasError = true;
+    })
+
+    // Methods
+    const isInvalid = (value: string): string => !value && state.hasError ? "invalid" : "";
+    const clickToCall = () => {
+      if (!state.from || !state.to || !state.callerId) {
+        state.hasError = true;
         return;
       }
-      this.hasError = false;
+      state.hasError = false;
       const params = {
-        phoneNumberFrom: this.from,
-        phoneNumberTo: this.to,
-        callerId: this.callerId,
+        phoneNumberFrom: state.from,
+        phoneNumberTo: state.to,
+        callerId: state.callerId,
       };
-      this.$store.dispatch("clickToCall", params);
-    },
-  },
-};
+      store.dispatch("clickToCall", params);
+    }
+
+    return {
+      ...toRefs(state),
+      isInvalid,
+      clickToCall
+    }
+  }
+});
 </script>
 <style scoped>
 .call-config {
