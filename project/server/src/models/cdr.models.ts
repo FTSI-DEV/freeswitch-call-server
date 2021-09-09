@@ -1,8 +1,7 @@
 export class CDRModels{
     UUID: string;
-    CallerIdNumber?: string;
-    CallerName?: string;
-    CalleeIdNumber?: string;
+    PhoneNumberFrom?: string;
+    PhoneNumberTo?: string;
     CallDirection?: string;
     CallStatus?: string;
     StartedDate: any;

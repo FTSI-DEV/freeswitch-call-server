@@ -8,12 +8,12 @@ import {
 } from '@nestjs/common';
 import { Pagination } from 'nestjs-typeorm-paginate';
 import { CallDetailRecordDTO } from 'src/models/cdr.models';
-import { FreeswitchCallSystemService } from '../services/freeswitch-call-system.service';
+import { CallDetailRecordService } from '../services/call-detail-record.service';
 
-@Controller('/freeswitch-call-system')
-export class FreeswitchCallSystemController {
+@Controller('/call-detail-record')
+export class CallDetailRecordController {
   constructor(
-    private readonly _freeswitchCallSystemService: FreeswitchCallSystemService,
+    private readonly _freeswitchCallSystemService: CallDetailRecordService,
   ) {}
 
   @Get('getCdrLogs')

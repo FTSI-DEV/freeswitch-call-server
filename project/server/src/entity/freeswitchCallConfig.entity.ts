@@ -20,7 +20,6 @@ export class FreeswitchCallConfigRepository extends Repository<FreeswitchCallCon
     }
 
     getById = async (id:number) => {
-        console.log('test');
         let retVal = null;
         
         let record = this.findOneOrFail(id)

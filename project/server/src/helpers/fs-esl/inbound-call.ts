@@ -12,7 +12,7 @@ import { Instructions } from '../../helpers/parser/xmlCommandObject';
 import { EVENT_LIST } from "../constants/event-list.constants";
 import { chownSync } from "fs";
 import { InboundCallDTMFHelper } from "./inbound-call.dtmf.helper";
-import { start, XmlParserSample } from "../parser/xmlParserSample";
+import {  XmlParserSample } from "../parser/xmlParserSample";
 import { combineLatest, concatAll } from "rxjs";
 
 export class InboundCallHelper{
@@ -90,11 +90,16 @@ export class InboundCallHelper{
                                 let var_name = "target_num"; // channel variable that digits should be placed in
 
                                 conn.execute('play_and_get_digits', 
-                                        `${minValue} ${maxValue} ${tries} ${timeout} ${terminator} ${soundFile} ${invalidFile} ${var_name} ${regexValue} ${digit_timeout}`, (e) => {
+                                        `${minValue} ${maxValue} ${tries} ${timeout} ${terminator} ${soundFile} ${invalidFile} ${var_name} 1000|1003 ${digit_timeout}`, (e) => {
 
                                     let validValue = e.getHeader(`variable_${var_name}`);
 
                                     let invalidValue = e.getHeader(`variable_${var_name}_invalid`);
+
+                                    if (legStop){
+                                        console.log('Leg has stop');
+                                        return;
+                                    }
 
                                     if (validValue !== undefined){
                                         
@@ -115,6 +120,11 @@ export class InboundCallHelper{
                                         console.log('4. Sleep executed - ' + new Date());
 
                                         conn.execute('play_and_get_digits', `1 5 2 10000 # ivr/ivr-enter_destination_telephone_number.wav ivr/ivr-that_was_an_invalid_entry.wav target_num 3 2000`, (e) => {
+                                            
+                                            if (legStop){
+                                                console.log('Leg has stop');
+                                                return;
+                                            }
                                             
                                                 let validValue = e.getHeader(`variable_target_num`);
 
@@ -142,8 +152,12 @@ export class InboundCallHelper{
 
                                                     let sampel = new XmlParserSample().tryParse(sampleVal);
 
-                                                    var vaa = 0;
                                                     for (let i = 0; i < sampel.length; i ++ ){
+
+                                                        if (legStop){
+                                                            console.log('Leg has stop');
+                                                            return;
+                                                        }
 
                                                         let val = sampel[i];
 
@@ -161,6 +175,11 @@ export class InboundCallHelper{
                                                                 console.log('EXECUTED PLAY DIGITS');
 
                                                                 conn.execute('play_and_get_digits', `${minValue} ${maxValue} ${tries} ${val.attrib.timeout}00 ${terminator} ${soundFile} ${invalidFile} ${val.attrib.numDigits} ${digit_timeout} ${var_name}`, () => {
+
+                                                                    if (legStop){
+                                                                        console.log('Leg has stop');
+                                                                        return;
+                                                                    }
 
                                                                     if (val.attrib.action){
                                                                         console.log('TRIGGER WEBHOOK HERE');

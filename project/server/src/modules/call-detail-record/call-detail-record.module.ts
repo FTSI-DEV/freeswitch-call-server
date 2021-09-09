@@ -2,15 +2,15 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { FsCallDetailRecordEntity, FsCallDetailRecordRepository } from 'src/entity/freeswitchCallDetailRecord.entity';
 import { FREESWITCH_SERVICE } from '../freeswitch/freeswitch.interface';
-import { FreeswitchCallSystemController } from './controllers/freeswitch-call-system.controller';
-import { FreeswitchCallSystemService } from './services/freeswitch-call-system.service';
+import { CallDetailRecordController } from './controllers/call-detail-record.controller';
+import { CallDetailRecordService } from './services/call-detail-record.service';
 
 @Module({
   providers: [
-    FreeswitchCallSystemService
+    CallDetailRecordService
   ],
   imports: [TypeOrmModule.forFeature([FsCallDetailRecordEntity, FsCallDetailRecordRepository])],
-  exports: [FreeswitchCallSystemService],
-  controllers: [FreeswitchCallSystemController]
+  exports: [CallDetailRecordService],
+  controllers: [CallDetailRecordController]
 })
-export class FreeswitchCallSystemModule {}
+export class CallDetailRecordModule {}

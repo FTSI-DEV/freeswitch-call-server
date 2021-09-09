@@ -1,16 +1,16 @@
 const readline = require("readline");
 const xml = require('xmldoc');
 
-export const start = readline.createInterface({
-    input: process.stdin,
-    output: process.stdout
-});
+// export const start = readline.createInterface({
+//     input: process.stdin,
+//     output: process.stdout
+// });
 
-start.question("Enter value ", function saveInput(name) {
-  console.log(`VALUE ENTERED \n ${name}`);
+// start.question("Enter value ", function saveInput(name) {
+//   console.log(`VALUE ENTERED \n ${name}`);
 
-  new XmlParserSample().tryParse(name);
-});
+//   new XmlParserSample().tryParse(name);
+// });
 
 interface DialplanInstructions{
     dp:string;

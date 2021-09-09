@@ -1,6 +1,6 @@
 import { Console } from 'console';
 import { FsCallDetailRecordEntity } from 'src/entity/freeswitchCallDetailRecord.entity';
-import { FreeswitchCallSystemService } from 'src/modules/freeswitch-call-system/services/freeswitch-call-system.service';
+import { CallDetailRecordService } from 'src/modules/call-detail-record/services/call-detail-record.service';
 import { WebhookInboundCallStatusCallBack, WebhookOutboundCallStatusCallBack } from 'src/utils/webhooks';
 import { CallTypes } from '../constants/call-type';
 import { CHANNEL_VARIABLE } from '../constants/channel-variables.constants';
@@ -26,9 +26,6 @@ export const FreeswitchConnectionResult: ConnResult = {
 };
 
 export class InboundEslConnectionHelper {
-  constructor(
-    private readonly _freeswitchCallSystemService: FreeswitchCallSystemService,
-  ) {}
 
   startConnection(){
 
@@ -56,6 +53,7 @@ export class InboundEslConnectionHelper {
       connection.subscribe('CHANNEL_HANGUP_COMPLETE');
       connection.subscribe('CHANNEL_ANSWER');
       connection.subscribe('DTMF');
+      connection.subscribe('BACKGROUND_JOB');
     });
 
     this._onListenEvent(connection, dtmf);
@@ -69,14 +67,17 @@ export class InboundEslConnectionHelper {
 
     connection.on('esl::event::CHANNEL_HANGUP_COMPLETE::**', (fsEvent) => {
 
-      // console.log('EVENTS -> ', JSON.stringify(fsEvent));
-
       console.log('EVENT-NAME ->' , fsEvent.getHeader(EVENT_LIST.EVENT_NAME));
 
       let callId = fsEvent.getHeader(CHANNEL_VARIABLE.UNIQUE_ID);
 
       let channelId = fsEvent.getHeader('Channel-Call-UUID');
+
       console.log('CHANNEL ID -> ', channelId);
+
+      let cdrValues = new CDRHelper().getCallRecords(fsEvent);
+
+      cdrValues.UUID = callId;
 
       if (callId === channelId){
         console.log('Call : ' , callId);
@@ -85,8 +86,22 @@ export class InboundEslConnectionHelper {
         console.log('Call : ' , callId);
         dtmf.stopDTMF(connection, callId);
         console.log('Parent Call : ', channelId);
+
+        cdrValues.ParentCallUid = channelId;
       }
+
+      if (cdrValues.CallDirection === "outbound"){
+        http.get(WebhookOutboundCallStatusCallBack(cdrValues));
+      }
+      else{
+        http.get(WebhookInboundCallStatusCallBack(cdrValues));
+      }
+
     });
+
+    connection.on('esl::event::BACKGROUND_JOB::*', (evt) =>{
+      console.log('BG - EVT -> ', evt);
+    })
 
     connection.on('esl::event::CHANNEL_ANSWER::**', (evt) => {
 
@@ -96,17 +111,30 @@ export class InboundEslConnectionHelper {
 
       let channelId = evt.getHeader('Channel-Call-UUID');
 
-      console.log('CHANNEL ID -> ', channelId);
+      // connection.bgapi('sofia status', (res) => {
+      //   console.log('SOFIA STATUS -> ' , res);
+      // });
 
-      if (callId === channelId){
-        console.log('Call : ' , callId);
-      }
-      else{
-        console.log('Call : ' , callId);
-        console.log('Parent Call : ', channelId);
-        dtmf.startDTMF(connection, callId);
-        dtmf.captureDTMF(connection, callId);
-      }
+      // connection.bgapi('show calls', (res) => {
+
+      //   let jobUUID = res.getHeader('Job-UUID');
+
+      //   console.log('show calls -> ' , jobUUID);
+
+      //   console.log('ALL -> ', res);
+      // });
+
+      // console.log('CHANNEL ID -> ', channelId);
+
+      // if (callId === channelId){
+      //   console.log('Call : ' , callId);
+      // }
+      // else{
+      //   console.log('Call : ' , callId);
+      //   console.log('Parent Call : ', channelId);
+      //   dtmf.startDTMF(connection, callId);
+      //   dtmf.captureDTMF(connection, callId);
+      // }
     });
   }
 }

@@ -1,12 +1,12 @@
 import { OnQueueActive, Process, Processor } from "@nestjs/bull";
 import { Job } from "bull";
-import { FreeswitchCallSystemService } from "src/modules/freeswitch-call-system/services/freeswitch-call-system.service";
+import { CallDetailRecordService } from "src/modules/call-detail-record/services/call-detail-record.service";
 
 @Processor('default')
 export class OutboundCallJob{
 
     constructor(
-        private readonly _freeswitchCallSystemService: FreeswitchCallSystemService
+        private readonly _freeswitchCallSystemService: CallDetailRecordService
     ) {}
 
     @Process('outboundCall')
@@ -20,8 +20,8 @@ export class OutboundCallJob{
 
             await this._freeswitchCallSystemService.saveCDR({
                 UUID: parameter.data.UUID,
-                CallerIdNumber: parameter.data.CallerIdNumber,
-                CalleeIdNumber: parameter.data.CalleeIdNumber,
+                PhoneNumberFrom: parameter.data.PhoneNumberFrom,
+                PhoneNumberTo: parameter.data.PhoneNumberTo,
                 CallDirection: parameter.data.CallDirection,
                 StartedDate: parameter.data.StartedDate,
                 CallStatus: parameter.data.CallStatus,
@@ -38,8 +38,8 @@ export class OutboundCallJob{
 
             await this._freeswitchCallSystemService.updateCDR({
                 UUID: parameter.data.UUID,
-                CallerIdNumber: parameter.data.CallerIdNumber,
-                CalleeIdNumber: parameter.data.CalleeIdNumber,
+                PhoneNumberFrom: parameter.data.PhoneNumberFrom,
+                PhoneNumberTo: parameter.data.PhoneNumberTo,
                 CallDirection: parameter.data.CallDirection,
                 StartedDate: parameter.data.StartedDate,
                 CallStatus: parameter.data.CallStatus,

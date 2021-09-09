@@ -1,9 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { FreeswitchConnectionResult } from 'src/helpers/fs-esl/inbound-esl.connection';
+import { CallDetailRecordService } from 'src/modules/call-detail-record/services/call-detail-record.service';
 
 @Injectable()
 export class OutboundCallService {
-    constructor() {}
+    constructor(
+        private readonly _callDetailRecordService : CallDetailRecordService
+    ) {}
 
     async clickToCall(
         phoneNumberTo:string,
@@ -31,6 +34,23 @@ export class OutboundCallService {
 
         return new Promise<string>((resolve,reject) => {
             resolve(callUid);
+        });
+    }
+
+    async getPhoneNumberToByUUID(uuid:string):Promise<string>{
+        
+        return new Promise<string>( async (resolve) => {
+
+            let retVal = await this._callDetailRecordService.getByCallUid(uuid);
+
+            if (retVal != null){
+
+                resolve(retVal.PhoneNumberTo);
+
+                return;
+            }
+
+            resolve(null);
         });
     }
 

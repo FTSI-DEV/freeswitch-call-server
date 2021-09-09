@@ -4,13 +4,13 @@ import { IncomingCallService } from './incomingCall.service';
 import { InjectQueue } from '@nestjs/bull';
 import { CDRModels } from 'src/models/cdr.models';
 import { FreeswitchPhoneNumberConfigService } from '../config/fs-phonenumber-config/services/phonenumber-config.service';
-import { FreeswitchCallSystemService } from '../freeswitch-call-system/services/freeswitch-call-system.service';
+import { CallDetailRecordService } from '../call-detail-record/services/call-detail-record.service';
 
 @Controller('NewInboundCall')
 export class IncomingCallController {
   constructor(private incomingCallService: IncomingCallService,
               private freeswitchCallConfig: FreeswitchPhoneNumberConfigService,
-              private freeswitchCallSystemService: FreeswitchCallSystemService,
+              private freeswitchCallSystemService: CallDetailRecordService,
               @InjectQueue('default')
               private incomingCallJob: Queue
               ) 

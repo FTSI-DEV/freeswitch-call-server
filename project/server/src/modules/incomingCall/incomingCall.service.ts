@@ -2,12 +2,12 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CDRModels } from 'src/models/cdr.models';
 import { Repository } from 'typeorm';
-import { FreeswitchCallSystemService } from '../freeswitch-call-system/services/freeswitch-call-system.service';
+import { CallDetailRecordService } from '../call-detail-record/services/call-detail-record.service';
 
 @Injectable()
 export class IncomingCallService {
   constructor(
-    private readonly _freeswitchCallSystemService: FreeswitchCallSystemService
+    private readonly _freeswitchCallSystemService: CallDetailRecordService
     ) {}
 
   saveIncomingCallCDR(callData:CDRModels){
@@ -16,11 +16,10 @@ export class IncomingCallService {
 
     this._freeswitchCallSystemService.saveCDR({
       UUID: callData.UUID,
-      CallerIdNumber: callData.CallerIdNumber,
-      CallerName: callData.CallerName,
+      PhoneNumberFrom: callData.PhoneNumberFrom,
       CallDirection : callData.CallDirection,
       CallStatus: callData.CallStatus,
-      CalleeIdNumber: callData.CalleeIdNumber,
+      PhoneNumberTo: callData.PhoneNumberTo,
       StartedDate: callData.StartedDate,
       RecordingUUID: callData.UUID,
       CallDuration: callData.CallDuration,

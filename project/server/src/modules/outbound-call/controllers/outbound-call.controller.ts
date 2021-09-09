@@ -3,14 +3,14 @@ import { Controller, Get, Inject, Param, Post, Query } from '@nestjs/common';
 import { Queue } from 'bull';
 import * as moment from 'moment';
 import { CDRModels } from 'src/models/cdr.models';
-import { FreeswitchCallSystemService } from 'src/modules/freeswitch-call-system/services/freeswitch-call-system.service';
+import { CallDetailRecordService } from 'src/modules/call-detail-record/services/call-detail-record.service';
 import { OutboundCallService } from '../services/outbound-call.service';
 
 @Controller('/api/outbound-call')
 export class OutboundCallController {
     constructor(
         private readonly _outboundCallService : OutboundCallService,
-        private readonly _freeswitchCallSystemService : FreeswitchCallSystemService,
+        private readonly _freeswitchCallSystemService : CallDetailRecordService,
         @InjectQueue('default')
         private readonly outboundCallJobQueue : Queue
     ) {}
@@ -28,11 +28,12 @@ export class OutboundCallController {
           callerId,
         );
     
-        // this._freeswitchCallSystemService.saveCDR({
-        //   UUID: result,
-        //   CallDirection: 'outbound',
-        //   StartedDate:  moment().format('YYYY-MM-DDTHH:mm:ss.SSS')
-        // });
+        this._freeswitchCallSystemService.saveCDR({
+          UUID: result,
+          CallDirection: 'outbound',
+          StartedDate:  moment().format('YYYY-MM-DDTHH:mm:ss.SSS'),
+          PhoneNumberTo : phoneNumberTo
+        });
     
         return result;
     }

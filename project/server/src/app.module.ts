@@ -9,7 +9,7 @@ import { configService } from './config/config.service';
 import { PhoneNumberConfigModule } from './modules/config/fs-phonenumber-config/phonenumber-config.module';
 import { IvrModule } from './modules/ivr/ivr.module';
 import { IncomingCallModule } from './modules/incomingCall/incomingCall.module';
-import { FreeswitchCallSystemModule } from './modules/freeswitch-call-system/freeswitch-call-system.module';
+import { CallDetailRecordModule } from './modules/call-detail-record/call-detail-record.module';
 import { FreeswitchModule } from './modules/freeswitch/freeswitch.module';
 import { InboundCallConfigModule } from './modules/config/inbound-call-config/inbound-call-config.module';
 import { EslServerHelper } from './helpers/fs-esl/inboundCall.server';
@@ -18,10 +18,11 @@ import { BullModule } from '@nestjs/bull';
 import { BullModuleQueue } from './bull-queue/bull.module';
 import { TestModule } from './modules/test/test.module';
 import { InboundEslConnectionHelper } from './helpers/fs-esl/inbound-esl.connection';
-import { FreeswitchCallSystemService } from './modules/freeswitch-call-system/services/freeswitch-call-system.service';
+import { CallDetailRecordService } from './modules/call-detail-record/services/call-detail-record.service';
 import { CallRecordingModule } from './modules/call-recording/call-recording.module';
 import { OutboundCallModule } from './modules/outbound-call/outbound-call.module';
 import { ClickToCallServerHelper } from './helpers/fs-esl/click-to-call.server';
+import { OutboundCallService } from './modules/outbound-call/services/outbound-call.service';
 
 @Module({
   imports: [
@@ -32,7 +33,7 @@ import { ClickToCallServerHelper } from './helpers/fs-esl/click-to-call.server';
     PhoneNumberConfigModule,
     IncomingCallModule,
     FreeswitchModule,
-    FreeswitchCallSystemModule,
+    CallDetailRecordModule,
     InboundCallConfigModule,
     BullModuleQueue,
     TestModule,
@@ -51,13 +52,14 @@ import { ClickToCallServerHelper } from './helpers/fs-esl/click-to-call.server';
 export class AppModule {
   constructor(private connection: Connection,
               private readonly _inboundCall: InboundCallConfigService,
-              private readonly _freeswitchCallSystem: FreeswitchCallSystemService) {
+              private readonly _freeswitchCallSystem: CallDetailRecordService,
+              private readonly _outboundCallService: OutboundCallService) {
 
     
     new EslServerHelper(_inboundCall).startEslServer();
 
-    new InboundEslConnectionHelper(_freeswitchCallSystem).startConnection();
+    new InboundEslConnectionHelper().startConnection();
 
-    new ClickToCallServerHelper().startClickToCallServer();
+    new ClickToCallServerHelper(_outboundCallService).startClickToCallServer();
   }
 }

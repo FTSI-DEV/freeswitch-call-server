@@ -5,7 +5,7 @@ import { FsCallDetailRecordEntity, FsCallDetailRecordRepository } from 'src/enti
 import { CallDetailRecordDTO, CDRModels } from 'src/models/cdr.models';
 
 @Injectable()
-export class FreeswitchCallSystemService {
+export class CallDetailRecordService {
     constructor(
         @InjectRepository(FsCallDetailRecordRepository)
         private freeswitchCallSystemRepo: FsCallDetailRecordRepository)
@@ -23,8 +23,8 @@ export class FreeswitchCallSystemService {
         cdr.CallStatus = cdrParam.CallStatus;
         cdr.DateCreated = cdrParam.StartedDate;
         cdr.RecordingUUID = cdrParam.RecordingUUID;
-        cdr.PhoneNumberFrom = cdrParam.CallerIdNumber;
-        cdr.PhoneNumberTo = cdrParam.CalleeIdNumber;
+        cdr.PhoneNumberFrom = cdrParam.PhoneNumberFrom;
+        cdr.PhoneNumberTo = cdrParam.PhoneNumberTo;
         cdr.CallDuration = cdrParam.CallDuration;
         cdr.CallDirection = cdrParam.CallDirection;
         cdr.ParentCallUid = cdrParam.ParentCallUid;
@@ -46,8 +46,8 @@ export class FreeswitchCallSystemService {
 
         result.CallDuration = cdrParam.CallDuration;
         result.CallStatus = cdrParam.CallStatus;
-        result.PhoneNumberFrom = cdrParam.CallerIdNumber;
-        result.PhoneNumberTo = cdrParam.CalleeIdNumber;
+        result.PhoneNumberFrom = cdrParam.PhoneNumberFrom;
+        result.PhoneNumberTo = cdrParam.PhoneNumberTo;
         result.RecordingUUID = cdrParam.UUID;
         result.ParentCallUid = cdrParam.ParentCallUid;
 

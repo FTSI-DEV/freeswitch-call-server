@@ -1,5 +1,5 @@
 import { CallTypes } from "src/helpers/constants/call-type";
-import { Column, CreateDateColumn, Entity, JoinColumn, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, EntityRepository, JoinColumn, OneToMany, OneToOne, PrimaryGeneratedColumn, Repository } from "typeorm";
 import { FsCallDetailRecordEntity } from "./freeswitchCallDetailRecord.entity";
 
 @Entity('CallRecordingStorage')
@@ -10,9 +10,6 @@ export class CallRecordingStorageEntity{
     @Column( { length: 200 , nullable: true})
     RecordingUid: string;
 
-    // @OneToOne(type => FsCallDetailRecordEntity)
-    // @JoinColumn()
-    // CallId : number;
     @Column( { length: 200 })
     CallUid : string;
 
@@ -25,16 +22,26 @@ export class CallRecordingStorageEntity{
     @CreateDateColumn()
     DateCreated: Date;
 
-    // @OneToMany(type => FsCallDetailRecordEntity, (callDetailRecord: FsCallDetailRecordEntity) => callDetailRecord.Id)
-    // @JoinColumn({
-    //     name: "fk_callRecordingStorage_callDetailRecord_id"
-    // })
-    // public callDetailRecord: FsCallDetailRecordEntity;
-
-    @OneToOne(type => FsCallDetailRecordEntity, {
-        cascade: true,
+    @OneToOne(type => FsCallDetailRecordEntity)
+    @JoinColumn({ 
+        name: 'CallId', 
+        referencedColumnName : 'Id' 
     })
-    @JoinColumn()
     callDetailRecord: FsCallDetailRecordEntity;
+}
+
+@EntityRepository(CallRecordingStorageEntity)
+export class CallRecordingStorageRepository extends Repository<CallRecordingStorageEntity>{
+
+    saveUpdateRecord = async (callRecordingStorage: CallRecordingStorageEntity) => {
+        return await this.save(callRecordingStorage);
+    }
+
+    getById = async (id: number): Promise<CallRecordingStorageEntity> => {
+
+        let record = await this.findOneOrFail(id);
+
+        return record;
+    }
 
 }

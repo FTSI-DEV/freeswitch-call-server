@@ -15,8 +15,7 @@ export class CDRHelper{
         
         const uuid = this.getHeader(CHANNEL_VARIABLE.UNIQUE_ID, fsEvent);
         const callerId = this.getHeader(CHANNEL_VARIABLE.CALLER_CALLER_ID_NUMBER, fsEvent);
-        const callerName = this.getHeader(CHANNEL_VARIABLE.CALLER_CALLER_ID_NAME, fsEvent);
-        const calleeIdNumber = this.getHeader(CHANNEL_VARIABLE.CALLER_CALLE_ID_NUMBER, fsEvent);
+         const calleeIdNumber = this.getHeader(CHANNEL_VARIABLE.CALLER_CALLE_ID_NUMBER, fsEvent);
         const callDirection = this.getHeader(CHANNEL_VARIABLE.CALL_DIRECTION, fsEvent);
         const hangup_cause = this.getHeader(CHANNEL_VARIABLE.HANGUP_CAUSE, fsEvent);
         const started_date = this.getHeader(CHANNEL_VARIABLE.EVENT_DATE_LOCAL, fsEvent);
@@ -27,9 +26,8 @@ export class CDRHelper{
 
         return{
             UUID: uuid,
-            CallerIdNumber: callerId,
-            CallerName: callerName,
-            CalleeIdNumber: calleeIdNumber,
+            PhoneNumberFrom: callerId,
+            PhoneNumberTo: calleeIdNumber,
             CallDirection: callDirection,
             CallStatus: hangup_cause,
             StartedDate: started_date,
@@ -47,8 +45,8 @@ export class CDRHelper{
         const answeredDate = new Date(start_epoch*1000);
         const hangupDate = new Date(end_epoch*1000);
 
-        console.log('Answered Time -> ', answeredDate.toUTCString());
-        console.log('HangupTime ->' , hangupDate.toUTCString());
+        // console.log('Answered Time -> ', answeredDate.toUTCString());
+        // console.log('HangupTime ->' , hangupDate.toUTCString());
 
         let duration = Math.abs(answeredDate.getTime() - hangupDate.getTime());
 

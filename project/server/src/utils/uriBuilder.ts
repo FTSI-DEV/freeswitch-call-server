@@ -28,9 +28,8 @@ export class URIBuilder {
   private mappedCallDataParams(callData:CDRModels):string{
 
     let callUUID = `UUID=${callData.UUID}`;
-    let callerIdNumber = `CallerIdNumber=${callData.CallerIdNumber}`;
-    let callerName = `CallerName=${callData.CallerName}`;
-    let calleeIdNumber = `CalleeIdNumber=${callData.CalleeIdNumber}`;
+    let callerIdNumber = `PhoneNumberFrom=${callData.PhoneNumberFrom}`;
+    let calleeIdNumber = `PhoneNumberTo=${callData.PhoneNumberTo}`;
     let callDirection = `CallDirection=${callData.CallDirection}`;
     let callStatus = `CallStatus=${callData.CallStatus}`;
     let startedDate = `StartedDate=${callData.StartedDate}`;
@@ -38,6 +37,6 @@ export class URIBuilder {
     let recordingUUID = `RecordingUUID=${callData.RecordingUUID}`;
     let parentCallUUID = `ParentCallUid=${callData.ParentCallUid}`;
 
-    return `${callUUID}&${callerIdNumber}&${callerName}&${calleeIdNumber}&${callDirection}&${callStatus}&${startedDate}&${duration}&${recordingUUID}&${parentCallUUID}`;
+    return `${callUUID}&${callerIdNumber}&${calleeIdNumber}&${callDirection}&${callStatus}&${startedDate}&${duration}&${recordingUUID}&${parentCallUUID}`;
   }
 }
