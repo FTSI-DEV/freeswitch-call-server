@@ -99,9 +99,9 @@
             </div>
           </a-col>
         </a-row> 
-        <b-row v-if="phoneNumberConfigs.length">
+        <b-row v-if="phoneNumberConfigList.length">
           <b-col>
-            <a-table :data-source="phoneNumberConfigs" :columns="columns">
+            <a-table :data-source="phoneNumberConfigList" :columns="columns">
               <template #action="{ record }">
                 <a title="Edit" @click="editConfig(record)"
                   ><EditOutlined style="font-size: 1.2em; margin-right: 15px"
@@ -169,15 +169,20 @@
     </a-layout>
   </a-layout>
 </template>
-<script>
+<script lang="ts">
 import {
   DownOutlined,
   EditOutlined,
   DeleteOutlined,
 } from "@ant-design/icons-vue";
-export default {
-  data() {
-    return {
+import { useStore } from 'vuex';
+import { computed, defineComponent, toRefs, reactive } from "vue";
+import ColumnArray from './helper';
+export default defineComponent({
+  components: { DownOutlined, EditOutlined, DeleteOutlined },
+  setup() {
+    const store = useStore();
+    const state = reactive({
       friendlyName: null,
       phoneNumber: null,
       httpMethod: "POST",
@@ -188,34 +193,7 @@ export default {
       hasError: false,
       isSaved: false,
       isServerError: false,
-      configList: null,
-      columns: [
-        {
-          title: "Friendly Name",
-          dataIndex: "friendlyName",
-          key: "friendlyName",
-        },
-        {
-          title: "HTTP Method",
-          dataIndex: "httpMethod",
-          key: "httpMethod",
-        },
-        {
-          title: "Phone Number",
-          dataIndex: "phoneNumber",
-          key: "phoneNumber",
-        },
-        {
-          title: "Weebhook URL",
-          dataIndex: "webhookUrl",
-          key: "webhookUrl",
-        },
-        {
-          title: "Action",
-          slots: { customRender: "action" },
-          dataIndex: "webhookUrl",
-        },
-      ],
+      columns: ColumnArray,
       modleVisibility: false,
       selectedConfig: {
         friendlyName: null,
@@ -223,90 +201,85 @@ export default {
         httpMethod: "GET",
         webhookUrl: null,
       },
-    };
-  },
-  computed: {
-    selectedHttpMethod() {
-      return this.httpMethod === "POST" ? "HTTP POST" : "HTTP GET";
-    },
-    phoneNumberConfigs() {
-      return this.$store.getters['getPhoneNumberConfig']
-    },
-    phoneNumberConfig() {
-      return this.$store.getters['getPhoneNumberConfigById']
-    }
-  },
-  methods: {
-    setMethodUpdate(val) {
-      this.selectedConfig.httpMethod = val;
-    },
-    deleteConfig(val) {
+    });
+
+    // Computed
+    const selectedHttpMethod = computed((): string => state.httpMethod === "POST" ? "HTTP POST" : "HTTP GET");
+    const phoneNumberConfigList = computed((): any => store.getters['getPhoneNumberConfig']);
+    const phoneNumberConfig = computed((): any => store.getters['getPhoneNumberConfigById']);
+
+    // Methods
+    const setMethodUpdate = (val: string) => state.selectedConfig.httpMethod = val;
+    const getPhoneNumberConfigs = () => store.dispatch('getPhoneNumberConfigs');
+    const deleteConfig = (val: any) => {
       if (confirm("Are you sure you want to delete this config?")) {
-        this.$store.dispatch("deletePhoneNumberConfig", val.id).then(() => {
-          this.getPhoneNumberConfigs();
+        store.dispatch("deletePhoneNumberConfig", val.id).then(() => {
+          getPhoneNumberConfigs();
         });
       }
-    },
-    editConfig(val) {
-      this.selectedConfig.friendlyName = null;
-      this.selectedConfig.phoneNumber = null;
-      this.selectedConfig.webhookUrl = null;
-      this.$store.dispatch("getPhoneNumberConfigById", { id: val.id }).then(() => {
-          this.modleVisibility = true;
-          this.selectedConfig.friendlyName = this.phoneNumberConfig.friendlyName;
-          this.selectedConfig.phoneNumber = this.phoneNumberConfig.phoneNumber;
-          this.selectedConfig.httpMethod = this.phoneNumberConfig.httpMethod || "GET";
-          this.selectedConfig.webhookUrl = this.phoneNumberConfig.webhookUrl;
+    }
+    const editConfig = (val: any) => {
+      state.selectedConfig.friendlyName = null;
+      state.selectedConfig.phoneNumber = null;
+      state.selectedConfig.webhookUrl = null;
+      store.dispatch("getPhoneNumberConfigById", { id: val.id }).then(() => {
+          state.modleVisibility = true;
+          state.selectedConfig.friendlyName = phoneNumberConfig.value.friendlyName;
+          state.selectedConfig.phoneNumber = phoneNumberConfig.value.phoneNumber;
+          state.selectedConfig.httpMethod = phoneNumberConfig.value.httpMethod || "GET";
+          state.selectedConfig.webhookUrl = phoneNumberConfig.value.webhookUrl;
       });
-      console.log("val: ", val.id);
-    },
-    handleOk() {
-      this.$store.dispatch('updatePhoneNumberConfig', this.selectedConfig).then((res) => {
-         this.modleVisibility = false;
+    }
+    const handleOk = () => {
+      store.dispatch('updatePhoneNumberConfig', state.selectedConfig).then((res) => {
+         state.modleVisibility = false;
       });
-    },
-    isInvalid(value) {
-      return !value && this.hasError ? "invalid" : "";
-    },
-    setMethod(val) {
-      this.httpMethod = val;
-    },
-    saveConfig() {
+    }
+    const isInvalid = (value: string): string =>  !value && state.hasError ? "invalid" : "";
+    const setMethod = (val: string) => state.httpMethod = val;
+    const saveConfig = () => {
       if (
-        !this.friendlyName ||
-        !this.phoneNumber ||
-        !this.httpMethod ||
-        !this.webhookURL
+        !state.friendlyName ||
+        !state.phoneNumber ||
+        !state.httpMethod ||
+        !state.webhookURL
       ) {
-        this.hasError = true;
+        state.hasError = true;
         return;
       }
-
-      this.hasError = false;
-
+      state.hasError = false;
       const params = {
-        friendlyName: this.friendlyName,
-        phoneNumber: this.phoneNumber,
-        httpMethod: this.httpMethod,
-        webhookUrl: this.webhookURL,
+        friendlyName: state.friendlyName,
+        phoneNumber: state.phoneNumber,
+        httpMethod: state.httpMethod,
+        webhookUrl: state.webhookURL,
       };
-
-      this.$store.dispatch('addPhoneNumberConfig', params).then((res) => {
-        this.friendlyName = null;
-        this.phoneNumber = null;
-        this.webhookURL = null;
-        this.isSaved = true;
+      store.dispatch('addPhoneNumberConfig', params).then((res) => {
+        state.friendlyName = null;
+        state.phoneNumber = null;
+        state.webhookURL = null;
+        state.isSaved = true;
       });
-    },
-    getPhoneNumberConfigs() {
-      this.$store.dispatch('getPhoneNumberConfigs');
-    },
-  },
-  created() {
-    this.getPhoneNumberConfigs();
-  },
-  components: { DownOutlined, EditOutlined, DeleteOutlined },
-};
+    }
+
+    getPhoneNumberConfigs();
+
+    return {
+      ...toRefs(state),
+      selectedHttpMethod,
+      phoneNumberConfigList,
+      phoneNumberConfig,
+      setMethodUpdate,
+      getPhoneNumberConfigs,
+      deleteConfig,
+      handleOk,
+      editConfig,
+      isInvalid,
+      setMethod,
+      saveConfig
+    }
+  }
+});
 </script>
 <style scoped>
 .call-config {

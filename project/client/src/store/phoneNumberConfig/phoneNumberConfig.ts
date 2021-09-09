@@ -5,7 +5,7 @@ import {
     PhoneNumberConfigPager,
     PhoneNumberConfigItem,
     PhoneNumberConfig
-} from '../../interface/phoneNumberConfig';
+} from '../../types/phoneNumberConfig';
 
 export default {
     state() {
@@ -61,6 +61,7 @@ export default {
             state.phoneConfigById.httpMethod = httpMethod;
             state.phoneConfigById.phoneNumber = phoneNumber;
             state.phoneConfigById.webhookUrl = webhookUrl;
+            console.log('state.phoneConfigById: ', state.phoneConfigById);
         }
     },
     actions: {

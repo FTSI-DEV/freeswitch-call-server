@@ -5,7 +5,7 @@ import {
     InboundConfigItem, 
     InboundConfigPager, 
     InboundConfig 
-} from '../../interface/InbounCallConfig'
+} from '../../types/InbounCallConfig'
 
 export default {
     state: {

@@ -142,117 +142,106 @@
     </a-layout>
   </a-layout>
 </template>
-<script>
+<script lang="ts">
+import { useStore } from 'vuex';
+import { computed, defineComponent, toRefs, reactive } from "vue";
 import { EditOutlined, DownOutlined, DeleteOutlined } from "@ant-design/icons-vue";
+import columnArray from './helper';
 
-export default {
+export default defineComponent({
   components: { EditOutlined , DownOutlined, DeleteOutlined},
-  data() {
-    return {
+  setup() {
+    const store = useStore();
+    const state = reactive({
       from: null,
       to: null,
       hasError: false,
       callerId: null,
       webhookUrl: null,
-      httpMethod: "POST",
+      httpMethod: "GET",
       isSaved: false,
       isServerError: false,
-      configList: null,
-      columns: [
-        {
-          title: "Caller Id",
-          dataIndex: "callerId",
-          key: "callerId",
-        },
-        {
-          title: "HTTP Method",
-          dataIndex: "httpMethod",
-          key: "httpMethod"
-        },
-        {
-          title: "Webhook URL",
-          dataIndex: "webhookUrl",
-          key: "webhookUrl",
-        },
-        {
-          title: "Action",
-          slots: { customRender: "action" },
-        },
-      ],
       modleVisibility: false,
+      columns: columnArray,
       selectedConfig: {
         callerId: null,
         webhookUrl: null,
         httpMethod: "GET"
       },
-    };
-  },
-  computed: {
-    selectedHttpMethod(){
-      return this.httpMethod === "POST" ? "HTTP POST" : "HTTP GET";
-    },
-    inboundCallConfigData() {
-      return this.$store.getters['inboundCallConfigData']
-    },
-    inboundCallConfigById() {
-      return this.$store.getters['inboundConfigById'].inboundConfigById
-    }
-  },
-  methods: {
-    deleteConfig(val) {
+    })
+
+    // Computed
+    const selectedHttpMethod = computed((): string => state.httpMethod === "POST" ? "HTTP POST" : "HTTP GET");
+    const inboundCallConfigData = computed((): any => store.getters['inboundCallConfigData']);
+    const inboundCallConfigById = computed((): any => store.getters['inboundConfigById']);
+
+    // Methods
+    const deleteConfig = (val: any) => {
       if (confirm("Are you sure you want to delete this config?")) {
-        this.$store.dispatch("deleteInboundCallConfig", val.id);
+        store.dispatch("deleteInboundCallConfig", val.id);
       }
-    },
-    editConfig(val) {
-      this.selectedConfig.callerId = null;
-      this.selectedConfig.webhookUrl = null;
-      this.$store.dispatch("getInboundCallConfigById", val.id).then(() => {
-          this.modleVisibility = true
-          this.selectedConfig.callerId = this.inboundCallConfigById.callerId;
-          this.selectedConfig.webhookUrl = this.inboundCallConfigById.webhookUrl;
-          this.selectedConfig.httpMethod = this.inboundCallConfigById.httpMethod || "GET";
+    }
+    const editConfig = (val: any) => {
+      state.selectedConfig.callerId = null;
+      state.selectedConfig.webhookUrl = null;
+      store.dispatch("getInboundCallConfigById", val.id).then(() => {
+          state.modleVisibility = true
+          state.selectedConfig.callerId = inboundCallConfigById.value.callerId;
+          state.selectedConfig.webhookUrl = inboundCallConfigById.value.webhookUrl;
+          state.selectedConfig.httpMethod = inboundCallConfigById.value.httpMethod || "GET";
       });
-    },
-    handleOk() {
-      this.$store.dispatch("updateInboundCallConfig", this.selectedConfig).then(res => {
-        this.modleVisibility = false;
+    }
+    const handleOk = () => {
+      store.dispatch("updateInboundCallConfig", state.selectedConfig).then(res => {
+        state.modleVisibility = false;
       });
-    },
-    isInvalid(value) {
-      return !value && this.hasError ? "invalid" : "";
-    },
-    saveConfig() {
-      if (!this.callerId || !this.webhookUrl) {
-        this.hasError = true;
+    }
+    const isInvalid = (value: string): string => !value && state.hasError ? "invalid" : "";
+    const saveConfig = () => {
+      if (!state.callerId || !state.webhookUrl) {
+        state.hasError = true;
         return;
       }
-      this.hasError = false;
+      state.hasError = false;
       const params = {
-        callerId: this.callerId,
-        webhookUrl: this.webhookUrl,
-        httpMethod: this.httpMethod
+        callerId: state.callerId,
+        webhookUrl: state.webhookUrl,
+        httpMethod: state.httpMethod
       };
-      this.$store.dispatch("addInboundCallConfig", params).then(res => {
-          this.callerId = null;
-          this.webhookUrl = null;
-          this.isSaved = true;
+      store.dispatch("addInboundCallConfig", params).then(res => {
+          state.callerId = null;
+          state.webhookUrl = null;
+          state.isSaved = true;
       });
-    },
-    getInboundCallConfigs() {
-      this.$store.dispatch("getInboundCallConfigs");
-    },
-    setMethodUpdate(val){
-      this.selectedConfig.httpMethod = val;
-    },
-     setMethod(val) {
-      this.httpMethod = val;
-    },
-  },
-  created() {
-    this.getInboundCallConfigs();
-  },
-};
+    }
+
+
+    const getInboundCallConfigs = () => store.dispatch("getInboundCallConfigs");
+    const setMethodUpdate = (val: string) => state.selectedConfig.httpMethod = val;
+    const setMethod = (val: string) => state.httpMethod = val;
+    const fetchInitialData = () => {
+      getInboundCallConfigs();
+    }
+    
+    fetchInitialData();
+
+    return {
+      ...toRefs(state),
+      selectedHttpMethod,
+      inboundCallConfigData,
+      inboundCallConfigById,
+      editConfig,
+      deleteConfig,
+      isInvalid,
+      handleOk,
+      saveConfig,
+      getInboundCallConfigs,
+      setMethodUpdate,
+      setMethod,
+      fetchInitialData
+    }
+  }
+});
 </script>
 <style scoped>
 .call-config {
