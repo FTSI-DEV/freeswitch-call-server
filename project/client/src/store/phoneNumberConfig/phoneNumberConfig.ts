@@ -74,11 +74,11 @@ export default {
         },
         getPhoneNumberConfigById({ commit }: { commit: Commit }, params: any) {
             return HTTP.get(`/api/freeswitch-phonenumber-config/getPhoneNumberConfigById/${params.id}`)
-                .then(res => {
-                    if (res.status === Status.OK) {
-                        commit('setPhoneNumberConfigById', res.data)
-                    }
-            });
+            //     .then(res => {
+            //         if (res.status === Status.OK) {
+            //             commit('setPhoneNumberConfigById', res.data)
+            //         }
+            // });
         },
         addPhoneNumberConfig({ dispatch }: { dispatch: Dispatch }, params: PhoneNumberConfigItem) {
             return HTTP.post('/api/freeswitch-phonenumber-config/add', params).then(res => {

@@ -37,7 +37,7 @@
 <script lang="ts">
 import { SmileOutlined, DownOutlined } from '@ant-design/icons-vue';
 import { defineComponent } from 'vue';
-import { data, columns } from './helper';
+import { data, columns } from './helper/helper';
 
 export default defineComponent({
   components: {

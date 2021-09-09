@@ -143,86 +143,42 @@
   </a-layout>
 </template>
 <script lang="ts">
-import { useStore } from 'vuex';
-import { computed, defineComponent, toRefs, reactive } from "vue";
-import { EditOutlined, DownOutlined, DeleteOutlined } from "@ant-design/icons-vue";
-import columnArray from './helper';
+import { 
+  defineComponent, 
+  toRefs,
+} from "vue";
+import { 
+  EditOutlined, 
+  DownOutlined, 
+  DeleteOutlined 
+} from "@ant-design/icons-vue";
+import gettersObj from './helper/getters';
+import methodsObj from './helper/methods';
 
 export default defineComponent({
-  components: { EditOutlined , DownOutlined, DeleteOutlined},
+  components: { 
+    EditOutlined , 
+    DownOutlined, 
+    DeleteOutlined,
+  },
   setup() {
-    const store = useStore();
-    const state = reactive({
-      from: null,
-      to: null,
-      hasError: false,
-      callerId: null,
-      webhookUrl: null,
-      httpMethod: "GET",
-      isSaved: false,
-      isServerError: false,
-      modleVisibility: false,
-      columns: columnArray,
-      selectedConfig: {
-        callerId: null,
-        webhookUrl: null,
-        httpMethod: "GET"
-      },
-    })
+    const { 
+      inboundCallConfigData, 
+      inboundCallConfigById 
+    } = gettersObj();
+    const {
+      state,
+      editConfig,
+      deleteConfig,
+      isInvalid,
+      handleOk,
+      saveConfig,
+      setMethodUpdate,
+      setMethod,
+      fetchInitialData,
+      selectedHttpMethod
+    } = methodsObj();
 
-    // Computed
-    const selectedHttpMethod = computed((): string => state.httpMethod === "POST" ? "HTTP POST" : "HTTP GET");
-    const inboundCallConfigData = computed((): any => store.getters['inboundCallConfigData']);
-    const inboundCallConfigById = computed((): any => store.getters['inboundConfigById']);
-
-    // Methods
-    const deleteConfig = (val: any) => {
-      if (confirm("Are you sure you want to delete this config?")) {
-        store.dispatch("deleteInboundCallConfig", val.id);
-      }
-    }
-    const editConfig = (val: any) => {
-      state.selectedConfig.callerId = null;
-      state.selectedConfig.webhookUrl = null;
-      store.dispatch("getInboundCallConfigById", val.id).then(() => {
-          state.modleVisibility = true
-          state.selectedConfig.callerId = inboundCallConfigById.value.callerId;
-          state.selectedConfig.webhookUrl = inboundCallConfigById.value.webhookUrl;
-          state.selectedConfig.httpMethod = inboundCallConfigById.value.httpMethod || "GET";
-      });
-    }
-    const handleOk = () => {
-      store.dispatch("updateInboundCallConfig", state.selectedConfig).then(res => {
-        state.modleVisibility = false;
-      });
-    }
-    const isInvalid = (value: string): string => !value && state.hasError ? "invalid" : "";
-    const saveConfig = () => {
-      if (!state.callerId || !state.webhookUrl) {
-        state.hasError = true;
-        return;
-      }
-      state.hasError = false;
-      const params = {
-        callerId: state.callerId,
-        webhookUrl: state.webhookUrl,
-        httpMethod: state.httpMethod
-      };
-      store.dispatch("addInboundCallConfig", params).then(res => {
-          state.callerId = null;
-          state.webhookUrl = null;
-          state.isSaved = true;
-      });
-    }
-
-
-    const getInboundCallConfigs = () => store.dispatch("getInboundCallConfigs");
-    const setMethodUpdate = (val: string) => state.selectedConfig.httpMethod = val;
-    const setMethod = (val: string) => state.httpMethod = val;
-    const fetchInitialData = () => {
-      getInboundCallConfigs();
-    }
-    
     fetchInitialData();
 
     return {
@@ -235,10 +191,9 @@ export default defineComponent({
       isInvalid,
       handleOk,
       saveConfig,
-      getInboundCallConfigs,
       setMethodUpdate,
       setMethod,
-      fetchInitialData
+      fetchInitialData,
     }
   }
 });

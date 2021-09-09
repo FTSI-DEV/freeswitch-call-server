@@ -65,11 +65,12 @@ export default {
           })
         },
         getInboundCallConfigById({commit}: { commit: Commit }, params: number) {
-            return HTTP.get(`/api/inbound-call-config/getInboundCallConfigById/${params}`).then(res => {
-                if (res.status === Status.OK) {
-                    commit("setInboundConfigById", res.data);
-                }
-            });
+            return HTTP.get(`/api/inbound-call-config/getInboundCallConfigById/${params}`)
+            // .then(res => {
+            //     if (res.status === Status.OK) {
+            //         commit("setInboundConfigById", res.data);
+            //     }
+            // });
         },
         addInboundCallConfig({ dispatch }: { dispatch: Dispatch }, params: InboundConfigItem) {
             return HTTP.post(`/api/inbound-call-config/add/${params.callerId}/${params.webhookUrl}/${params.httpMethod}`)
