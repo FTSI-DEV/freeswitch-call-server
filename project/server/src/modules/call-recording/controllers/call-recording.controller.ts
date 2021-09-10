@@ -1,5 +1,6 @@
-import { Controller, DefaultValuePipe, Get, Param, ParseIntPipe, Query } from '@nestjs/common';
+import { Controller, DefaultValuePipe, Get, Param, ParseIntPipe, Query, Request, Response } from '@nestjs/common';
 import { Pagination } from 'nestjs-typeorm-paginate';
+import { RangeFileStreamResult } from 'src/utils/rangeFileStreamResult';
 import { CallRecordingStorageDTO } from '../models/call-recording.dto';
 import { CallRecordingService } from '../services/call-recording.service';
 
@@ -57,6 +58,22 @@ export class CallRecordingController {
             };
         }
         
+        return null;
+    }
+
+    @Get('getRecordFile/:recordingId')
+    async getRecordFile(
+        @Param('recordingId') recordingId: number,
+        @Request() request,
+        @Response() response
+    ){
+        let callRecording = await this._callRecordingStorageService.getByRecordingId(recordingId);
+
+        if (callRecording != null){
+            new RangeFileStreamResult(request, response, callRecording.FilePath);
+        }
+        
+        console.log('No recording file');
         return null;
     }
 }
