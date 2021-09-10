@@ -70,7 +70,7 @@ export class CallRecordingController {
         let callRecording = await this._callRecordingStorageService.getByRecordingId(recordingId);
 
         if (callRecording != null){
-            new RangeFileStreamResult(request, response, callRecording.FilePath);
+            new RangeFileStreamResult(request, response, callRecording.FilePath, "audio/wav");
         }
         
         console.log('No recording file');

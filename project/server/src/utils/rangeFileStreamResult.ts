@@ -3,7 +3,7 @@ const fs = require('fs');
 
 export class RangeFileStreamResult{
 
-    constructor(req,res, filepath:string) {
+    constructor(req,res, filepath:string,contentType:string) {
         
         var stat = fs.statSync(filepath);
         var total = stat.size;
@@ -24,7 +24,7 @@ export class RangeFileStreamResult{
             res.writeHead(206, {
                 'Content-Range':'bytes ' + start + '-' + end + '/' + total,
                 'Accept-Ranges':'bytes' , 'Content-Length' : chunckSize,
-                'Content-Type' : 'audio/wav' 
+                'Content-Type' : 'audio/' + contentType 
             });
 
             readStream.pipe(res);
