@@ -1,22 +1,36 @@
 import { OnQueueActive, Process, Processor } from '@nestjs/bull';
 import { Job } from 'bull';
+import { FsCallDetailRecordEntity } from 'src/entity/freeswitchCallDetailRecord.entity';
 import { CallDetailRecordService } from 'src/modules/call-detail-record/services/call-detail-record.service';
-import { IncomingCallService } from 'src/modules/incomingCall/incomingCall.service';
+import { CallRecordingService } from 'src/modules/call-recording/services/call-recording.service';
 
 @Processor('default')
 export class IncomingCallJob {
-  constructor(private readonly _freeswitchCallSystemService: CallDetailRecordService) {}
+  constructor(
+    private readonly _callDetailRecordService: CallDetailRecordService,
+    private readonly _callRecordingService: CallRecordingService
+  ) {}
 
   @Process('inboundCall')
   async handleTranscode(parameter: Job){
 
-    let cdrRecord = await this._freeswitchCallSystemService.getByCallUid(parameter.data.UUID);
+    let cdrRecord = await this._callDetailRecordService.getByCallUid(parameter.data.UUID);
 
+    await this.saveCallDetailRecord(cdrRecord, parameter);
+
+    await this.saveCallRecordingStorage(cdrRecord);
+    
+
+  console.log('Transcoding complete InboundCall',); 
+  
+  }
+
+  private async saveCallDetailRecord(cdrRecord: FsCallDetailRecordEntity, parameter: Job){
     if (cdrRecord === null || cdrRecord === undefined){
             
       console.log('Record does not exist', cdrRecord);
 
-      await this._freeswitchCallSystemService.saveCDR({
+      await this._callDetailRecordService.saveCDR({
           UUID: parameter.data.UUID,
           PhoneNumberFrom: parameter.data.PhoneNumberFrom,
           PhoneNumberTo: parameter.data.PhoneNumberTo,
@@ -34,7 +48,7 @@ export class IncomingCallJob {
 
       console.log('UUID -> ', parameter.data.UUID);
 
-      await this._freeswitchCallSystemService.updateCDR({
+      await this._callDetailRecordService.updateCDR({
           UUID: parameter.data.UUID,
           PhoneNumberFrom: parameter.data.PhoneNumberFrom,
           PhoneNumberTo: parameter.data.PhoneNumberTo,
@@ -47,11 +61,25 @@ export class IncomingCallJob {
           Id: parameter.data.Id
       });
   }
-    
-
-  console.log('Transcoding complete InboundCall',); 
-  
   }
+
+  
+  private async saveCallRecordingStorage(cdrRecord: FsCallDetailRecordEntity){
+
+    let callRecordingStorage = await this._callRecordingService.getByRecordingUUID(cdrRecord.RecordingUUID);
+
+    if (callRecordingStorage === null || callRecordingStorage === undefined){
+        await this._callRecordingService.saveCallRecording({
+            RecordingUUID : cdrRecord.RecordingUUID,
+            CallUUID : cdrRecord.CallUUID,
+            FilePath : `${process.env.CALL_RECORDING_BASE_PATH}${cdrRecord.CallUUID}`,
+        });
+    }
+    else{
+        console.log('CALL RECORDING EXISTS');
+    }
+
+}
 
   @OnQueueActive()
   onActive(job: Job) {

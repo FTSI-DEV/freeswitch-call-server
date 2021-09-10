@@ -1,9 +1,9 @@
 export class CallRecordingModel{
-    RecordingId: number;
+    RecordingId?: number;
     RecordingUUID?: string;
     CallUUID?: string;
     FilePath?:string;
-    IsDeleted:boolean;
-    DateCreated:Date;
+    IsDeleted?:boolean;
+    DateCreated?:Date;
     CallId?: number;
 }
