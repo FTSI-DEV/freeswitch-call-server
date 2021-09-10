@@ -1,4 +1,4 @@
-export class CDRModels{
+export class CDRModel{
     UUID: string;
     PhoneNumberFrom?: string;
     PhoneNumberTo?: string;
@@ -13,13 +13,13 @@ export class CDRModels{
 
 export class CallDetailRecordDTO{
     Id: number;
-    PhoneNumberTo: string;
-    PhoneNumberFrom: string;
-    CallStatus: string;
-    CallUUID: string;
-    Duration: number;
+    PhoneNumberTo?: string;
+    PhoneNumberFrom?: string;
+    CallStatus?: string;
+    CallUUID?: string;
+    Duration?: number;
     DateCreated: Date;
-    RecordingUUID: string;
-    CallDirection: string;
-    ParentCallUid: string;
+    RecordingUUID?: string;
+    CallDirection?: string;
+    ParentCallUid?: string;
 }

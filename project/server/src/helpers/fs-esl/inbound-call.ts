@@ -1,5 +1,5 @@
 import axios from "axios";
-import { CDRModels } from "src/models/cdr.models";
+import { CDRModel } from "src/modules/call-detail-record/models/cdr.models";
 import { InboundCallConfigService } from "src/modules/config/inbound-call-config/services/inbound-call-config.service";
 import { WebhookInboundCallStatusCallBack } from "src/utils/webhooks";
 import { CHANNEL_VARIABLE } from "../constants/channel-variables.constants";
@@ -273,7 +273,7 @@ export class InboundCallHelper{
     }
 
     //callwebhook when call ends
-    private triggerIncomingStatusCallBack(cdrModel: CDRModels){
+    private triggerIncomingStatusCallBack(cdrModel: CDRModel){
         http.get(WebhookInboundCallStatusCallBack(cdrModel));
     }
 

@@ -1,3 +1,4 @@
+import { async } from "rxjs";
 import { CallTypes } from "src/helpers/constants/call-type";
 import { Column, CreateDateColumn, Entity, EntityRepository, JoinColumn, OneToMany, OneToOne, PrimaryGeneratedColumn, Repository } from "typeorm";
 import { FsCallDetailRecordEntity } from "./freeswitchCallDetailRecord.entity";
@@ -42,6 +43,14 @@ export class CallRecordingStorageRepository extends Repository<CallRecordingStor
         let record = await this.findOneOrFail(id);
 
         return record;
+    }
+
+    deleteRecord = async(param:CallRecordingStorageEntity) => {
+        await this.createQueryBuilder()
+            .update(CallRecordingStorageEntity)
+            .set({ IsDeleted: param.IsDeleted })
+            .where("RecordingId = :RecordingId ", { RecordingId : param.RecordingId })
+            .execute();
     }
 
 }

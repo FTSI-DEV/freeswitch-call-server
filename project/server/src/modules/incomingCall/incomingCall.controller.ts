@@ -2,7 +2,7 @@ import { Controller, Get, Query } from '@nestjs/common';
 import { Queue } from 'bull';
 import { IncomingCallService } from './incomingCall.service';
 import { InjectQueue } from '@nestjs/bull';
-import { CDRModels } from 'src/models/cdr.models';
+import { CDRModel } from 'src/modules/call-detail-record/models/cdr.models';
 import { FreeswitchPhoneNumberConfigService } from '../config/fs-phonenumber-config/services/phonenumber-config.service';
 import { CallDetailRecordService } from '../call-detail-record/services/call-detail-record.service';
 
@@ -17,7 +17,7 @@ export class IncomingCallController {
               {}
 
   @Get('IncomingStatusCallBack')
-  incomingStatusCallBack(@Query() callData:CDRModels){
+  incomingStatusCallBack(@Query() callData:CDRModel){
 
     console.log('IncomingCall/IncomingStatusCallBack' , callData);
 

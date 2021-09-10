@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { FreeswitchConnectionResult } from 'src/helpers/fs-esl/inbound-esl.connection';
 import { CallDetailRecordService } from 'src/modules/call-detail-record/services/call-detail-record.service';
+import * as moment from 'moment';
 
 @Injectable()
 export class OutboundCallService {
@@ -14,26 +15,39 @@ export class OutboundCallService {
         callerId: string
     ): Promise<string>{
 
-        let callUid: string;
+        return new Promise<string>( async (resolve,reject) => {
 
-        let connectionResult = FreeswitchConnectionResult;
+            let connectionResult = FreeswitchConnectionResult;
 
-        if (!connectionResult.isSuccess){
-            console.log('Connection Error -> No ESL connection established!');
-            return "Connection Error -> No ESL Connection established!";
-        }
+            if (!connectionResult.isSuccess){
 
-        callUid = await this.triggerOriginateCall(
-            connectionResult.connectionObj,
-            phoneNumberFrom,
-            phoneNumberTo,
-            callerId
-        );
+                let message = 'Connection Error -> No ESL connection established!';
 
-        console.log('Originate CallUid -> ', callUid);
+                console.log(message);
 
-        return new Promise<string>((resolve,reject) => {
-            resolve(callUid);
+                reject(message);
+            }
+            else
+            {
+                let callUid: string;
+
+                callUid = await this.triggerOriginateCall(
+                    connectionResult.connectionObj,
+                    phoneNumberFrom,
+                    callerId
+                );
+        
+                console.log('Originate CallUid -> ', callUid);
+
+                this._callDetailRecordService.saveCDR({
+                    UUID: callUid,
+                    CallDirection: 'outbound',
+                    StartedDate:  moment().format('YYYY-MM-DDTHH:mm:ss.SSS'),
+                    PhoneNumberTo : phoneNumberTo
+                });
+
+                resolve(callUid);
+            }
         });
     }
 
@@ -57,7 +71,6 @@ export class OutboundCallService {
     private triggerOriginateCall(
         connection,
         phoneNumberFrom:string,
-        phoneNumberTo:string,
         callerId:string
     ): Promise<string>{
 
@@ -65,7 +78,7 @@ export class OutboundCallService {
 
             let app_args = `sofia/gateway/fs-test1/${phoneNumberFrom}`;
             
-            let arg1 = `{ignore_early_media=true,origination_caller_id_number=${phoneNumberFrom},hangup_after_bridge=true}${app_args}`;
+            let arg1 = `{ignore_early_media=true,origination_caller_id_number=${callerId},hangup_after_bridge=true}${app_args}`;
 
             let arg4 = `${arg1} &socket(192.168.18.3:8000 async full)`;
 

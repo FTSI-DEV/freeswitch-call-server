@@ -54,8 +54,14 @@ export class ClickToCallServerHelper {
 
       if (!legStop) {
 
-        conn.execute('export', 'execute_on_answer=record_session $${recordings_dir}/${strftime(%Y-%m-%d-%H-%M-%S)}_${uuid}_${caller_id_number}.wav', () => {
-          conn.execute('playback', 'https://crm.dealerownedsoftware.com/hosted-files/audio/ConvertedSalesService.wav', () => {
+      conn.execute('record_session', '$${sample_record_dir}/${strftime(%Y-%m-%d-%H-%M-%S)}_${uuid}.wav', (record) => {
+
+          console.log('start recording... -> ', record);
+
+          conn.execute('playback', 'ivr/ivr-recording_started.wav', () => {
+              console.log('playback executed');
+
+              conn.execute('playback', 'https://crm.dealerownedsoftware.com/hosted-files/audio/ConvertedSalesService.wav', () => {
 
             console.log('playback executed');
   
@@ -113,9 +119,8 @@ export class ClickToCallServerHelper {
               },
             );
           });
+          });
         });
-
-        
       }
     });
   }

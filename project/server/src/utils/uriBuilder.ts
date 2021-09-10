@@ -1,4 +1,4 @@
-import { CDRModels } from "src/models/cdr.models";
+import { CDRModel } from "src/modules/call-detail-record/models/cdr.models";
 
 export class URIBuilder {
   baseUrl: string;
@@ -7,7 +7,7 @@ export class URIBuilder {
     this.baseUrl = baseUrl;
   }
 
-  inboundCallStatusCallBack(callData:CDRModels) {
+  inboundCallStatusCallBack(callData:CDRModel) {
 
     let api = `/NewInboundCall/IncomingStatusCallBack`;
 
@@ -16,7 +16,7 @@ export class URIBuilder {
     return `${this.baseUrl}${api}?${params}`;
   }
 
-  outboundCallStatusCallBack(callData:CDRModels){
+  outboundCallStatusCallBack(callData:CDRModel){
 
     let api = `/api/outbound-call/outboundCallStatusCallBack`;
 
@@ -25,7 +25,7 @@ export class URIBuilder {
     return `${this.baseUrl}${api}?${params}`;
   }
 
-  private mappedCallDataParams(callData:CDRModels):string{
+  private mappedCallDataParams(callData:CDRModel):string{
 
     let callUUID = `UUID=${callData.UUID}`;
     let callerIdNumber = `PhoneNumberFrom=${callData.PhoneNumberFrom}`;

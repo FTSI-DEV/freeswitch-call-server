@@ -1,4 +1,4 @@
-import { CDRModels } from "src/models/cdr.models";
+import { CDRModel } from "src/modules/call-detail-record/models/cdr.models";
 import { CHANNEL_VARIABLE } from "../constants/channel-variables.constants";
 
 export class CDRHelper{
@@ -11,7 +11,7 @@ export class CDRHelper{
         return this.getHeader('Caller-Destination-Number',fsEvent);
     }
 
-    getCallRecords(fsEvent):CDRModels{
+    getCallRecords(fsEvent):CDRModel{
         
         const uuid = this.getHeader(CHANNEL_VARIABLE.UNIQUE_ID, fsEvent);
         const callerId = this.getHeader(CHANNEL_VARIABLE.CALLER_CALLER_ID_NUMBER, fsEvent);

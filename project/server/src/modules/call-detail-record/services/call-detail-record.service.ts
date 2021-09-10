@@ -2,20 +2,16 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { IPaginationMeta, IPaginationOptions, paginate, Pagination } from 'nestjs-typeorm-paginate';
 import { FsCallDetailRecordEntity, FsCallDetailRecordRepository } from 'src/entity/freeswitchCallDetailRecord.entity';
-import { CallDetailRecordDTO, CDRModels } from 'src/models/cdr.models';
+import { CallDetailRecordDTO, CDRModel } from 'src/modules/call-detail-record/models/cdr.models';
 
 @Injectable()
 export class CallDetailRecordService {
     constructor(
         @InjectRepository(FsCallDetailRecordRepository)
-        private freeswitchCallSystemRepo: FsCallDetailRecordRepository)
+        private _callDetailRecordRepo: FsCallDetailRecordRepository)
     {}
 
-    saveCDR(cdrParam: CDRModels){
-        
-        console.log('TRYING TO CREATE A RECORD');
-
-        console.log('cdparam', cdrParam);
+    saveCDR(cdrParam: CDRModel){
 
         let cdr = new FsCallDetailRecordEntity();
 
@@ -29,12 +25,11 @@ export class CallDetailRecordService {
         cdr.CallDirection = cdrParam.CallDirection;
         cdr.ParentCallUid = cdrParam.ParentCallUid;
 
-        this.freeswitchCallSystemRepo.saveCDR(cdr);
+        this._callDetailRecordRepo.saveCDR(cdr);
 
-        console.log('fs', cdr);
     }
 
-    async updateCDR(cdrParam: CDRModels){
+    async updateCDR(cdrParam: CDRModel){
 
         let result = await this.getByCallUid(cdrParam.UUID);
 
@@ -51,19 +46,22 @@ export class CallDetailRecordService {
         result.RecordingUUID = cdrParam.UUID;
         result.ParentCallUid = cdrParam.ParentCallUid;
 
-        await this.freeswitchCallSystemRepo.saveCDR(result);
+        await this._callDetailRecordRepo.saveCDR(result);
     }
 
     getByCallUid(callUid:string): Promise<FsCallDetailRecordEntity>{
 
-        let record = this.freeswitchCallSystemRepo.createQueryBuilder("CallDetailRecord")
+        let record = this._callDetailRecordRepo.createQueryBuilder("CallDetailRecord")
                     .where("CallDetailRecord.CallUUID = :callUid", { callUid: callUid})
                     .getOne();
         return record;
     }
 
-    getById(id: number): any{
-        return this.getCDRById(id);
+    async getById(id: number): Promise<FsCallDetailRecordEntity>{
+
+        let cdr = await this.getRecordById(id);
+
+        return cdr;
     }
 
     getCallLogs(options: IPaginationOptions): any {
@@ -74,7 +72,7 @@ export class CallDetailRecordService {
     private getCallConfigRecords(options: IPaginationOptions):Promise<any>{
         return new Promise<Pagination<CallDetailRecordDTO>>((resolve, reject) => {
 
-            let pageRecords = paginate<FsCallDetailRecordEntity>(this.freeswitchCallSystemRepo, options);
+            let pageRecords = paginate<FsCallDetailRecordEntity>(this._callDetailRecordRepo, options);
 
             pageRecords
             .then(result => {
@@ -115,11 +113,11 @@ export class CallDetailRecordService {
         });
     }
 
-    private getCDRById(id:number): any{
+    private getCDRById(id:number){
 
         return new Promise<CallDetailRecordDTO>((resolve,reject) => {
 
-            this.freeswitchCallSystemRepo.findOneOrFail(id)
+            this._callDetailRecordRepo.findOneOrFail(id)
             .then(result => {
 
                 let cdrDTO: CallDetailRecordDTO = {
@@ -149,6 +147,11 @@ export class CallDetailRecordService {
     }
 
     private getRecordById = (id:number) : Promise<FsCallDetailRecordEntity> => {
-        return this.freeswitchCallSystemRepo.findOneOrFail(id);
+
+        let record = this._callDetailRecordRepo.createQueryBuilder("CallDetailRecord")
+        .where("CallDetailRecord.Id = :id", { id: id})
+        .getOne();
+        
+        return record;
     } 
 }

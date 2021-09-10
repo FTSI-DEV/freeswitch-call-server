@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { CDRModels } from 'src/models/cdr.models';
+import { CDRModel } from 'src/modules/call-detail-record/models/cdr.models';
 import { Repository } from 'typeorm';
 import { CallDetailRecordService } from '../call-detail-record/services/call-detail-record.service';
 
@@ -10,7 +10,7 @@ export class IncomingCallService {
     private readonly _freeswitchCallSystemService: CallDetailRecordService
     ) {}
 
-  saveIncomingCallCDR(callData:CDRModels){
+  saveIncomingCallCDR(callData:CDRModel){
 
     console.log('service CDR VALUE', callData);
 
