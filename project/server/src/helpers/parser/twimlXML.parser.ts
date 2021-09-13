@@ -1,6 +1,5 @@
 import { TwiMLContants } from '../constants/twiml.constants';
 import { XMLParserContext, CreateCommandObject } from './XMLCommandObject';
-import { isPhoneNumberValid } from '../../utils/phoneNumberValidation';
 
 const xmldoc = require('xmldoc');
 
@@ -54,9 +53,7 @@ export class XMLParserHelper {
       if (element.name === TwiMLContants.Say) {
         context.finalInstructionList.push(context.createCommandObject = new CreateCommandObject(element.name, 'exec', element.attr, element.val, element.children));
       } else if (element.name  === TwiMLContants.Dial) {
-        if (isPhoneNumberValid(element.val)){
-          context.finalInstructionList.push(context.createCommandObject = new CreateCommandObject(element.name, 'exec', element.attr, element.val, element.children));
-        }
+        context.finalInstructionList.push(context.createCommandObject = new CreateCommandObject(element.name, 'exec', element.attr, element.val, element.children));
       } else if (element.name ===  TwiMLContants.Reject) {
         context.finalInstructionList.push(context.createCommandObject = new CreateCommandObject(element.name, 'exec', element.attr, element.val, element.children));
       } else if (element.name === TwiMLContants.Pause) {
@@ -72,3 +69,8 @@ export class XMLParserHelper {
 //   arrayConExecute = [key,value,order],
 //   arrayConApi = [key,value]
 // }
+
+export enum CommandType {
+  Exec = 'exec',
+  Api = 'api',
+}

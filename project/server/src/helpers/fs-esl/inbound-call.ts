@@ -5,7 +5,7 @@ import { WebhookInboundCallStatusCallBack } from "src/utils/webhooks";
 import { CHANNEL_VARIABLE } from "../constants/channel-variables.constants";
 import { ESL_SERVER, FS_DIALPLAN, FS_ESL } from "../constants/fs-esl.constants";
 import { TwiMLContants } from "../constants/twiml.constants";
-import { KeyValues, XMLParser, XMLParserHelper } from "../parser/twimlXML.parser";
+import { KeyValues, XMLParser, XMLParserHelper, CommandType } from "../parser/twimlXML.parser";
 import { http } from "../libs/http";
 import { eslServerRes } from "./inboundCall.server";
 import { Instructions } from '../../helpers/parser/xmlCommandObject';
@@ -293,18 +293,32 @@ export class InboundCallHelper{
     }
 
     private executeTaskList(instructionsList: Instructions[], conn) {
-       if (instructionsList.length) {
+        console.log('instructionsList: ', instructionsList);
+        if (instructionsList.length) {
             for (let i = 0; i < instructionsList.length; i++) {
                 const element = instructionsList[i];
-                if (element.command === 'Say') {
-                    conn.execute('say', 'en name_spelled pronounced john');
-                    //conn.execute('say', 'en messaged pronounced john');
-                  } else if (element.command === 'Reject') {
+                if (element.command === TwiMLContants.Say) { 
+                    if (element.type === CommandType.Exec) {
+                        conn.execute('speak', `flite|kal|${element.value}`);
+                    }
+                    if (instructionsList.length ===  i+1) {
+                        conn.execute('speak', `flite|kal|${element.value}`);
+                        conn.execute('hangup');
+                    }
+                  } else if (element.command === TwiMLContants.Gather) {
+                    const attrib= JSON.parse(element.attrib);
+                    console.log('attrib: ', attrib);
+                    if (element.type === CommandType.Exec) {
+                     conn.execute('play_and_get_digits', `1 5 2 10000 # ivr/ivr-enter_destination_telephone_number.wav ivr/ivr-that_was_an_invalid_entry.wav target_num ${attrib.numDigits} 2000`, function() {
+                         console.log("play and get digits callack")
+                     });
+                    }
+                  } else if (element.command === TwiMLContants.Reject) {
                     conn.execute('hangup');
                   }
             }
        } else {
-        conn.execute('hangup');
+            conn.execute('hangup');
        }
     }
 }
