@@ -109,9 +109,9 @@ export class FirstMigration1631505375288 implements MigrationInterface {
             .query(`CREATE TABLE "PhoneNumberConfig"
                 ("Id" SERIAL NOT NULL,
                 "FriendlyName" varchar(200),
-                "HttpMethod" varchar(100)
+                "HttpMethod" varchar(100),
                 "WebhookUrl" varchar,
-                "PhoneNumber" varchar(100)
+                "PhoneNumber" varchar(100),
                 "IsDeleted" boolean NOT NULL DEFAULT false)`);
 
         await queryRunner

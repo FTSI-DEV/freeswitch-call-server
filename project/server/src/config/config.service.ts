@@ -50,7 +50,6 @@ export class ConfigService implements IConfigService{
                        InboundCallConfigEntity,
                        PhoneNumberConfigEntity,
                        CallRecordingStorageEntity],
-            migrationsTableName: 'migration',
             migrations: ['dist/migration/**/*.js'],
             migrationsRun: true,
             cli: {
