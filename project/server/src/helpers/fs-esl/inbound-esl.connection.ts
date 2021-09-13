@@ -1,5 +1,5 @@
 import { Console } from 'console';
-import { FsCallDetailRecordEntity } from 'src/entity/freeswitchCallDetailRecord.entity';
+import { FsCallDetailRecordEntity } from 'src/entity/call-detail-record';
 import { CallDetailRecordService } from 'src/modules/call-detail-record/services/call-detail-record.service';
 import { WebhookInboundCallStatusCallBack, WebhookOutboundCallStatusCallBack } from 'src/utils/webhooks';
 import { CallTypes } from '../constants/call-type';

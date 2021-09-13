@@ -54,7 +54,7 @@ export class CallRecordingController {
              FilePath : callRecording.FilePath,
              IsDeleted: callRecording.IsDeleted,
              DateCreated : callRecording.DateCreated,
-             CallId: callRecording.callDetailRecord.Id   
+            //  CallId: callRecording.callDetailRecord.Id   
             };
         }
         

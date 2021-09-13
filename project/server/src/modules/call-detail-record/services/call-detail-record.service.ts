@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { IPaginationMeta, IPaginationOptions, paginate, Pagination } from 'nestjs-typeorm-paginate';
-import { FsCallDetailRecordEntity, FsCallDetailRecordRepository } from 'src/entity/freeswitchCallDetailRecord.entity';
+import { FsCallDetailRecordEntity, FsCallDetailRecordRepository } from 'src/entity/call-detail-record';
 import { CallDetailRecordDTO, CDRModel } from 'src/modules/call-detail-record/models/cdr.models';
 
 @Injectable()
@@ -15,10 +15,10 @@ export class CallDetailRecordService {
 
         let cdr = new FsCallDetailRecordEntity();
 
-        cdr.CallUUID = cdrParam.UUID;
+        cdr.CallUid = cdrParam.UUID;
         cdr.CallStatus = cdrParam.CallStatus;
         cdr.DateCreated = cdrParam.StartedDate;
-        cdr.RecordingUUID = cdrParam.RecordingUUID;
+        cdr.RecordingUid = cdrParam.RecordingUUID;
         cdr.PhoneNumberFrom = cdrParam.PhoneNumberFrom;
         cdr.PhoneNumberTo = cdrParam.PhoneNumberTo;
         cdr.CallDuration = cdrParam.CallDuration;
@@ -43,7 +43,7 @@ export class CallDetailRecordService {
         result.CallStatus = cdrParam.CallStatus;
         result.PhoneNumberFrom = cdrParam.PhoneNumberFrom;
         result.PhoneNumberTo = cdrParam.PhoneNumberTo;
-        result.RecordingUUID = cdrParam.UUID;
+        result.RecordingUid = cdrParam.UUID;
         result.ParentCallUid = cdrParam.ParentCallUid;
 
         await this._callDetailRecordRepo.saveCDR(result);
@@ -80,7 +80,7 @@ export class CallDetailRecordService {
 
                 result.items.forEach(element => {
                     let configModel: CallDetailRecordDTO = {
-                        CallUUID: element.CallUUID,
+                        CallUUID: element.CallUid,
                         PhoneNumberFrom: element.PhoneNumberFrom,
                         PhoneNumberTo: element.PhoneNumberTo,
                         CallDirection: element.CallDirection,
@@ -88,7 +88,7 @@ export class CallDetailRecordService {
                         DateCreated: element.DateCreated,
                         Duration: element.CallDuration,
                         Id: element.Id,
-                        RecordingUUID: element.RecordingUUID,
+                        RecordingUUID: element.RecordingUid,
                         ParentCallUid: element.ParentCallUid
                     };
 
@@ -125,10 +125,10 @@ export class CallDetailRecordService {
                     PhoneNumberTo: result.PhoneNumberTo,
                     PhoneNumberFrom: result.PhoneNumberFrom,
                     CallStatus: result.CallStatus,
-                    CallUUID: result.CallUUID,
+                    CallUUID: result.CallUid,
                     Duration: result.CallDuration,
                     DateCreated: result.DateCreated,
-                    RecordingUUID: result.RecordingUUID,
+                    RecordingUUID: result.RecordingUid,
                     CallDirection: result.CallDirection,
                     ParentCallUid: result.ParentCallUid
                 };

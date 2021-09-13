@@ -14,10 +14,10 @@ export class PhoneNumberConfigEntity{
     @Column({ type:"varchar", length: 100, nullable:true})
     HttpMethod?: string;
 
-    @Column( { type:"varchar", length: 100, nullable:true})
+    @Column( { type:"varchar", nullable:true})
     WebhookUrl?: string;
 
-    @Column( { type:"varchar", length: 200, nullable:true })
+    @Column( { type:"varchar", length: 100, nullable:true })
     PhoneNumber?: string;
 
     @Column( { default: false })

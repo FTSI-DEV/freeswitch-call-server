@@ -27,7 +27,7 @@ export class CallRecordingService {
         let cdr = await this._callRecordDetailService.getById(param.CallId);
 
         if (cdr != null){
-            callRecording.callDetailRecord = cdr;
+            // callRecording.callDetailRecord = cdr;
         }
 
         this._recordingStorageRepo.saveUpdateRecord(callRecording);
@@ -107,7 +107,7 @@ export class CallRecordingService {
                             FilePath : element.FilePath,
                             IsDeleted: element.IsDeleted,
                             DateCreated : element.DateCreated,
-                            CallId : element.callDetailRecord.Id
+                            // CallId : element.callDetailRecord.Id
                         };
 
                         itemObjs.push(recordingDTO);

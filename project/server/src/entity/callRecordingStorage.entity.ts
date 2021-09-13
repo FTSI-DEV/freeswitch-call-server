@@ -1,34 +1,34 @@
 import { async } from "rxjs";
 import { CallTypes } from "src/helpers/constants/call-type";
 import { Column, CreateDateColumn, Entity, EntityRepository, JoinColumn, OneToMany, OneToOne, PrimaryGeneratedColumn, Repository } from "typeorm";
-import { FsCallDetailRecordEntity } from "./freeswitchCallDetailRecord.entity";
+import { FsCallDetailRecordEntity } from "./call-detail-record";
 
 @Entity('CallRecordingStorage')
 export class CallRecordingStorageEntity{
     @PrimaryGeneratedColumn()
     RecordingId: number;
 
-    @Column( { length: 200 , nullable: true})
+    @Column( { length: 200 , nullable: true, type: "varchar"})
     RecordingUid: string;
 
-    @Column( { length: 200 })
+    @Column( { length: 200, nullable: true, type:"bit"})
     CallUid : string;
 
     @Column( {  type: 'varchar',nullable: true })
     FilePath: string;
 
-    @Column( { default: false })
+    @Column( { default: false, type:"boolean" })
     IsDeleted: boolean;
 
     @CreateDateColumn()
     DateCreated: Date;
 
-    @OneToOne(type => FsCallDetailRecordEntity)
-    @JoinColumn({ 
-        name: 'CallId', 
-        referencedColumnName : 'Id' 
-    })
-    callDetailRecord: FsCallDetailRecordEntity;
+    // @OneToOne(type => FsCallDetailRecordEntity)
+    // @JoinColumn({ 
+    //     name: 'CallId', 
+    //     referencedColumnName : 'Id' 
+    // })
+    // callDetailRecord: FsCallDetailRecordEntity;
 }
 
 @EntityRepository(CallRecordingStorageEntity)

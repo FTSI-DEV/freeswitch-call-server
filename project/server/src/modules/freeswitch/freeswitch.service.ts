@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { FsCallDetailRecordRepository } from 'src/entity/freeswitchCallDetailRecord.entity';
+import { FsCallDetailRecordRepository } from 'src/entity/call-detail-record';
 import { Repository } from 'typeorm';
 import { IFreeswitchService } from './freeswitch.interface';
 

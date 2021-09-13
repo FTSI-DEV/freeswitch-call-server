@@ -1,4 +1,4 @@
-import { FsCallDetailRecordEntity } from "src/entity/freeswitchCallDetailRecord.entity";
+import { FsCallDetailRecordEntity } from "src/entity/call-detail-record";
 import { CDRModel } from "src/modules/call-detail-record/models/cdr.models";
 
 

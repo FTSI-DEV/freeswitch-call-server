@@ -4,14 +4,15 @@
     "username": "postgres",
     "password": "123456",
     "port": "5432",
-    "database": "testsample",
-    "synchronize": true,
+    "database": "postgres",
+    "synchronize": false,
     "logging": false,
+    "migrationsRun": true,
     "entities": [
         "dist/**/*.entity.js"
     ],
     "migrations": [
-       "src/migration/**/*.ts"
+       "dist/migration/**/*.js"
     ],
     "subscribers": [
        "src/subscriber/**/*.ts"

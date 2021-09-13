@@ -2,7 +2,7 @@ import { Injectable } from "@nestjs/common";
 import { TypeOrmModuleOptions } from "@nestjs/typeorm";
 import { CallRecordingStorageEntity } from "src/entity/callRecordingStorage.entity";
 import { FreeswitchCallConfigEntity } from "src/entity/freeswitchCallConfig.entity";
-import { FsCallDetailRecordEntity } from "src/entity/freeswitchCallDetailRecord.entity";
+import { FsCallDetailRecordEntity } from "src/entity/call-detail-record";
 import { InboundCallConfigEntity } from "src/entity/inboundCallConfig.entity";
 import { PhoneNumberConfigEntity } from "src/entity/phoneNumberConfig.entity";
 import { ApiCredential } from "src/models/apiCredential.model";
@@ -51,13 +51,13 @@ export class ConfigService implements IConfigService{
                        PhoneNumberConfigEntity,
                        CallRecordingStorageEntity],
             migrationsTableName: 'migration',
-            migrations: ['dist/migration/*.js'],
+            migrations: ['dist/migration/**/*.js'],
             migrationsRun: true,
             cli: {
                 migrationsDir: 'src/migration',
             },
             ssl: this.isProduction(),
-            synchronize: true
+            synchronize: false
         };
     }
 

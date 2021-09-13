@@ -1,5 +1,5 @@
 import { truncate } from "fs/promises";
-import { Column, Entity, EntityRepository, Index, PrimaryGeneratedColumn, Repository } from "typeorm";
+import { Column, CreateDateColumn, Entity, EntityRepository, Index, PrimaryGeneratedColumn, Repository } from "typeorm";
 
 @Entity('InboundCallConfig')
 export class InboundCallConfigEntity{
@@ -7,7 +7,7 @@ export class InboundCallConfigEntity{
     @PrimaryGeneratedColumn()
     Id: number;
 
-    @Column( { nullable: true , length: 200 })
+    @Column( { nullable: true , length: 200, type:"varchar"})
     CallerId?: string;
 
     @Column( { type: "varchar", nullable:true } )
@@ -18,6 +18,9 @@ export class InboundCallConfigEntity{
 
     @Column( {default: false} )
     IsDeleted: boolean;
+
+    @CreateDateColumn()
+    CreatedDate: Date
 }
 
 @EntityRepository(InboundCallConfigEntity)

@@ -7,7 +7,7 @@ import {
   Query,
 } from '@nestjs/common';
 import { Pagination } from 'nestjs-typeorm-paginate';
-import { FsCallDetailRecordEntity } from 'src/entity/freeswitchCallDetailRecord.entity';
+import { FsCallDetailRecordEntity } from 'src/entity/call-detail-record';
 import { CallDetailRecordDTO } from 'src/modules/call-detail-record/models/cdr.models';
 import { CallDetailRecordService } from '../services/call-detail-record.service';
 
@@ -37,7 +37,7 @@ export class CallDetailRecordController {
     if (record != null){
       return{
         Id: record.Id,
-        CallUUID: record.CallUUID,
+        CallUUID: record.CallUid,
         ParentCallUid: record.ParentCallUid,
         CallDirection : record.CallDirection,
         CallStatus: record.CallStatus,

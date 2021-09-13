@@ -1,6 +1,6 @@
 import { OnQueueActive, Process, Processor } from "@nestjs/bull";
 import { Job } from "bull";
-import { FsCallDetailRecordEntity } from "src/entity/freeswitchCallDetailRecord.entity";
+import { FsCallDetailRecordEntity } from "src/entity/call-detail-record";
 import { CallDetailRecordService } from "src/modules/call-detail-record/services/call-detail-record.service";
 import { CallRecordingService } from "src/modules/call-recording/services/call-recording.service";
 
@@ -65,13 +65,13 @@ export class OutboundCallJob{
 
     private async saveCallRecordingStorage(cdrRecord: FsCallDetailRecordEntity){
 
-        let callRecordingStorage = await this._callRecordingService.getByRecordingUUID(cdrRecord.RecordingUUID);
+        let callRecordingStorage = await this._callRecordingService.getByRecordingUUID(cdrRecord.RecordingUid);
 
         if (callRecordingStorage === null || callRecordingStorage === undefined){
             await this._callRecordingService.saveCallRecording({
-                RecordingUUID : cdrRecord.RecordingUUID,
-                CallUUID : cdrRecord.CallUUID,
-                FilePath : `${process.env.CALL_RECORDING_BASE_PATH}${cdrRecord.CallUUID}`,
+                RecordingUUID : cdrRecord.RecordingUid,
+                CallUUID : cdrRecord.CallUid,
+                FilePath : `${process.env.CALL_RECORDING_BASE_PATH}${cdrRecord.CallUid}`,
             });
         }
         else{
