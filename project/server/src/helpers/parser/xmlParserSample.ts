@@ -32,47 +32,55 @@ export class XmlParserSample{
 
     tryParse(value:string):DialplanInstructions[]{
 
+        console.log('value -> ', value);
+
         let arrValue : string[] = [];
 
         let dpInstructions : DialplanInstructions[] = [];
 
-        let xmlDocResult = new xml.XmlDocument(value);
+        try
+        {
+            let xmlDocResult = new xml.XmlDocument(value);
 
-        let xmlChildren = xmlDocResult.children;
-
-        for (let i = 0; i < xmlChildren.length; i++){
-
-            let element = xmlChildren[i];
-
-            if (element.name === "Say"){
-
-                arrValue.push(element.name);
-
-                dpInstructions.push({
-                    dp: "say",
-                    type: "exec",
-                    value: element.val,
-                    attrib: element.attr,
-                    children : element.children
-                });
+            let xmlChildren = xmlDocResult.children;
+    
+            for (let i = 0; i < xmlChildren.length; i++){
+    
+                let element = xmlChildren[i];
+    
+                if (element.name === "Say"){
+    
+                    arrValue.push(element.name);
+    
+                    dpInstructions.push({
+                        dp: "speak",
+                        type: "exec",
+                        value: element.val,
+                        attrib: element.attr,
+                        children : element.children
+                    });
+                }
+                else if (element.name === "Gather"){
+    
+                    arrValue.push(element.name);
+    
+                    dpInstructions.push({
+                        dp: "play_and_get_digits",
+                        type: "exec",
+                        value: element.val,
+                        attrib: {
+                            numDigits: element.attr.numDigits,
+                            action: element.attr.action,
+                            method: element.attr.method,
+                            timeout: element.attr.timeout
+                        },
+                        children : element.children
+                    });
+                }
             }
-            else if (element.name === "Gather"){
-
-                arrValue.push(element.name);
-
-                dpInstructions.push({
-                    dp: "play_and_get_digits",
-                    type: "exec",
-                    value: element.val,
-                    attrib: {
-                        numDigits: element.attr.numDigits,
-                        action: element.attr.action,
-                        method: element.attr.method,
-                        timeout: element.attr.timeout
-                    },
-                    children : element.children
-                });
-            }
+        }
+        catch(err){
+            console.log('ERROR PARSING -> ',err);
         }
 
         return dpInstructions;

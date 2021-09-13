@@ -13,7 +13,9 @@ import { EVENT_LIST } from "../constants/event-list.constants";
 import { chownSync } from "fs";
 import { InboundCallDTMFHelper } from "./inbound-call.dtmf.helper";
 import {  XmlParserSample } from "../parser/xmlParserSample";
-import { combineLatest, concatAll } from "rxjs";
+import { combineLatest, concatAll, sample } from "rxjs";
+import { Any } from "typeorm";
+import { exec } from "child_process";
 
 export class InboundCallHelper{
 
@@ -65,7 +67,11 @@ export class InboundCallHelper{
                 conn.execute("start_dtmf" , () => {
                     console.log('STARTING DTMF'); 
                     conn.execute('sleep', '5000', () => {
-                        console.log('1. Sleep executed - 5 seconds - ' + new Date());
+
+                        conn.execute('say' , `en MESSAGES pronounced FEMININE please press`, () => {
+                            console.log('executed say');
+
+                            
         
                         if (legStop){
                             console.log('Leg has stop');
@@ -119,82 +125,15 @@ export class InboundCallHelper{
                                     conn.execute('sleep', '5000', () => {
                                         console.log('4. Sleep executed - ' + new Date());
 
-                                        conn.execute('play_and_get_digits', `1 5 2 10000 # ivr/ivr-enter_destination_telephone_number.wav ivr/ivr-that_was_an_invalid_entry.wav target_num 3 2000`, (e) => {
-                                            
-                                            if (legStop){
-                                                console.log('Leg has stop');
-                                                return;
-                                            }
-                                            
-                                                let validValue = e.getHeader(`variable_target_num`);
-
-                                                let invalidValue = e.getHeader(`variable_target_num_invalid`);
-
-                                                if (validValue != null || validValue != undefined){
-                                                    console.log('VALID -> ', validValue);
-                                                    conn.execute('playback', 'https://crm.dealerownedsoftware.com/hosted-files/ivr-rec-2/WelcomeMessage.mp3', () => {
-                                                    
-                                                    });
-                                                }
-                                                else
-                                                {
-                                                    console.log('INVALID -> ', invalidValue);
-
-                                                    conn.execute('sleep', '3000', () => {
-                                                        console.log('3. Sleep executed . ' + new Date());
-                                                    });
-                                                }
-
-                                                conn.execute('sleep', '5000', () => {
-                                                    console.log('4. SLEEP EXECUTED - ' + new Date());
-
-                                                    var sampleVal = `<Respond><Say>Please press 1 to connect</Say><Gather numDigits="1" action="http://localhost:3000/api" method="POST" timeout="10"></Gather><Say>No input received</Say></Respond>`;
-
-                                                    let sampel = new XmlParserSample().tryParse(sampleVal);
-
-                                                    for (let i = 0; i < sampel.length; i ++ ){
-
-                                                        if (legStop){
-                                                            console.log('Leg has stop');
-                                                            return;
-                                                        }
-
-                                                        let val = sampel[i];
-
-                                                        if (val.type === "exec"){
-                                                            
-                                                            console.log('value -> ' , val.dp);
-
-                                                            if (val.dp === "say"){
-                                                                conn.execute('playback', 'https://crm.dealerownedsoftware.com/hosted-files/ivr-rec-2/WelcomeMessage.mp3', () => {
-                                                                    console.log('executed playback');
-                                                                });
-                                                            }
-                                                            else if (val.dp === "play_and_get_digits")
-                                                            {
-                                                                console.log('EXECUTED PLAY DIGITS');
-
-                                                                conn.execute('play_and_get_digits', `${minValue} ${maxValue} ${tries} ${val.attrib.timeout}00 ${terminator} ${soundFile} ${invalidFile} ${val.attrib.numDigits} ${digit_timeout} ${var_name}`, () => {
-
-                                                                    if (legStop){
-                                                                        console.log('Leg has stop');
-                                                                        return;
-                                                                    }
-
-                                                                    if (val.attrib.action){
-                                                                        console.log('TRIGGER WEBHOOK HERE');
-                                                                        //trigger webhook;
-                                                                    }
-                                                                });
-                                                            }
-                                                        }
-                                                    }
-                                                });
+                                        self.dialplanInstructions(conn, () => {
+                                            console.log('Dialplan instructions executed');
                                         });
                                     });
                                 });
                             });
                         });
+                        });
+                        console.log('1. Sleep executed - 5 seconds - ' + new Date());
                     });
                 });
             }
@@ -203,6 +142,82 @@ export class InboundCallHelper{
             // conn.execute('export', 'execute_on_answer=record_session $${recordings_dir}/${strftime(%Y-%m-%d-%H-%M-%S)}_${uuid}_${caller_id_number}.wav');
             // self.inboundCallExecute(conn, destinationNumber);
         });
+    }
+
+    private dialplanInstructions(conn:any,callback){
+
+        let minValue = '4'; // minimum number of digits to collect;
+        let maxValue = '11'; // maximum number of digits to collecct; 
+        let tries = '2'; // number of attempts to play the file and collect digits 
+        let timeout = '10000'; // number of milliseconds to wait before assuming the caller is done entering digits
+        let terminator = '#'; // digits used to end input
+        let soundFile = 'ivr/ivr-enter_destination_telephone_number.wav'; // sound file to play while digits are fetched. 
+        let invalidFile = 'ivr/ivr-that_was_an_invalid_entry.wav'; // sound file to play when digits don't match the regex
+        let regexValue = '1000'; // regular expression to match digits
+        let digit_timeout = '3000'; // (optional) number of milliseconds to wait between digits
+        let var_name = "target_num"; // channel variable that digits should be placed in
+
+        var sampleVal = `<Respond><Say>Please press 1 to connect</Say><Gather numDigits="1" action="http://localhost:8080/NewInboundCall/IncomingCallVerify" method="GET" timeout="10"></Gather><Say>No input received</Say></Respond>`;
+        
+        let sampel = new XmlParserSample().tryParse(sampleVal);
+
+        let size = sampel.length;
+
+        console.log('size -> ' , size);
+
+        let processed = 0;
+
+        let validated = 0;
+
+        let executes = [];
+
+        for (let s of sampel){
+
+            if (s.type === "exec"){
+
+                if (s.dp === "speak"){
+                    console.log('SPEAK -> ' , s);
+                    validated++;
+                    executes.push({obj:s, order:validated});
+                    console.log('executes -> ', executes);
+                    conn.execute('speak', `flite|kal|${s.value}`, () => {
+                        processed++;
+                        console.log('executed speak');
+                        console.log(`Processed -> ${processed} , Speak -> ${s.value}, Validated -> ${validated}`);
+                    });
+
+                    // conn.execute('say' , `en messages pronouced ${s.value}`, () => {
+                    //     console.log('executed say');
+                    // });
+                }
+                else if (s.dp === "play_and_get_digits"){
+                    console.log('PLAY DIGITS -> ' , s);
+                    validated++;
+                    executes.push({obj:s, order:validated});
+                    console.log('executes -> ', executes);
+                    conn.execute('play_and_get_digits', `${minValue} ${maxValue} ${tries} ${s.attrib.timeout}000 ${terminator} ${soundFile} ${invalidFile} ${var_name} 2 ${digit_timeout} `, () => {
+                        processed++;
+                        console.log('EXECUTED PLAY DIGITS');
+                        console.log('digits -> ' , s.attrib.numDigits);
+                        axios.get(`${s.attrib.action}`);
+                        console.log(`Processed -> ${processed} , Speak -> ${s.value} , Action -> ${s.attrib.action} , Validated -> ${validated}`);
+                    });
+                }
+            }
+        }
+
+        // for (let exec of executes){
+        //     console.log(`Obj -> ${JSON.stringify(exec.obj)} , Order -> ${exec.order}`);
+
+        //     conn.execute(`${exec.obj.dp}`, `flite|kal|${exec.obj.value}`);
+        // }
+
+        console.log('Processed -> ', processed);
+
+        if (processed === size){
+            console.log('OKAY!');
+            callback();
+        }
     }
 
     private inboundCallExecute(conn, callerId:string){

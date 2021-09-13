@@ -85,17 +85,16 @@ export class InboundEslConnectionHelper {
       else{
         console.log('Call : ' , callId);
         dtmf.stopDTMF(connection, callId);
-        console.log('Parent Call : ', channelId);
-
         cdrValues.ParentCallUid = channelId;
+        console.log('Parent Call : ', channelId);
       }
 
-      if (cdrValues.CallDirection === "outbound"){
-        http.get(WebhookOutboundCallStatusCallBack(cdrValues));
-      }
-      else{
-        http.get(WebhookInboundCallStatusCallBack(cdrValues));
-      }
+      // if (cdrValues.CallDirection === "outbound"){
+      //   http.get(WebhookOutboundCallStatusCallBack(cdrValues));
+      // }
+      // else{
+      //   http.get(WebhookInboundCallStatusCallBack(cdrValues));
+      // }
 
     });
 

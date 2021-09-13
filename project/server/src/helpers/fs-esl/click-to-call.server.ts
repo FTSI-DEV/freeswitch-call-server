@@ -56,7 +56,7 @@ export class ClickToCallServerHelper {
 
       conn.execute('record_session', '$${sample_record_dir}/${strftime(%Y-%m-%d-%H-%M-%S)}_${uuid}.wav', (record) => {
 
-          console.log('start recording... -> ', record);
+          // console.log('start recording... -> ', record);
 
           conn.execute('playback', 'ivr/ivr-recording_started.wav', () => {
               console.log('playback executed');
@@ -76,43 +76,47 @@ export class ClickToCallServerHelper {
                   console.log('Leg has stop', legStop);
                   return;
                 }
-  
-                conn.execute('sleep', '3000', async () => {
-  
-                  console.log('2. sleep executed ' + new Date());
-  
-                  if (legStop) {
-                    console.log('Execution break', legStop);
-                    return;
-                  }
 
-                  var phoneNumberTo = await this._outboundCallService.getPhoneNumberToByUUID(legId);
+                conn.execute('speak', 'flite|kal|We are now connecting you to our team. Please hold!', () => {
+                  console.log('SPEAK EXECUTED');
 
-                  console.log('PHONE NUMBER TO -> ', phoneNumberTo);
+                  conn.execute('sleep', '3000', async () => {
   
-                  let var_name = 'regex';
-  
-                  conn.execute('play_and_get_digits', `1 5 2 10000 # ivr/ivr-enter_destination_telephone_number.wav ivr/ivr-that_was_an_invalid_entry.wav ${var_name} ${phoneNumberTo} 2000`, (e) => {
-  
-                    let validValue = e.getHeader(`variable_${var_name}`);
-  
-                    let invalidValue = e.getHeader(`variable_${var_name}_invalid`);
-  
-                    if (validValue != null || validValue != undefined){
-                        console.log('VALID -> ', validValue);
-                        conn.execute('bridge', 'sofia/gateway/fs-test3/${regex}');
+                    console.log('2. sleep executed ' + new Date());
+    
+                    if (legStop) {
+                      console.log('Execution break', legStop);
+                      return;
                     }
-                    else
-                    {
-                        console.log('INVALID -> ', invalidValue);
   
-                        conn.execute('sleep', '3000', () => {
-                            console.log('3. Sleep executed . ' + new Date());
-                        });
-                    }
-
+                    var phoneNumberTo = await this._outboundCallService.getPhoneNumberToByUUID(legId);
+  
+                    console.log('PHONE NUMBER TO -> ', phoneNumberTo);
+    
+                    let var_name = 'regex';
+    
                     conn.execute('play_and_get_digits', `1 5 2 10000 # ivr/ivr-enter_destination_telephone_number.wav ivr/ivr-that_was_an_invalid_entry.wav ${var_name} ${phoneNumberTo} 2000`, (e) => {
-                    
+    
+                      let validValue = e.getHeader(`variable_${var_name}`);
+    
+                      let invalidValue = e.getHeader(`variable_${var_name}_invalid`);
+    
+                      if (validValue != null || validValue != undefined){
+                          console.log('VALID -> ', validValue);
+                          conn.execute('bridge', 'sofia/gateway/fs-test3/${regex}');
+                      }
+                      else
+                      {
+                          console.log('INVALID -> ', invalidValue);
+    
+                          conn.execute('sleep', '3000', () => {
+                              console.log('3. Sleep executed . ' + new Date());
+                          });
+                      }
+  
+                      conn.execute('play_and_get_digits', `1 5 2 10000 # ivr/ivr-enter_destination_telephone_number.wav ivr/ivr-that_was_an_invalid_entry.wav ${var_name} ${phoneNumberTo} 2000`, (e) => {
+                      
+                      });
                     });
                   });
                 });
