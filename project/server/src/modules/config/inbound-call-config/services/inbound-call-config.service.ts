@@ -1,6 +1,7 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { IPaginationMeta, IPaginationOptions, paginate, Pagination } from 'nestjs-typeorm-paginate';
+import { config } from 'rxjs';
 import { InboundCallConfigEntity, InboundCallConfigRepository } from 'src/entity/inboundCallConfig.entity';
 import { InboundCallConfigModel, InboundCallConfigParam } from '../models/inbound-call-config.model';
 
@@ -8,19 +9,20 @@ import { InboundCallConfigModel, InboundCallConfigParam } from '../models/inboun
 export class InboundCallConfigService {
 
     constructor(
-        @InjectRepository(InboundCallConfigEntity)
-        private _inboundCallConfigRepo: InboundCallConfigRepository,
-        
+        @InjectRepository(InboundCallConfigRepository)
+        private _inboundCallConfigRepo: InboundCallConfigRepository
     ) {}
 
     add(param: InboundCallConfigParam){
 
         console.log('parma', param);
+
         let inboundCallConfig = new InboundCallConfigEntity();
 
         inboundCallConfig.WebhookUrl = param.webhookUrl;
         inboundCallConfig.CallerId = param.callerId;
         inboundCallConfig.HTTPMethod = param.httpMethod;
+        inboundCallConfig.CreatedDate = new Date;
 
         this._inboundCallConfigRepo.saveUpdateRecord(inboundCallConfig);
     }
@@ -44,23 +46,26 @@ export class InboundCallConfigService {
         return true;
     }
 
-    getInboundConfigCallerId(callerId: string) : any {
-        return new Promise<InboundCallConfigModel>((resolve, reject) => {
+    getInboundConfigCallerId(callerId: string) : Promise<InboundCallConfigModel> {
+
+        return new Promise<InboundCallConfigModel>((resolve,reject) => {
+
             this.getConfigByCallerId(callerId)
-            .then((result) => {
-                if (result == null || result == undefined) reject(null);
+            .then(config => {
+                
+                if (config === null || config === undefined) reject(null);
 
-                let retVal = new InboundCallConfigModel();
-                retVal.callerId = result.CallerId;
-                retVal.webhookUrl = result.WebhookUrl;
-                retVal.httpMethod = result.HTTPMethod;
-
-                resolve(retVal);
-
-            }).catch((err) => {
-                reject(null);
+                resolve({
+                    id:config.Id,
+                    webhookUrl: config.WebhookUrl,
+                    httpMethod: config.HTTPMethod,
+                    callerId:config.CallerId
+                });
+            })
+            .catch(err => {
+                reject(`Error -> ${err}`);
             });
-        })
+        });
     }
 
     getInboundCallConfigById(id:number):any{
@@ -128,7 +133,7 @@ export class InboundCallConfigService {
         })
     }
 
-    private getConfigByCallerId = (callerId:string) : any => {
+    private getConfigByCallerId = (callerId:string) : Promise<InboundCallConfigEntity> => {
         return new Promise<InboundCallConfigEntity>((resolve,reject) => {
             
             this._inboundCallConfigRepo.createQueryBuilder("public.InboundCallConfig")

@@ -73,7 +73,8 @@ export default {
             // });
         },
         addInboundCallConfig({ dispatch }: { dispatch: Dispatch }, params: InboundConfigItem) {
-            return HTTP.post(`/api/inbound-call-config/add/${params.callerId}/${params.webhookUrl}/${params.httpMethod}`)
+            console.log('params: ', params)
+            return HTTP.post('/api/inbound-call-config/add', params)
                 .then(res => {
                     if (res.status === 201) {
                         dispatch("getInboundCallConfigs");

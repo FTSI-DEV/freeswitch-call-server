@@ -1,7 +1,8 @@
-import { Controller, DefaultValuePipe, Get, Param, ParseIntPipe, Post, Query } from '@nestjs/common';
+import { Body, Controller, DefaultValuePipe, Get, Param, ParseIntPipe, Post, Query } from '@nestjs/common';
 import { Pagination } from 'nestjs-typeorm-paginate';
-import { InboundCallConfigModel } from '../models/inbound-call-config.model';
+import { InboundCallConfigModel, InboundCallConfigParam } from '../models/inbound-call-config.model';
 import { InboundCallConfigService } from '../services/inbound-call-config.service';
+
 
 @Controller('/api/inbound-call-config')
 export class InboundCallConfigController {
@@ -12,18 +13,20 @@ export class InboundCallConfigController {
     return this._inboundCallConfig.getInboundCallConfigById(id);
   }
 
-  @Post('add/:callerId/:webhookUrl/:httpMethod')
+  @Post('add')
   add(
-    @Param('callerId') callerId: string,
-    @Param('webhookUrl') webhookUrl: string,
-    @Param('httpMethod') httpMethod:string
+    @Body() params: InboundCallConfigParam
   ): string {
 
-    console.log('entered');
+    console.log(`entered -> 
+      CallerId -> ${params.callerId} , 
+      Webhook -> ${params.webhookUrl}, 
+      HttpMethod -> ${params.httpMethod}`);
+
     this._inboundCallConfig.add({
-      webhookUrl: webhookUrl,
-      callerId: callerId,
-      httpMethod: httpMethod
+      webhookUrl: params.webhookUrl,
+      callerId: params.callerId,
+      httpMethod: params.httpMethod
     });
 
     return 'Successfully added config';
