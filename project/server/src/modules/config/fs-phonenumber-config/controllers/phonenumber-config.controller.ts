@@ -46,9 +46,9 @@ export class FreeswitchPhoneNumberConfigController {
   }
 
   @Post('delete/:id')
-  deletePhonNumberConfig(@Param('id') id: number) {
-    this._freeswitchCallConfigService.deletePhoneNumberConfig(id);
-    return 'Config successfully deleted';
+   async deletePhoneNumberConfig(@Param('id') id: number) {
+    try {
+        return await this._freeswitchCallConfigService.deletePhoneNumberConfig(id);  
+    } catch(err) { return err };
   }
-
 }

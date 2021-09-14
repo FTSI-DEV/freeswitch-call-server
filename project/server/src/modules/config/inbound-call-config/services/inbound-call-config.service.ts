@@ -45,7 +45,7 @@ export class InboundCallConfigService {
 
         return true;
     }
-    
+
     getInboundConfigCallerId(callerId: string) : Promise<InboundCallConfigModel> {
 
         return new Promise<InboundCallConfigModel>((resolve,reject) => {
@@ -157,11 +157,18 @@ export class InboundCallConfigService {
         return this._inboundCallConfigRepo.findOneOrFail(id);
     }
     
-    deleteInboundCallConfig(id: number) {
-        let inboundCallConfig = new InboundCallConfigEntity();
-        inboundCallConfig.Id = id;
-        inboundCallConfig.IsDeleted = true;
-        this._inboundCallConfigRepo.deleteRecord(inboundCallConfig);
+    async deleteInboundCallConfig(id: number): Promise<string> {
+        return new Promise<string>(async (resolve, reject) => {
+            const config = await this.getRecordById(id);
+            if (!config.IsDeleted) {
+                let inboundCallConfig = new InboundCallConfigEntity();
+                inboundCallConfig.Id = id;
+                inboundCallConfig.IsDeleted = true;
+                this._inboundCallConfigRepo.deleteRecord(inboundCallConfig);
+                resolve('Config successfully deleted');
+            } else {
+                reject("Unable to delete config");
+            }
+        });
     }
-
 }

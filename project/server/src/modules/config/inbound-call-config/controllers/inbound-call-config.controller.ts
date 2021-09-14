@@ -60,8 +60,9 @@ export class InboundCallConfigController {
   }
 
   @Post('delete/:id')
-  deleteInboundCallConfig(@Param('id') id: number) {
-    this._inboundCallConfig.deleteInboundCallConfig(id);
-    return 'Config successfully deleted';
+  async deleteInboundCallConfig(@Param('id') id: number) {
+    try {
+     return await this._inboundCallConfig.deleteInboundCallConfig(id);
+    } catch(err) { return err };
   }
 }
