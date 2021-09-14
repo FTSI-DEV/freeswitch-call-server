@@ -44,4 +44,11 @@ export class FreeswitchPhoneNumberConfigController {
         limit
     });
   }
+
+  @Post('delete/:id')
+  deletePhonNumberConfig(@Param('id') id: number) {
+    this._freeswitchCallConfigService.deletePhoneNumberConfig(id);
+    return 'Config successfully deleted';
+  }
+
 }

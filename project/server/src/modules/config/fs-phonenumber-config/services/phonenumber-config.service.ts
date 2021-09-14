@@ -149,17 +149,18 @@ export class FreeswitchPhoneNumberConfigService{
                 let itemsObjs: FreeswitchPhoneNumberConfigParam[] = [];
 
                 result.items.forEach(element => {
-                    
-                    let configModel = new FreeswitchPhoneNumberConfigParam();
 
-                    configModel.friendlyName = element.FriendlyName;
-                    configModel.httpMethod = element.HttpMethod;
-                    configModel.phoneNumber = element.PhoneNumber;
-                    configModel.webhookUrl = element.WebhookUrl;
-                    configModel.id = element.Id;
+                    if (!element.IsDeleted) {
+                        let configModel = new FreeswitchPhoneNumberConfigParam();
 
-                    itemsObjs.push(configModel);
+                        configModel.friendlyName = element.FriendlyName;
+                        configModel.httpMethod = element.HttpMethod;
+                        configModel.phoneNumber = element.PhoneNumber;
+                        configModel.webhookUrl = element.WebhookUrl;
+                        configModel.id = element.Id;
 
+                        itemsObjs.push(configModel);
+                    }
                 });
 
                 resolve(new Pagination<FreeswitchPhoneNumberConfigParam, IPaginationMeta>(itemsObjs, result.meta));
@@ -176,6 +177,13 @@ export class FreeswitchPhoneNumberConfigService{
         }).catch(error => {
             console.log('error', error);
         })
+    }
+
+    deletePhoneNumberConfig(id: number) {
+        let phoneNumberConfig = new PhoneNumberConfigEntity();
+        phoneNumberConfig.Id = id;
+        phoneNumberConfig.IsDeleted = true;
+        this._phoneNumberConfigRepo.deleteRecord(phoneNumberConfig);
     }
 }
     

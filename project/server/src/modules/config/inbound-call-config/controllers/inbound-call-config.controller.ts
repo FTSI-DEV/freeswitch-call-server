@@ -58,4 +58,10 @@ export class InboundCallConfigController {
         limit
     });
   }
+
+  @Post('delete/:id')
+  deleteInboundCallConfig(@Param('id') id: number) {
+    this._inboundCallConfig.deleteInboundCallConfig(id);
+    return 'Config successfully deleted';
+  }
 }

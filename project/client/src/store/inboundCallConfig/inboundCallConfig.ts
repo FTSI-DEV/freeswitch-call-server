@@ -82,9 +82,9 @@ export default {
             })
         },
         deleteInboundCallConfig({ dispatch }: { dispatch: Dispatch }, params: number) {
-            return HTTP.post(`/api/inbound-call-config/deleteConfig/${params}`)
+            return HTTP.post(`/api/inbound-call-config/delete/${Number(params)}`)
                 .then(res => {
-                    if (res.status === Status.OK) {
+                    if (res.status === 201) {
                         dispatch("getInboundCallConfigs");
                     }
                 });
