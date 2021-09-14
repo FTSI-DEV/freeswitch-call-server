@@ -95,8 +95,8 @@ export default {
             });
         },
         deletePhoneNumberConfig({ dispatch }: { dispatch: Dispatch }, params: number) {
-            return HTTP.post(`/api/freeswitch-phonenumber-config/deleteConfig/${params}`).then(res => {
-                if (res.status === Status.OK) {
+            return HTTP.post(`/api/freeswitch-phonenumber-config/delete/${Number(params)}`).then(res => {
+                if (res.status === 201) {
                     dispatch('getPhoneNumberConfigs');
                 }
             });

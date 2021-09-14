@@ -45,7 +45,7 @@ export class InboundCallConfigService {
 
         return true;
     }
-
+    
     getInboundConfigCallerId(callerId: string) : Promise<InboundCallConfigModel> {
 
         return new Promise<InboundCallConfigModel>((resolve,reject) => {
@@ -97,19 +97,20 @@ export class InboundCallConfigService {
             pageRecords.then(result => {
 
                 let itemsObjs: InboundCallConfigModel[] = [];
-
+          
                 result.items.forEach(element => {
+                    if (!element.IsDeleted) {
+                        let configModel = new InboundCallConfigModel();
 
-                    let configModel = new InboundCallConfigModel();
-
-                    configModel.webhookUrl = element.WebhookUrl;
-                    configModel.callerId = element.CallerId;
-                    configModel.httpMethod = element.HTTPMethod;
-                    configModel.id = element.Id;
-
-                    itemsObjs.push(configModel);
+                        configModel.webhookUrl = element.WebhookUrl;
+                        configModel.callerId = element.CallerId;
+                        configModel.httpMethod = element.HTTPMethod;
+                        configModel.id = element.Id;
+                        
+                        itemsObjs.push(configModel);
+                    }
                 });
-
+            
                 resolve(new Pagination<InboundCallConfigModel, IPaginationMeta>(itemsObjs, result.meta));
             })
             .catch(err => {
@@ -135,7 +136,6 @@ export class InboundCallConfigService {
 
     private getConfigByCallerId = (callerId:string) : Promise<InboundCallConfigEntity> => {
         return new Promise<InboundCallConfigEntity>((resolve,reject) => {
-            
             this._inboundCallConfigRepo.createQueryBuilder("public.InboundCallConfig")
                 .where("public.InboundCallConfig.CallerId = :callerId" , { callerId : callerId })
                 .getOneOrFail()
@@ -143,7 +143,7 @@ export class InboundCallConfigService {
                     if (result == null || result == undefined){
                         reject(null);
                     }
-                    else {
+                    else { 
                         resolve(result);
                     }
                 })
@@ -155,6 +155,13 @@ export class InboundCallConfigService {
 
     private getRecordById = (id:number) : Promise<InboundCallConfigEntity> => {
         return this._inboundCallConfigRepo.findOneOrFail(id);
-    } 
+    }
+    
+    deleteInboundCallConfig(id: number) {
+        let inboundCallConfig = new InboundCallConfigEntity();
+        inboundCallConfig.Id = id;
+        inboundCallConfig.IsDeleted = true;
+        this._inboundCallConfigRepo.deleteRecord(inboundCallConfig);
+    }
 
 }

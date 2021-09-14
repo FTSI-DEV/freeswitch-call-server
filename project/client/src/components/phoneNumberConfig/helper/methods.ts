@@ -31,9 +31,7 @@ export default function methodsObj() {
       const getPhoneNumberConfigs = () => store.dispatch('getPhoneNumberConfigs');
       const deleteConfig = (val: any) => {
         if (confirm("Are you sure you want to delete this config?")) {
-          store.dispatch("deletePhoneNumberConfig", val.id).then(() => {
-            getPhoneNumberConfigs();
-          });
+          store.dispatch("deletePhoneNumberConfig", val.id);
         }
       }
       const editConfig = (val: any) => {
