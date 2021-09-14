@@ -1,6 +1,3 @@
-import { Console } from 'console';
-import { FsCallDetailRecordEntity } from 'src/entity/call-detail-record';
-import { CallDetailRecordService } from 'src/modules/call-detail-record/services/call-detail-record.service';
 import { WebhookInboundCallStatusCallBack, WebhookOutboundCallStatusCallBack } from 'src/utils/webhooks';
 import { CallTypes } from '../constants/call-type';
 import { CHANNEL_VARIABLE } from '../constants/channel-variables.constants';
@@ -42,7 +39,6 @@ export class InboundEslConnectionHelper {
     let dtmf = new DTMFHelper();
 
     connection.on(FS_ESL.CONNECTION.ERROR, () => {
-      // console.log('ESL INBOUND CONNECTION ERROR!');
       FreeswitchConnectionResult.errorMessage = 'Connection Error';
     });
 
@@ -88,14 +84,12 @@ export class InboundEslConnectionHelper {
         cdrValues.ParentCallUid = channelId;
         console.log('Parent Call : ', channelId);
       }
-
-      // if (cdrValues.CallDirection === "outbound"){
-      //   http.get(WebhookOutboundCallStatusCallBack(cdrValues));
-      // }
-      // else{
-      //   http.get(WebhookInboundCallStatusCallBack(cdrValues));
-      // }
-
+      if (cdrValues.CallDirection === "outbound"){
+        http.get(WebhookOutboundCallStatusCallBack(cdrValues));
+      }
+      else{
+        http.get(WebhookInboundCallStatusCallBack(cdrValues));
+      }
     });
 
     connection.on('esl::event::BACKGROUND_JOB::*', (evt) =>{

@@ -4,5 +4,8 @@ export const TwiMLContants = {
     Reject: 'Reject',
     Gather: 'Gather',
     Hangup: 'Hangup',
+    Redirect: 'Redirect',
+    Play: 'Play',
+    Number: 'Number',
     Pause: 'Pause'
 }
