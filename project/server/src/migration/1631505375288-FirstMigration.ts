@@ -81,7 +81,8 @@ export class FirstMigration1631505375288 implements MigrationInterface {
             .query(`CREATE TABLE "FreeswitchCallConfig"
                   ("Id" SERIAL NOT NULL,
                   "Name" varchar,
-                  "Value" varchar)`);
+                  "Value" varchar,
+                  CONSTRAINT "PK_FreeswitchCallConfig_Id" PRIMARY KEY ("Id"))`);
 
         await queryRunner
             .query(`CREATE INDEX "IDX_FreeswitchCallConfig_Id" ON "FreeswitchCallConfig" ("Id")`);
@@ -96,7 +97,8 @@ export class FirstMigration1631505375288 implements MigrationInterface {
                     "WebhookUrl" varchar,
                     "HTTPMethod" varchar(100),
                     "IsDeleted" boolean NOT NULL DEFAULT false,
-                    "CreatedDate" date NOT NULL)`);
+                    "CreatedDate" date NOT NULL,
+                    CONSTRAINT "PK_InboundCallConfig_Id" PRIMARY KEY ("Id"))`);
 
         await queryRunner
             .query(`CREATE INDEX "IDX_InboundCallConfig_Id" ON "InboundCallConfig" ("Id")`);
@@ -112,7 +114,8 @@ export class FirstMigration1631505375288 implements MigrationInterface {
                 "HttpMethod" varchar(100),
                 "WebhookUrl" varchar,
                 "PhoneNumber" varchar(100),
-                "IsDeleted" boolean NOT NULL DEFAULT false)`);
+                "IsDeleted" boolean NOT NULL DEFAULT false,
+                CONSTRAINT "PK_PhoneNumberConfig_Id" PRIMARY KEY ("Id"))`);
 
         await queryRunner
             .query(`CREATE INDEX "IDX_PhoneNumberConfig_Id" ON "PhoneNumberConfig" ("Id")`);

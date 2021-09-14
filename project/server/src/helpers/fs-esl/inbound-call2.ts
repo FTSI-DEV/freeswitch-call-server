@@ -51,6 +51,7 @@ export class InboundCallHelper2 {
             this._inboundCallConfig
               .getInboundConfigCallerId('8667468950')
               .then((config) => {
+                
                 let voiceRequestParam = new VoiceRequestParam();
 
                 voiceRequestParam.From = phoneNumberFrom;
