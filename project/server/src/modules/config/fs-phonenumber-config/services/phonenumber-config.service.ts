@@ -179,11 +179,19 @@ export class FreeswitchPhoneNumberConfigService{
         })
     }
 
-    deletePhoneNumberConfig(id: number) {
-        let phoneNumberConfig = new PhoneNumberConfigEntity();
-        phoneNumberConfig.Id = id;
-        phoneNumberConfig.IsDeleted = true;
-        this._phoneNumberConfigRepo.deleteRecord(phoneNumberConfig);
+    deletePhoneNumberConfig(id: number): Promise<string> {
+      return new Promise<string>(async (resolve, reject) => {
+        const config = await this._phoneNumberConfigRepo.findOneOrFail({ where: { Id: id } });
+        if (!config.IsDeleted) {
+            let phoneNumberConfig = new PhoneNumberConfigEntity();
+            phoneNumberConfig.Id = id;
+            phoneNumberConfig.IsDeleted = true;
+            this._phoneNumberConfigRepo.deleteRecord(phoneNumberConfig);
+            resolve("Config successfully deleted");
+        } else {
+            reject("Unable to delete config");
+        }
+      });
     }
 }
     
