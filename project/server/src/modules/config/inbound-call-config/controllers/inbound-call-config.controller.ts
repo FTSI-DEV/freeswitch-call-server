@@ -1,6 +1,6 @@
 import { Body, Controller, DefaultValuePipe, Get, Param, ParseIntPipe, Post, Query } from '@nestjs/common';
 import { Pagination } from 'nestjs-typeorm-paginate';
-import { JsonDataListReturnModel, JsonDataListReturnModel2 } from 'src/utils/jsonDataListReturnModel';
+import { JsonDataListReturnModel } from 'src/utils/jsonDataListReturnModel';
 import { InboundCallConfigModel, InboundCallConfigParam } from '../models/inbound-call-config.model';
 import { InboundCallConfigService } from '../services/inbound-call-config.service';
 

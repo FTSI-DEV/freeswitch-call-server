@@ -15,31 +15,6 @@ export interface JsonDataListModel<T>{
     Message?:string;
 }
 
-export class JsonDataListReturnModel2 extends JsonDataListModel<object> {}
-
-function add(a:string, b:string):string;
-
-function add(a:number, b:number): number;
-
-function add(a: any, b:any): any {
-    return a + b;
-}
-
-function Ok(message:string):JsonDataListModel<object>;
-
-function Ok(message:string, data?:object):JsonDataListModel<object>;
-
-function Ok(message:string,data?:object):JsonDataListModel<object>{
-
-   let value = new JsonDataListModel<object>();
-
-   value.Data = data;
-   value.Message = message;
-   value.Status = JsonResultStatus.OK;
-
-   return value;
-}
-
 export class JsonDataListReturnModel extends JsonDataListModel<object>{
 
     static Ok(message:string):JsonDataListModel<object>
