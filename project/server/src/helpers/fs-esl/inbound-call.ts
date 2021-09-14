@@ -221,7 +221,7 @@ export class InboundCallHelper{
     }
 
     private inboundCallExecute(conn, callerId:string){
-
+        const self = this;
         this._inboundCallConfig.getInboundConfigCallerId(callerId)
             .then( async (result) => {
                 
@@ -231,15 +231,19 @@ export class InboundCallHelper{
 
                 if (apiRetVal)
                 {
-                    //Parse xml to json
-                    let xmlParserResult = new XMLParser().tryParseXMLBody(apiRetVal);
+                    let parsedXML = new XMLParserHelper().tryParseXMLBody(apiRetVal);
+                    
+                    self.executeTaskList(parsedXML.finalInstructionList, conn)
 
-                    // Converted xml
-                    let dialplan_taskList = this.XmlConversionTaskValues(xmlParserResult);
+                    // //Parse xml to json
+                    // let xmlParserResult = new XMLParser().tryParseXMLBody(apiRetVal);
 
-                    console.log('dialplan_tasklist: ', dialplan_taskList);
+                    // // Converted xml
+                    // let dialplan_taskList = this.XmlConversionTaskValues(xmlParserResult);
 
-                    await this.executeTask(dialplan_taskList,conn);
+                    // console.log('dialplan_tasklist: ', dialplan_taskList);
+
+                    // await this.executeTask(dialplan_taskList,conn);
                 }
 
             }).catch((err) => {
