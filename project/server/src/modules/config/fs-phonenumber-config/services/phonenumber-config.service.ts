@@ -67,7 +67,7 @@ export class FreeswitchPhoneNumberConfigService{
         });
     }
 
-    getPhoneNumberConfigById(id: number): any{
+    getPhoneNumberConfigById(id: number): Promise<FreeswitchPhoneNumberConfigParam>{
         return new Promise<FreeswitchPhoneNumberConfigParam>((resolve, reject) => {
             this.getById(id)
                 .then((result) => {

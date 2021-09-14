@@ -5,6 +5,7 @@ import { InjectQueue } from '@nestjs/bull';
 import { CDRModel } from 'src/modules/call-detail-record/models/cdr.models';
 import { FreeswitchPhoneNumberConfigService } from '../config/fs-phonenumber-config/services/phonenumber-config.service';
 import { CallDetailRecordService } from '../call-detail-record/services/call-detail-record.service';
+import { JsonDataListReturnModel } from 'src/utils/jsonDataListReturnModel';
 
 @Controller('NewInboundCall')
 export class IncomingCallController {
@@ -17,12 +18,12 @@ export class IncomingCallController {
               {}
 
   @Get('IncomingStatusCallBack')
-  incomingStatusCallBack(@Query() callData:CDRModel){
+  incomingStatusCallBack(@Query() callData:CDRModel):JsonDataListReturnModel{
 
     console.log('IncomingCall/IncomingStatusCallBack' , callData);
 
     this.incomingCallJob.add('inboundCall', callData);
     
-    return "Successfully submitted to job queue";
+    return JsonDataListReturnModel.Ok("Successfully submitted to job queue");
   }
 }

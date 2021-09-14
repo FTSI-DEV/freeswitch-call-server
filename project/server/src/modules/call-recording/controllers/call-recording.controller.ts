@@ -1,5 +1,6 @@
 import { Controller, DefaultValuePipe, Get, Param, ParseIntPipe, Query, Request, Response } from '@nestjs/common';
 import { Pagination } from 'nestjs-typeorm-paginate';
+import { JsonDataListReturnModel } from 'src/utils/jsonDataListReturnModel';
 import { RangeFileStreamResult } from 'src/utils/rangeFileStreamResult';
 import { CallRecordingStorageDTO } from '../models/call-recording.dto';
 import { CallRecordingService } from '../services/call-recording.service';
@@ -14,51 +15,54 @@ export class CallRecordingController {
     @Get('deleteCallRecording/:recordingId')
     async deleteCallRecording(
         @Param('recordingId') recordingId: number
-    ):Promise<string>{
+    ):Promise<JsonDataListReturnModel>{
 
         let deleteRecord = await this._callRecordingStorageService.deleteCallRecording(recordingId);
 
         if (deleteRecord){
-            return "Successfully deleted call recording";
+            return JsonDataListReturnModel.Ok("Successfully deleted call recording");
         }
         
-        return "Unable to delete call recording";
+        return JsonDataListReturnModel.Error("Unable to delete call recording");
     }
 
     @Get('getCallRecordings')
-    getCallRecordings(
+    async getCallRecordings(
         @Query('page' , new DefaultValuePipe(1), ParseIntPipe) page:number = 1,
         @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number = 10
-    ): Promise<Pagination<CallRecordingStorageDTO>>{
+    ): Promise<JsonDataListReturnModel>{
 
         limit = limit > 100 ? 100 : limit;
 
-        return this._callRecordingStorageService.getCallRecordings({
+        let recordings = await this._callRecordingStorageService.getCallRecordings({
             page,
             limit
         });
+
+        return JsonDataListReturnModel.Ok(null,recordings);
     }
 
     @Get('getCallRecord/:recordingId')
     async getCallRecord(
         @Param('recordingId') recordingId: number
-    ):Promise<CallRecordingStorageDTO>{
+    ):Promise<JsonDataListReturnModel>{
 
         let callRecording = await this._callRecordingStorageService.getByRecordingId(recordingId);
     
         if (callRecording != null){
-            return{
-             RecordingId: callRecording.RecordingId,
-             RecordingUUID : callRecording.RecordingUid,
-             CallUUID : callRecording.CallUid,
-             FilePath : callRecording.FilePath,
-             IsDeleted: callRecording.IsDeleted,
-             DateCreated : callRecording.DateCreated,
-            //  CallId: callRecording.callDetailRecord.Id   
-            };
+            let retVal: CallRecordingStorageDTO = {
+                RecordingId: callRecording.RecordingId,
+                RecordingUUID : callRecording.RecordingUid,
+                CallUUID : callRecording.CallUid,
+                FilePath : callRecording.FilePath,
+                IsDeleted: callRecording.IsDeleted,
+                DateCreated : callRecording.DateCreated,
+            }
+
+            return JsonDataListReturnModel.Ok(null, retVal);
         }
         
-        return null;
+        return JsonDataListReturnModel.Ok('No record to be displayed');
     }
 
     @Get('getRecordFile/:recordingId')
@@ -74,6 +78,7 @@ export class CallRecordingController {
         }
         
         console.log('No recording file');
+        
         return null;
     }
 }

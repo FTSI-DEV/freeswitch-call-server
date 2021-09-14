@@ -1,6 +1,4 @@
 import axios from 'axios';
-import { max } from 'rxjs';
-import { InboundCallConfigModel } from 'src/modules/config/inbound-call-config/models/inbound-call-config.model';
 import { InboundCallConfigService } from 'src/modules/config/inbound-call-config/services/inbound-call-config.service';
 import { CHANNEL_VARIABLE } from '../constants/channel-variables.constants';
 import { EVENT_LIST } from '../constants/event-list.constants';
@@ -51,7 +49,7 @@ export class InboundCallHelper2 {
             this._inboundCallConfig
               .getInboundConfigCallerId('8667468950')
               .then((config) => {
-                
+
                 let voiceRequestParam = new VoiceRequestParam();
 
                 voiceRequestParam.From = phoneNumberFrom;

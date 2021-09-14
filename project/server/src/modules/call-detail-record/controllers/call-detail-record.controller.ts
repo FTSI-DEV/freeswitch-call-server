@@ -6,9 +6,8 @@ import {
   ParseIntPipe,
   Query,
 } from '@nestjs/common';
-import { Pagination } from 'nestjs-typeorm-paginate';
-import { FsCallDetailRecordEntity } from 'src/entity/call-detail-record';
 import { CallDetailRecordDTO } from 'src/modules/call-detail-record/models/cdr.models';
+import { JsonDataListReturnModel } from 'src/utils/jsonDataListReturnModel';
 import { CallDetailRecordService } from '../services/call-detail-record.service';
 
 @Controller('/call-detail-record')
@@ -18,24 +17,28 @@ export class CallDetailRecordController {
   ) {}
 
   @Get('getCdrLogs')
-  getCallLogs(
+  async getCallLogs(
     @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number = 1,
     @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number = 10,
-  ): Promise<Pagination<CallDetailRecordDTO>> {
+  ): Promise<JsonDataListReturnModel> {
+
     limit = limit > 100 ? 100 : limit;
-    return this._callDetailRecordService.getCallLogs({
+
+    let callLogs = await this._callDetailRecordService.getCallLogs({
       page,
       limit
     });
+
+    return JsonDataListReturnModel.Ok(null, callLogs);
   }
 
   @Get('getCDRById/:id')
-  async getCDRById(@Param('id') id: number): Promise<CallDetailRecordDTO>{
+  async getCDRById(@Param('id') id: number): Promise<JsonDataListReturnModel>{
 
     let record =  await this._callDetailRecordService.getById(id);
 
     if (record != null){
-      return{
+      let retVal : CallDetailRecordDTO = {
         Id: record.Id,
         CallUUID: record.CallUid,
         ParentCallUid: record.ParentCallUid,
@@ -45,8 +48,11 @@ export class CallDetailRecordController {
         DateCreated: record.DateCreated,
         PhoneNumberFrom : record.PhoneNumberFrom,
         PhoneNumberTo : record.PhoneNumberTo
-      };
+      }
+
+      return JsonDataListReturnModel.Ok(null,retVal);
     }
-    return null;
+
+    return JsonDataListReturnModel.Ok('No records to be displayed');
   }
 }

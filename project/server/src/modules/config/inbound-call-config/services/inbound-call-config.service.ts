@@ -68,7 +68,7 @@ export class InboundCallConfigService {
         });
     }
 
-    getInboundCallConfigById(id:number):any{
+    getInboundCallConfigById(id:number):Promise<InboundCallConfigModel>{
         return new Promise<InboundCallConfigModel>((resolve,reject) => {
             this.getRecordById(id)
                 .then((result) => {

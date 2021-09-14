@@ -4,6 +4,7 @@ import { Queue } from 'bull';
 import * as moment from 'moment';
 import { CDRModel } from 'src/modules/call-detail-record/models/cdr.models';
 import { CallDetailRecordService } from 'src/modules/call-detail-record/services/call-detail-record.service';
+import { JsonDataListReturnModel } from 'src/utils/jsonDataListReturnModel';
 import { OutboundCallService } from '../services/outbound-call.service';
 
 @Controller('/api/outbound-call')
@@ -19,27 +20,29 @@ export class OutboundCallController {
         @Param('phoneNumberFrom') phoneNumberFrom: string,
         @Param('phoneNumberTo') phoneNumberTo: string,
         @Param('callerId') callerId: string,
-      ): Promise<string> {
+      ): Promise<JsonDataListReturnModel> {
     
         try{
+
           let result = await this._outboundCallService.clickToCall(
             phoneNumberTo,
             phoneNumberFrom,
             callerId,
           );
 
-          return result;
+          return JsonDataListReturnModel.Ok(result);
         }
         catch(err){
-         return err;
+          console.log('ERR -> ', JsonDataListReturnModel.Error(err));
+          return JsonDataListReturnModel.Error(err);
         }
     }
 
     @Get('outboundCallStatusCallBack')
-    outboundCallStatusCallBack(@Query() callData: CDRModel) {
+    outboundCallStatusCallBack(@Query() callData: CDRModel):JsonDataListReturnModel {
 
     this.outboundCallJobQueue.add('outboundCall',callData);
 
-    return 'Successfully submitted to job queue';
+    return JsonDataListReturnModel.Ok('Successfully submitted to job queue');
   }
 }

@@ -10,7 +10,6 @@ import { PhoneNumberConfigModule } from './modules/config/fs-phonenumber-config/
 import { IvrModule } from './modules/ivr/ivr.module';
 import { IncomingCallModule } from './modules/incomingCall/incomingCall.module';
 import { CallDetailRecordModule } from './modules/call-detail-record/call-detail-record.module';
-import { FreeswitchModule } from './modules/freeswitch/freeswitch.module';
 import { InboundCallConfigModule } from './modules/config/inbound-call-config/inbound-call-config.module';
 import { EslServerHelper } from './helpers/fs-esl/inboundCall.server';
 import { InboundCallConfigService } from './modules/config/inbound-call-config/services/inbound-call-config.service';
@@ -32,7 +31,6 @@ import { OutboundCallService } from './modules/outbound-call/services/outbound-c
     TypeOrmModule.forRoot(configService.getTypeOrmConfig()),
     PhoneNumberConfigModule,
     IncomingCallModule,
-    FreeswitchModule,
     CallDetailRecordModule,
     InboundCallConfigModule,
     BullModuleQueue,
