@@ -3,6 +3,7 @@ export class InboundCallConfigModel{
     webhookUrl: string;
     httpMethod:string;
     id?: number;
+    isDeleted:boolean;
 }
 
 export class InboundCallConfigParam{

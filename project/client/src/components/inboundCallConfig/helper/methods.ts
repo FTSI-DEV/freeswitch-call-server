@@ -1,7 +1,7 @@
 import columnArray from './helper';
 import { reactive, computed } from "vue";
 import { useStore } from 'vuex';
-
+import { Status } from '../../../store/status';
 export default function methodsObj() {
     const store = useStore();
     const state = reactive({
@@ -18,7 +18,8 @@ export default function methodsObj() {
         selectedConfig: {
           callerId: "",
           webhookUrl: "",
-          httpMethod: "GET"
+          httpMethod: "GET",
+          id: ""
         },
       })
 
@@ -34,16 +35,22 @@ export default function methodsObj() {
         state.selectedConfig.callerId = "";
         state.selectedConfig.webhookUrl = "";
         store.dispatch("getInboundCallConfigById", val.id).then((res) => {
-            const { callerId, webhookUrl, httpMethod } = res.data;
-            state.modleVisibility = true
-            state.selectedConfig.callerId = callerId;
-            state.selectedConfig.webhookUrl = webhookUrl;
-            state.selectedConfig.httpMethod = httpMethod || "GET";
+            if (res.data.Status === Status.OK) {
+              const { callerId, webhookUrl, httpMethod, id } = res.data.Data;
+              state.modleVisibility = true
+              state.selectedConfig.callerId = callerId;
+              state.selectedConfig.webhookUrl = webhookUrl;
+              state.selectedConfig.httpMethod = httpMethod || "GET";
+              state.selectedConfig.id = id
+            }
         });
       }
       const handleOk = () => {
         store.dispatch("updateInboundCallConfig", state.selectedConfig).then(res => {
-          state.modleVisibility = false;
+          if (res.data.Status === Status.OK) {  
+            getInboundCallConfigs();
+            state.modleVisibility = false;
+          }
         });
       }
       const isInvalid = (value: string): string => !value && state.hasError ? "invalid" : "";

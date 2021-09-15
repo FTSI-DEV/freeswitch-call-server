@@ -1,3 +1,3 @@
 export enum Status {
-    OK = 200
+    OK = 1
 } 

@@ -13,7 +13,11 @@ export interface InboundConfigPager {
 }
 
 export interface InboundConfig {
-    items: Array<InboundConfigItem>,
-    meta: InboundConfigPager,
+    Data: {
+        items: Array<InboundConfigItem>,
+        meta: InboundConfigPager
+    },
+    Message: "",
+    Status: "",
     inboundConfigById: InboundConfigItem
 }

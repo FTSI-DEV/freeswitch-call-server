@@ -9,13 +9,17 @@ import {
 
 export default {
     state: {
-        items: [],
-        meta: {
-            currentPage: 1,
-            itemCount: 1,
-            itemsPerPage: 1,
-            totalItems: 1
+        Data: {
+            items : [],
+            meta: {
+                currentPage: 1,
+                itemCount: 1,
+                itemsPerPage: 1,
+                totalItems: 1
+            }
         },
+        Message: "",
+        Status: "",
         inboundConfigById: {
             callerId: "",
             httpMethod: "",
@@ -24,29 +28,31 @@ export default {
         }
     } as InboundConfig,
     getters: {
-        inboundCallConfigData: (state: InboundConfig): Array<InboundConfigItem> => state.items,
-        inboundCallConfigPager: (state: InboundConfig): InboundConfigPager => state.meta,
+        inboundCallConfigData: (state: InboundConfig): Array<InboundConfigItem> => state.Data.items,
+        inboundCallConfigPager: (state: InboundConfig): InboundConfigPager => state.Data.meta,
         inboundConfigById: (state: InboundConfig): InboundConfigItem => state.inboundConfigById
     },
     mutations: {    
         setInboundCallConfig(state: InboundConfig, payload: InboundConfig) {
-            const { items, meta } = payload;
+            const { items, meta } = payload.Data;
             const { currentPage, itemCount, itemsPerPage , totalItems  } = meta;
 
-            state.items = [];
-            state.meta.currentPage = currentPage;
-            state.meta.itemCount = itemCount;
-            state.meta.itemsPerPage = itemsPerPage;
-            state.meta.totalItems = totalItems;
+            state.Data.items = [];
+            state.Data.meta.currentPage = currentPage;
+            state.Data.meta.itemCount = itemCount;
+            state.Data.meta.itemsPerPage = itemsPerPage;
+            state.Data.meta.totalItems = totalItems;
 
             items.forEach(prop => {
-                state.items.push({
+                state.Data.items.push({
                     callerId: prop.callerId,
                     httpMethod: prop.httpMethod,
                     webhookUrl: prop.webhookUrl,
                     id: prop.id,
                 });
             });
+
+            console.log('record -> ', state.Data);
         },
         setInboundConfigById(state: InboundConfig, payload: InboundConfigItem) {
             const { callerId, httpMethod, webhookUrl, id } = payload;
@@ -59,7 +65,7 @@ export default {
     actions: {
         getInboundCallConfigs({ commit }: { commit: Commit }) {
           return HTTP.get(`/api/inbound-call-config/getInboundCallConfigs`).then(res => {
-            if (res.status === Status.OK) {
+            if (res.data.Status === Status.OK) {
                 commit('setInboundCallConfig', res.data);
             }
           })
@@ -90,7 +96,7 @@ export default {
                 });
         },
         updateInboundCallConfig({ dispatch }: { dispatch: Dispatch }, params: InboundConfigItem) {
-            return HTTP.post(`/api/inbound-call-config/${params.callerId}/${params.webhookUrl}/${params.httpMethod}`);
+            return HTTP.post('/api/inbound-call-config/update', params);
         }
     }
 }

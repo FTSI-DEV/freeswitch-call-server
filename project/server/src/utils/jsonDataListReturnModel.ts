@@ -22,8 +22,6 @@ export class JsonDataListReturnModel extends JsonDataListModel<object>{
     static Ok(message:string,data?:object):JsonDataListModel<object>
 
     static Ok(message:string='Ok',data?:object):JsonDataListModel<object>{
-        console.log('message', message);
-        console.log('data', data);
         let value = new JsonDataListModel<object>();
 
         value.Data = data;

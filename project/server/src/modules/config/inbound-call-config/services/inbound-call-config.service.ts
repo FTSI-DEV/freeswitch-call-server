@@ -1,8 +1,10 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import e from 'express';
 import { IPaginationMeta, IPaginationOptions, paginate, Pagination } from 'nestjs-typeorm-paginate';
 import { config } from 'rxjs';
 import { InboundCallConfigEntity, InboundCallConfigRepository } from 'src/entity/inboundCallConfig.entity';
+import { JsonResultStatus } from 'src/utils/jsonResultStatus.enum';
 import { InboundCallConfigModel, InboundCallConfigParam } from '../models/inbound-call-config.model';
 
 @Injectable()
@@ -13,9 +15,7 @@ export class InboundCallConfigService {
         private _inboundCallConfigRepo: InboundCallConfigRepository
     ) {}
 
-    add(param: InboundCallConfigParam){
-
-        console.log('parma', param);
+    async add(param: InboundCallConfigParam):Promise<boolean>{
 
         let inboundCallConfig = new InboundCallConfigEntity();
 
@@ -24,24 +24,22 @@ export class InboundCallConfigService {
         inboundCallConfig.HTTPMethod = param.httpMethod;
         inboundCallConfig.CreatedDate = new Date;
 
-        this._inboundCallConfigRepo.saveUpdateRecord(inboundCallConfig);
+        await this._inboundCallConfigRepo.saveUpdateRecord(inboundCallConfig);
+
+        return true;
     }
 
-    update(param: InboundCallConfigParam):boolean{
+    async update(param: InboundCallConfigParam):Promise<boolean>{
 
-        this.getRecordById(param.id)
-        .then((result) => {
+        let config = await this.getRecordById(param.id);
 
-            if (result == null || result == undefined)  return false;
+        if (config === null || config === undefined) return false;
 
-            result.CallerId = param.callerId;
-            result.WebhookUrl = param.webhookUrl;
-            result.HTTPMethod = param.httpMethod;
-            this._inboundCallConfigRepo.saveUpdateRecord(result);
-        })
-        .catch(err => {
-            return false;
-        });
+        config.HTTPMethod = param.httpMethod;
+        config.WebhookUrl = param.webhookUrl;
+        config.CallerId = param.callerId;
+
+        await this._inboundCallConfigRepo.saveUpdateRecord(config);
 
         return true;
     }
@@ -59,7 +57,8 @@ export class InboundCallConfigService {
                     id:config.Id,
                     webhookUrl: config.WebhookUrl,
                     httpMethod: config.HTTPMethod,
-                    callerId:config.CallerId
+                    callerId:config.CallerId,
+                    isDeleted:config.IsDeleted
                 });
             })
             .catch(err => {
@@ -78,7 +77,8 @@ export class InboundCallConfigService {
                         webhookUrl: result.WebhookUrl,
                         callerId: result.CallerId,
                         id: result.Id,
-                        httpMethod: result.HTTPMethod
+                        httpMethod: result.HTTPMethod,
+                        isDeleted: result.IsDeleted
                     };
 
                     resolve(configModel);
@@ -89,49 +89,43 @@ export class InboundCallConfigService {
         })
     }
 
-    getInboundCallConfigs(options: IPaginationOptions): Promise<any>{
-        return new Promise<Pagination<InboundCallConfigModel>>((resolve,reject) => {
+    async getInboundCallConfigs(options: IPaginationOptions): Promise<Pagination<InboundCallConfigModel>>{
+        
+        let pageRecords = await paginate<InboundCallConfigEntity>(this._inboundCallConfigRepo, options);
 
-            let pageRecords = paginate<InboundCallConfigEntity>(this._inboundCallConfigRepo, options);
+        let itemsObjs: InboundCallConfigModel[] = [];
 
-            pageRecords.then(result => {
+        pageRecords.items.forEach(element => {
 
-                let itemsObjs: InboundCallConfigModel[] = [];
-          
-                result.items.forEach(element => {
-                    if (!element.IsDeleted) {
-                        let configModel = new InboundCallConfigModel();
+            if(!element.IsDeleted){
+                let configModel:InboundCallConfigModel = {
+                    webhookUrl : element.WebhookUrl,
+                    callerId: element.CallerId,
+                    httpMethod: element.HTTPMethod,
+                    isDeleted: element.IsDeleted,
+                    id: element.Id
+                };
 
-                        configModel.webhookUrl = element.WebhookUrl;
-                        configModel.callerId = element.CallerId;
-                        configModel.httpMethod = element.HTTPMethod;
-                        configModel.id = element.Id;
-                        
-                        itemsObjs.push(configModel);
-                    }
-                });
-            
-                resolve(new Pagination<InboundCallConfigModel, IPaginationMeta>(itemsObjs, result.meta));
-            })
-            .catch(err => {
-                reject(new Pagination<InboundCallConfigModel, IPaginationMeta>(null, {
-                    itemCount: 0,
-                    itemsPerPage: 0,
-                    totalItems: 0,
-                    totalPages: 0,
-                    currentPage: 0
-                }));
-            })
-            .catch(err => {
-                reject(new Pagination<InboundCallConfigModel, IPaginationMeta>(null, {
-                    itemCount: 0,
-                    itemsPerPage: 0,
-                    totalItems: 0,
-                    totalPages: 0,
-                    currentPage: 0
-                }));
-            });
-        })
+                itemsObjs.push(configModel);
+            }
+        });
+
+        // itemsObjs.sort((n1,n2) => n1.id - n2.id);
+
+        itemsObjs.sort((n1,n2) => {
+            if (n1.id < n2.id){
+                return 1;
+            }
+
+            if (n1.id > n2.id){
+                return -1;
+            }
+
+            return 0;
+        });
+
+        return new Pagination<InboundCallConfigModel, IPaginationMeta>(itemsObjs, pageRecords.meta);
+    
     }
 
     private getConfigByCallerId = (callerId:string) : Promise<InboundCallConfigEntity> => {
@@ -153,8 +147,13 @@ export class InboundCallConfigService {
         })
     }
 
-    private getRecordById = (id:number) : Promise<InboundCallConfigEntity> => {
-        return this._inboundCallConfigRepo.findOneOrFail(id);
+    private getRecordById = async (id:number) : Promise<InboundCallConfigEntity> => {
+       
+        let value = await this._inboundCallConfigRepo.createQueryBuilder("InboundCallConfig")
+            .where("InboundCallConfig.Id = :id", {id : id})
+            .getOne();
+
+        return value;
     }
     
     async deleteInboundCallConfig(id: number): Promise<string> {

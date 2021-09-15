@@ -17,16 +17,11 @@ export class InboundCallConfigController {
   }
 
   @Post('add')
-  add(
+  async add(
     @Body() params: InboundCallConfigParam
-  ): JsonDataListReturnModel {
+  ): Promise<JsonDataListReturnModel> {
 
-    console.log(`entered -> 
-      CallerId -> ${params.callerId} , 
-      Webhook -> ${params.webhookUrl}, 
-      HttpMethod -> ${params.httpMethod}`);
-
-    this._inboundCallConfig.add({
+    await this._inboundCallConfig.add({
       webhookUrl: params.webhookUrl,
       callerId: params.callerId,
       httpMethod: params.httpMethod
@@ -36,24 +31,40 @@ export class InboundCallConfigController {
   }
 
   @Post('update')
-  update(
+  async update(
     @Body() params: InboundCallConfigParam
-  ): JsonDataListReturnModel {
-    this._inboundCallConfig.update({
-      webhookUrl: params.webhookUrl,
-      callerId: params.callerId,
-      httpMethod : params.httpMethod,
-      id: params.id
-    });
+  ): Promise<JsonDataListReturnModel> {
+
+    try{
+      let isSuccess = await this._inboundCallConfig.update({
+              webhookUrl: params.webhookUrl,
+              callerId: params.callerId,
+              httpMethod : params.httpMethod,
+              id: params.id
+            });
+
+      if (isSuccess){
+        return JsonDataListReturnModel.Ok("Successfully updated config");
+      }
+      else
+      {
+        return JsonDataListReturnModel.Error("Unable to update config");
+      }
+    }
+    catch(err){
+      return JsonDataListReturnModel.Error('Error updating config -> ', err);
+    }
+   
 
     return JsonDataListReturnModel.Ok('Successfully updated config');
   }
 
   @Get('getInboundCallConfigs')
-  async getInboundCallConfigs(
+ async getInboundCallConfigs(
     @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number = 1,
     @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number = 10,
   ): Promise<JsonDataListReturnModel> {
+
     limit = limit > 100 ? 100 : limit;
 
     let retVal = await this._inboundCallConfig.getInboundCallConfigs({
