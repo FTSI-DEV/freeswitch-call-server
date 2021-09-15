@@ -51,8 +51,6 @@ export default {
                     id: prop.id,
                 });
             });
-
-            console.log('record -> ', state.Data);
         },
         setInboundConfigById(state: InboundConfig, payload: InboundConfigItem) {
             const { callerId, httpMethod, webhookUrl, id } = payload;

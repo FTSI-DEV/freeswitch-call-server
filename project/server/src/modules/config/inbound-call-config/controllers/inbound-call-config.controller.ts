@@ -11,6 +11,7 @@ export class InboundCallConfigController {
 
   @Get('getInboundCallConfigById/:id')
   async getInboundCallConfigById(@Param('id')id: number):Promise<JsonDataListReturnModel>{
+    
     let config = await this._inboundCallConfig.getInboundCallConfigById(id);
 
     return JsonDataListReturnModel.Ok(null, config);
@@ -54,9 +55,6 @@ export class InboundCallConfigController {
     catch(err){
       return JsonDataListReturnModel.Error('Error updating config -> ', err);
     }
-   
-
-    return JsonDataListReturnModel.Ok('Successfully updated config');
   }
 
   @Get('getInboundCallConfigs')

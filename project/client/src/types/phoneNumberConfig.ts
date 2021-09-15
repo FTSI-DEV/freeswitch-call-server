@@ -15,6 +15,12 @@ export interface PhoneNumberConfigItem {
 }
 
 export interface PhoneNumberConfig {
+    Data: {
+        items: Array<PhoneNumberConfigItem>,
+        meta: PhoneNumberConfigPager
+    },
+    Message: "",
+    Status: "",
     phoneConfigById: PhoneNumberConfigItem,
     items: Array<PhoneNumberConfigItem>,
     meta: PhoneNumberConfigPager,

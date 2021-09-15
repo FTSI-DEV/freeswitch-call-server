@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { rejects } from 'assert';
+import e from 'express';
 import { IPaginationMeta, IPaginationOptions, paginate, Pagination } from 'nestjs-typeorm-paginate';
 import { PhoneNumberConfigEntity, PhoneNumberConfigRepository } from 'src/entity/phoneNumberConfig.entity';
 import { FreeswitchPhoneNumberConfigParam } from 'src/models/freeswitchCallConfigModel';
@@ -13,7 +14,7 @@ export class FreeswitchPhoneNumberConfigService{
         private _phoneNumberConfigRepo: PhoneNumberConfigRepository,
     ) {}
 
-    add(param: FreeswitchPhoneNumberConfigParam){
+    async add(param: FreeswitchPhoneNumberConfigParam){
 
         let phoneNumberConfig = new PhoneNumberConfigEntity();
 
@@ -22,161 +23,86 @@ export class FreeswitchPhoneNumberConfigService{
         phoneNumberConfig.WebhookUrl = param.webhookUrl;
         phoneNumberConfig.PhoneNumber = param.phoneNumber;
 
-        this._phoneNumberConfigRepo.saveUpdateRecord(phoneNumberConfig);
+        await this._phoneNumberConfigRepo.saveUpdateRecord(phoneNumberConfig);
     }
 
-    async update(param: FreeswitchPhoneNumberConfigParam){
+    async update(param: FreeswitchPhoneNumberConfigParam):Promise<boolean>{
 
-        let record = this.getById(param.id);
+        let config = await this.getById(param.id);
 
-        console.log('re', record);
+        if (config === null || config === undefined) return false;
 
+        config.FriendlyName = param.friendlyName;
+        config.WebhookUrl = param.webhookUrl;
+        config.PhoneNumber = param.phoneNumber;
+        config.HttpMethod = param.httpMethod;
 
-        return false;
+        await this._phoneNumberConfigRepo.saveUpdateRecord(config);
 
-        // this.getRecordById(param.id)
-        // .then((result) => {
-
-        //     if (result == null || result == undefined) return false;
-
-        //     result.FriendlyName = param.friendlyName;
-        //     result.HttpMethod = param.httpMethod;
-        //     result.WebhookUrl = param.webhookUrl;
-        //     result.PhoneNumber = param.phoneNumber
-
-        //     console.log('res', result);
-
-        //     // this._phoneNumberConfigRepo.saveUpdateRecord(result);
-
-        // }).catch((err) => {
-        //     console.log('err',err);
-        //     return false;
-        // });
-
-        // return true;
-
+        return true;
     }
 
-    getPhone(id:number):any{
+    async getPhoneNumberConfigById(id: number): Promise<FreeswitchPhoneNumberConfigParam>{
 
-        this.getPhoneNumberConfigById(id)
-        .then((result) => {
-            return result;
-        }).catch((err) => {
-            return err;
-        });
+        let config = await this.getById(id);
+
+        if (config === null || config === undefined) return null;
+
+        let configModel: FreeswitchPhoneNumberConfigParam = {
+            friendlyName: config.FriendlyName,
+            phoneNumber: config.PhoneNumber,
+            httpMethod: config.HttpMethod,
+            webhookUrl: config.WebhookUrl,
+            id: config.Id,
+            isDeleted: config.IsDeleted
+        };
+
+        return configModel;
     }
 
-    getPhoneNumberConfigById(id: number): Promise<FreeswitchPhoneNumberConfigParam>{
-        return new Promise<FreeswitchPhoneNumberConfigParam>((resolve, reject) => {
-            this.getById(id)
-                .then((result) => {
-                    
-                    if (result == null || result == undefined){
-                        reject(null);
-                    }
-                    console.log('res', result);
-                    let configModel: FreeswitchPhoneNumberConfigParam = {
-                        friendlyName: result.FriendlyName,
-                        phoneNumber: result.PhoneNumber,
-                        httpMethod: result.HttpMethod,
-                        webhookUrl: result.WebhookUrl,
-                        id: result.Id
-                    };
-                    resolve(configModel);
+    async getPhoneNumberConfigs(options:IPaginationOptions) : Promise<Pagination<FreeswitchPhoneNumberConfigParam>>{
 
-                }).catch((err) => {
-                    reject(null);
-                });
-        })
-        .catch(err => {
-            console.log('err', err);
-            return null;
-        });
-    }
+        let pageRecords = await paginate<PhoneNumberConfigEntity>(this._phoneNumberConfigRepo, options);
 
-    getAll(options:IPaginationOptions) :any{
+        let itemObjs: FreeswitchPhoneNumberConfigParam[] = [];
 
-        return this.getPhoneNumberConfigs(options);
-    }
+        pageRecords.items.forEach(element => {
+            if (!element.IsDeleted){
+                let configModel: FreeswitchPhoneNumberConfigParam = {
+                    webhookUrl : element.WebhookUrl,
+                    httpMethod: element.HttpMethod,
+                    phoneNumber: element.PhoneNumber,
+                    id: element.Id,
+                    friendlyName: element.FriendlyName,
+                    isDeleted : element.IsDeleted
+                };
 
-    private getRecordById(id:number):any{
-
-        console.log('test', id);
-        this.getPhoneNumberConfigById(id)
-        .then((result) => {
-            if (result == null){
-                return null;
+                itemObjs.push(configModel);
             }
-            else{
-                return result;
+        });
+
+        itemObjs.sort((n1,n2) => {
+            if (n1.id < n2.id){
+                return 1;
             }
-        }).catch((err) => {
-            return null;
+
+            if (n1.id > n2.id){
+                return -1;
+            }
+
+            return 0;
         });
+
+        return new Pagination<FreeswitchPhoneNumberConfigParam, IPaginationMeta>(itemObjs, pageRecords.meta);
     }
 
-    private getById = (id: number): any => {
+    private getById = async (id: number): Promise<PhoneNumberConfigEntity> => {
+        
+        let value = await this._phoneNumberConfigRepo.createQueryBuilder("PhoneNumberConfig")
+            .where("PhoneNumberConfig.Id = :id" , { id: id})
+            .getOne();
 
-        return new Promise<PhoneNumberConfigEntity>((resolve,reject) => {
-            console.log('id', id);
-            this._phoneNumberConfigRepo.findOneOrFail({ where: { Id: id } })
-            .then(result => {
-                if (result == null || result == undefined){
-                    reject(null);
-                }
-                else {
-                    console.log('getbyId:resolve', result);
-                    resolve(result);
-                }
-            })
-            .catch(err => {
-                reject(null);
-            });
-        })
-        .catch(err => {
-            console.log('err', err);
-        });
-    }
-
-    private getPhoneNumberConfigs(options: IPaginationOptions):Promise<any>{
-
-        return new Promise<Pagination<FreeswitchPhoneNumberConfigParam>>((resolve, reject) => {
-
-            let pageRecords = paginate<PhoneNumberConfigEntity>(this._phoneNumberConfigRepo, options);
-
-            pageRecords.then(result => {
-                let itemsObjs: FreeswitchPhoneNumberConfigParam[] = [];
-
-                result.items.forEach(element => {
-
-                    if (!element.IsDeleted) {
-                        let configModel = new FreeswitchPhoneNumberConfigParam();
-
-                        configModel.friendlyName = element.FriendlyName;
-                        configModel.httpMethod = element.HttpMethod;
-                        configModel.phoneNumber = element.PhoneNumber;
-                        configModel.webhookUrl = element.WebhookUrl;
-                        configModel.id = element.Id;
-
-                        itemsObjs.push(configModel);
-                    }
-                });
-
-                resolve(new Pagination<FreeswitchPhoneNumberConfigParam, IPaginationMeta>(itemsObjs, result.meta));
-
-            }).catch(err => {
-                reject(new Pagination<FreeswitchPhoneNumberConfigParam, IPaginationMeta>(null, {
-                    itemCount: 0,
-                    itemsPerPage: 0,
-                    totalItems: 0,
-                    totalPages : 0,
-                    currentPage: 0
-                }));
-            })
-        }).catch(error => {
-            console.log('error', error);
-        })
+        return value;
     }
 
     deletePhoneNumberConfig(id: number): Promise<string> {

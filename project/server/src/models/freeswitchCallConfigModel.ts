@@ -4,6 +4,7 @@ export class FreeswitchPhoneNumberConfigParam{
     httpMethod: string;
     webhookUrl: string;
     id?: number;
+    isDeleted:boolean;
 }
 
 export class FreeswitchPhoneNumberConfigModel{

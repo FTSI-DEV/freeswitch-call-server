@@ -45,7 +45,7 @@ export class FreeswitchPhoneNumberConfigController {
 
         limit = limit > 100 ? 100 : limit;
 
-        let retVal = await this._freeswitchCallConfigService.getAll({
+        let retVal = await this._freeswitchCallConfigService.getPhoneNumberConfigs({
             page,
             limit
         });

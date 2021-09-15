@@ -10,6 +10,18 @@ import {
 export default {
     state() {
         return {
+            Data: {
+                items: [],
+                meta : {
+                    currentPage: 1,
+                    itemCount: 1,
+                    itemsPerPage: 1,
+                    totalItems: 1,
+                    totalPages: 1,
+                }
+            },
+            Message: "",
+            Status: "",
             items: [],
             meta: {
                 currentPage: 1,
@@ -28,24 +40,24 @@ export default {
         } as PhoneNumberConfig
     },
     getters: {
-        getPhoneNumberConfig: (state: PhoneNumberConfig): Array<PhoneNumberConfigItem> => state.items,
-        getPhoneNumberPager: (state: PhoneNumberConfig): PhoneNumberConfigPager => state.meta,
+        getPhoneNumberConfig: (state: PhoneNumberConfig): Array<PhoneNumberConfigItem> => state.Data.items,
+        getPhoneNumberPager: (state: PhoneNumberConfig): PhoneNumberConfigPager => state.Data.meta,
         getPhoneNumberConfigById: (state: PhoneNumberConfig): PhoneNumberConfigItem => state.phoneConfigById,
     },
     mutations: {
         setPhoneNumberConfigs(state: PhoneNumberConfig, payload: PhoneNumberConfig) {
-            const { items, meta } = payload;
+            const { items, meta } = payload.Data;
             const { currentPage, itemCount, itemsPerPage, totalItems, totalPages } = meta;
-
-            state.meta.currentPage = currentPage;
-            state.meta.itemCount = itemCount;
-            state.meta.itemsPerPage = itemsPerPage;
-            state.meta.totalItems = totalItems;
-            state.meta.totalPages = totalPages;
-            state.items = [];
+            
+            state.Data.items = [];
+            state.Data.meta.currentPage = currentPage;
+            state.Data.meta.itemCount = itemCount;
+            state.Data.meta.itemsPerPage = itemsPerPage;
+            state.Data.meta.totalItems = totalItems;
+            state.Data.meta.totalPages = totalPages;
 
             items.forEach(prop => {
-                state.items.push({
+                state.Data.items.push({
                     friendlyName: prop.friendlyName,
                     httpMethod: prop.httpMethod,
                     id: prop.id,
@@ -53,6 +65,8 @@ export default {
                     webhookUrl: prop.friendlyName,
                 });
             });
+
+            console.log('phonenumber -> ', state.Data);
         },
         setPhoneNumberConfigById(state: PhoneNumberConfig, payload: PhoneNumberConfigItem) {
             const { friendlyName, httpMethod, id, phoneNumber, webhookUrl } = payload;
