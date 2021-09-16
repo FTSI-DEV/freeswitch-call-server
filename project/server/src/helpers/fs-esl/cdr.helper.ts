@@ -22,7 +22,21 @@ export class CDRHelper{
         const answer_epoch = this.getHeader(CHANNEL_VARIABLE.ANSWER_EPOCH, fsEvent);
         const end_epoch = this.getHeader(CHANNEL_VARIABLE.END_EPOCH , fsEvent);
 
-        const duration = this.calculateDuration(answer_epoch, end_epoch);
+        let duration = 0;
+
+        if (answer_epoch === "0" ||
+            end_epoch === "0"){
+
+            duration = 0;
+        }
+        else
+        {
+            duration = this.calculateDuration(answer_epoch, end_epoch);
+        }
+
+        console.log('duration', duration);
+        console.log('answer_epoch ', answer_epoch);
+        console.log('end_epoch', end_epoch);
 
         return{
             UUID: uuid,

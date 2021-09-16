@@ -30,9 +30,6 @@ export class OutboundCallJob{
         {
             context.outboundCallParam = parameter.data;
 
-            console.log('data -' , parameter.data);
-            console.log('context - ', context.outboundCallParam);
-
             context.outboundCallParam.StartedDate = context.dateTime;
 
             context.cdrRecord = await this._callDetailRecordService.getByCallUid(context.outboundCallParam.UUID);

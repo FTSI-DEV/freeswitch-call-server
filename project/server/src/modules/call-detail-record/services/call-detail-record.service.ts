@@ -3,7 +3,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { IPaginationMeta, IPaginationOptions, paginate, Pagination } from 'nestjs-typeorm-paginate';
 import { FsCallDetailRecordEntity, FsCallDetailRecordRepository } from 'src/entity/call-detail-record';
 import { CallDetailRecordDTO, CDRModel } from 'src/modules/call-detail-record/models/cdr.models';
-import moment from 'moment';
 
 @Injectable()
 export class CallDetailRecordService {
