@@ -37,7 +37,7 @@ export class IncomingCallJob {
           CallDirection: parameter.data.CallDirection,
           StartedDate: parameter.data.StartedDate,
           CallStatus: parameter.data.CallStatus,
-          CallDuration: parameter.data.Duration,
+          Duration: parameter.data.Duration,
           RecordingUUID: parameter.data.RecordingUUID,
           ParentCallUid: parameter.data.ParentCallUid,
           Id: parameter.data.Id
@@ -55,7 +55,7 @@ export class IncomingCallJob {
           CallDirection: parameter.data.CallDirection,
           StartedDate: parameter.data.StartedDate,
           CallStatus: parameter.data.CallStatus,
-          CallDuration: parameter.data.Duration,
+          Duration: parameter.data.Duration,
           RecordingUUID: parameter.data.RecordingUUID,
           ParentCallUid: parameter.data.ParentCallUid,
           Id: parameter.data.Id

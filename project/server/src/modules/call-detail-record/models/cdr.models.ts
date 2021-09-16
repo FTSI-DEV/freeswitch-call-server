@@ -5,7 +5,7 @@ export class CDRModel{
     CallDirection?: string;
     CallStatus?: string;
     StartedDate: any;
-    CallDuration?: any;
+    Duration?: number;
     Id?: number;
     RecordingUUID?: string;
     ParentCallUid?:string;

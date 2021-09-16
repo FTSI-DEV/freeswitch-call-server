@@ -2,7 +2,6 @@ import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
-import { UsersModule } from './users/users.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Connection } from 'typeorm';
 import { configService } from './config/config.service';
@@ -26,7 +25,6 @@ import { OutboundCallService } from './modules/outbound-call/services/outbound-c
 @Module({
   imports: [
     AuthModule,
-    UsersModule,
     IvrModule,
     TypeOrmModule.forRoot(configService.getTypeOrmConfig()),
     PhoneNumberConfigModule,

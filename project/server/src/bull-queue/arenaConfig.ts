@@ -1,5 +1,7 @@
-const Bee = require('bee-queue');
-const Bull = require('bull');
+// const Bee = require('bee-queue');
+// const Bull = require('bull');
+
+import Bull from 'bull';
 
 export default {
       Bull,

@@ -35,8 +35,8 @@ export class FsCallDetailRecordEntity{
 
 @EntityRepository(FsCallDetailRecordEntity)
 export class FsCallDetailRecordRepository extends Repository<FsCallDetailRecordEntity>{
-    
-    saveCDR = async(cdr: FsCallDetailRecordEntity) => {
-        return await this.save(cdr);
+
+    async saveCDR(cdr: FsCallDetailRecordEntity){
+       return await this.save(cdr);
     }
 }

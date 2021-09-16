@@ -33,7 +33,7 @@ export class URIBuilder {
     let callDirection = `CallDirection=${callData.CallDirection}`;
     let callStatus = `CallStatus=${callData.CallStatus}`;
     let startedDate = `StartedDate=${callData.StartedDate}`;
-    let duration = `Duration=${callData.CallDuration}`;
+    let duration = `Duration=${callData.Duration}`;
     let recordingUUID = `RecordingUUID=${callData.RecordingUUID}`;
     let parentCallUUID = `ParentCallUid=${callData.ParentCallUid}`;
 

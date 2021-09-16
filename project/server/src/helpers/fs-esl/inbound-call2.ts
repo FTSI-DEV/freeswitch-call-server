@@ -4,6 +4,7 @@ import { CHANNEL_VARIABLE } from '../constants/channel-variables.constants';
 import { EVENT_LIST } from '../constants/event-list.constants';
 import { CommandConstants } from '../constants/freeswitch-command.constants';
 import { FreeswitchDpConstants } from '../constants/freeswitchdp.constants';
+import { FS_ESL } from '../constants/fs-esl.constants';
 import { DialplanInstruction, TwiMLXMLParser } from '../parser/xmlParser';
 import { inboundCallServer } from './inboundCall.server';
 
@@ -22,13 +23,15 @@ export class InboundCallHelper2 {
 
       let legId = conn.getInfo().getHeader(CHANNEL_VARIABLE.UNIQUE_ID);
 
+      console.log('LEG-A', legId);
+
       let hangupCompleteEvent = 'esl::event::CHANNEL_HANGUP_COMPLETE::' + legId;
 
       conn.subscribe(EVENT_LIST.CHANNEL_HANGUP_COMPLETE);
 
       let hangupCompleteWrapper = (esl) => {
         context.legStop = true;
-        console.log('Leg-A hangup');
+        console.log('Leg-A hangup', esl.getHeader('Unique-ID'));
         conn.removeListener(hangupCompleteEvent, hangupCompleteWrapper);
       };
 
@@ -37,6 +40,12 @@ export class InboundCallHelper2 {
       });
 
       conn.on(hangupCompleteEvent, hangupCompleteWrapper);
+
+      conn.subscribe('all');
+
+      conn.on('esl::event::*::*', (evt) => {
+        console.log(`EVENT NAME -> ${evt.getHeader('Event-Name')} , UniqueId -> ${evt.getHeader('Unique-ID')}`);
+      });
 
       if (!context.legStop) {
         // PLAY WELCOME MESSAGE
@@ -60,19 +69,17 @@ export class InboundCallHelper2 {
                 this.triggerWebhookUrl(config.webhookUrl,config.httpMethod,voiceRequestParam,
                   (twiMLResponse) => {
                     //start for the first instruction to be executed.
-                    console.log('RESULT CONFIG -> ', twiMLResponse);
 
                     let parseResult = new TwiMLXMLParser().tryParse(twiMLResponse);
 
                     this.dpInstruction(parseResult, context);
 
-                    console.log('context', context);
-
                     if (context.isValidated) {
+
                       let minValue = '1'; // minimum number of digits to collect;
                       let maxValue = '11'; // maximum number of digits to collecct;
                       let tries = '2'; // number of attempts to play the file and collect digits
-                      let timeout = '10000'; // number of milliseconds to wait before assuming the caller is done entering digits
+                      let timeout = ``; // number of milliseconds to wait before assuming the caller is done entering digits
                       let terminator = '#'; // digits used to end input
                       let soundFile =
                         'ivr/ivr-enter_destination_telephone_number.wav'; // sound file to play while digits are fetched.
@@ -81,10 +88,6 @@ export class InboundCallHelper2 {
                         context.dialplanInstruction.gatherAttribute.numDigits; // regular expression to match digits
                       let digit_timeout = '3000'; // (optional) number of milliseconds to wait between digits
                       let var_name = 'target_num'; // channel variable that digits should be placed in
-
-                      console.log('digits -> ', regexValue);
-
-                      console.log('command -> ',context.dialplanInstruction.command);
 
                       if (context.dialplanInstruction.command === 'exec') {
 
@@ -95,16 +98,12 @@ export class InboundCallHelper2 {
 
                             let inputtedDigit = e.getHeader(`variable_${var_name}`);
 
-                            console.log('Digit entered -> ', inputtedDigit);
-
                             if (context.legStop) {
                               console.log('Leg has stop');
                               return;
                             }
 
                             if (inputtedDigit === regexValue) {
-
-                              console.log('VALID INPUT -> ', inputtedDigit);
 
                               voiceRequestParam.Digits = inputtedDigit;
 
@@ -114,7 +113,6 @@ export class InboundCallHelper2 {
                               });
 
                             } else {
-                              console.log('INVALID INPUT -> ', inputtedDigit);
 
                               conn.execute('hangup', 'CALL_REJECTED', (cb) => {
                                 console.log('CALL REJECTED EXECUTED!');
@@ -239,8 +237,6 @@ export class InboundCallHelper2 {
         //3rd instruction to be executed
         this.triggerWebhookUrl(nextInstruction.value,null,voiceRequestParam, (twiMLResponse) => {
 
-            console.log('TwiML Response -> ',twiMLResponse);
-
             context.dialplanInstructions = [];
 
             let twiMLNextParseResult = new TwiMLXMLParser().tryParse(twiMLResponse);
@@ -250,10 +246,6 @@ export class InboundCallHelper2 {
             if (context.isValidated) {
 
               let instructionSize = context.dialplanInstructions.length;
-
-              console.log('size ',instructionSize);
-
-              console.log('INSTRUCTIONS', JSON.stringify(context.dialplanInstructions));
 
               if (instructionSize === 2) {
 
@@ -265,7 +257,6 @@ export class InboundCallHelper2 {
 
                       console.log('playback executed ');
                       nextInstruction = context.dialplanInstructions[1];
-                      console.log( 'next -> ', JSON.stringify(nextInstruction));
 
                       if (nextInstruction.name === FreeswitchDpConstants.bridge) {
                         console.log('bridge validated!');
@@ -273,10 +264,9 @@ export class InboundCallHelper2 {
 
                           conn.execute(
                             'export',
-                            'execute_on_answer=record_session $${recordings_dir}/${strftime(%Y-%m-%d-%H-%M-%S)}_${uuid}_${caller_id_number}.wav',
+                            'execute_on_answer=record_session $${recordings_dir}/${strftime(%Y-%m-%d-%T%H-%M-%S)}_${uuid}.wav',
                             () => {
 
-                              console.log('Number -> ', nextInstruction.children.value);
                               conn.execute(nextInstruction.name, `sofia/gateway/fs-test3/1000`,(cb) => {
 
                                   console.log('bridge completed');
@@ -292,9 +282,6 @@ export class InboundCallHelper2 {
                   });
                 }
               } else {
-                console.log('HANGUP HERE');
-                console.log('HANGUP -> ',JSON.stringify(context.dialplanInstruction));
-
                 if (context.dialplanInstruction.name === FreeswitchDpConstants.speak) {
                  
                   conn.execute(context.dialplanInstruction.name,
@@ -328,8 +315,6 @@ export class InboundCallHelper2 {
       context.dialplanInstruction.gatherAttribute.method,
       voiceRequestParam,
       (twiMLResponse) => {
-
-        console.log('TwiML Response -> ',twiMLResponse);
 
         let twiMLNextParseResult = new TwiMLXMLParser().tryParse(twiMLResponse);
 
@@ -376,12 +361,6 @@ export class InboundCallHelper2 {
     callback,
   ) {
     let record = null;
-
-    console.log(
-      `METHOD -> ${httpMethod} , WEBHOOK -> ${webhookUrl} , Params -> ${JSON.stringify(
-        params,
-      )}`,
-    );
 
     if (httpMethod === 'POST') {
       record = await axios.post(webhookUrl, params);

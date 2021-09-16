@@ -42,7 +42,7 @@ export class FirstMigration1631505375288 implements MigrationInterface {
             "PhoneNumberFrom" varchar(50),
             "CallStatus" varchar(300),
             "CallDuration" int,
-            "DateCreated" date NOT NULL, 
+            "DateCreated" timestamp without time zone NOT NULL, 
             "RecordingUid" varchar(200),
             "ParentCallUid" varchar(200),
             CONSTRAINT "PK_CallDetailRecord_Id" PRIMARY KEY ("Id")
@@ -61,7 +61,7 @@ export class FirstMigration1631505375288 implements MigrationInterface {
                   "CallUid" varchar(200),
                   "FilePath" varchar,
                   "IsDeleted" boolean NOT NULL DEFAULT false,
-                  "DateCreated" date NOT NULL,
+                  "DateCreated" timestamp without time zone NOT NULL,
                   "CallId" int NOT NULL,
                   CONSTRAINT "PK_CallRecordingStorage_RecordingId" PRIMARY KEY ("RecordingId")
                   )`);

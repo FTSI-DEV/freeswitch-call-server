@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
-import { UsersService } from 'src/users/users.service';
 import { Repository } from 'typeorm';
 import { ApiCredential } from 'src/models/apiCredential.model';
 import { configService } from 'src/config/config.service';
@@ -9,21 +8,18 @@ import { configService } from 'src/config/config.service';
 @Injectable()
 export class AuthService {
   constructor(
-    //  @InjectRepository(fscreds)
-    // private freeswitchRepo: Repository<fscreds>,
-      private usersService: UsersService,
       private jwtService: JwtService,
       ) {}
 
-  async validateUser(username: string, pass: string): Promise<any> {
-    console.log(`Validating username: ${username} , password: ${pass}`);
-    const user = await this.usersService.findOne(username);
-    if (user && user.password === pass) {
-      const { password, ...result } = user;
-      return result;
-    }
-    return null;
-  }
+  // async validateUser(username: string, pass: string): Promise<any> {
+  //   console.log(`Validating username: ${username} , password: ${pass}`);
+  //   const user = await this.usersService.findOne(username);
+  //   if (user && user.password === pass) {
+  //     const { password, ...result } = user;
+  //     return result;
+  //   }
+  //   return null;
+  // }
   
   async login(user: any){
       const payload = { username: user.username, sub: user.userId};

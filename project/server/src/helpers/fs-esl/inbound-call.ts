@@ -6,15 +6,10 @@ import { CHANNEL_VARIABLE } from "../constants/channel-variables.constants";
 import { ESL_SERVER, FS_DIALPLAN, FS_ESL } from "../constants/fs-esl.constants";
 import { TwiMLContants } from "../constants/twiml.constants";
 import { KeyValues, XMLParser, XMLParserHelper, CommandType } from "../parser/twimlXML.parser";
-import { http } from "../libs/http";
+import http from 'http';
 import { inboundCallServer } from "./inboundCall.server";
 import { Instructions } from '../../helpers/parser/xmlCommandObject';
-import { EVENT_LIST } from "../constants/event-list.constants";
-import { chownSync } from "fs";
 import { InboundCallDTMFHelper } from "./inbound-call.dtmf.helper";
-import { combineLatest, concatAll, sample } from "rxjs";
-import { Any } from "typeorm";
-import { exec } from "child_process";
 
 export class InboundCallHelper{
 

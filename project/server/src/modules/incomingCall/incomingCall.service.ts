@@ -22,7 +22,7 @@ export class IncomingCallService {
       PhoneNumberTo: callData.PhoneNumberTo,
       StartedDate: callData.StartedDate,
       RecordingUUID: callData.UUID,
-      CallDuration: callData.CallDuration,
+      Duration: callData.Duration,
     });
   }
 }

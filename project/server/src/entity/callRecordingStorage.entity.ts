@@ -23,19 +23,27 @@ export class CallRecordingStorageEntity{
     @CreateDateColumn()
     DateCreated: Date;
 
-    // @OneToOne(type => FsCallDetailRecordEntity)
-    // @JoinColumn({ 
-    //     name: 'CallId', 
-    //     referencedColumnName : 'Id' 
-    // })
-    // callDetailRecord: FsCallDetailRecordEntity;
+    @OneToOne(type => FsCallDetailRecordEntity)
+    @JoinColumn({ 
+        name: 'CallId', 
+        referencedColumnName : 'Id' 
+    })
+    callDetailRecord: FsCallDetailRecordEntity;
 }
 
 @EntityRepository(CallRecordingStorageEntity)
 export class CallRecordingStorageRepository extends Repository<CallRecordingStorageEntity>{
 
-    saveUpdateRecord = async (callRecordingStorage: CallRecordingStorageEntity) => {
-        return await this.save(callRecordingStorage);
+    // saveCallRecording = async (callRecordingStorage: CallRecordingStorageEntity) => {
+    //     return await this.save(callRecordingStorage);
+    // }
+
+    async saveCallRecording(param:CallRecordingStorageEntity){
+        return await this.save(param);
+    } 
+
+    async saveHere(param: CallRecordingStorageEntity){
+        await this.save(param);
     }
 
     getById = async (id: number): Promise<CallRecordingStorageEntity> => {

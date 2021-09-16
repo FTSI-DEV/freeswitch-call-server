@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { IPaginationMeta, IPaginationOptions, paginate, Pagination } from 'nestjs-typeorm-paginate';
 import { FsCallDetailRecordEntity, FsCallDetailRecordRepository } from 'src/entity/call-detail-record';
 import { CallDetailRecordDTO, CDRModel } from 'src/modules/call-detail-record/models/cdr.models';
+import moment from 'moment';
 
 @Injectable()
 export class CallDetailRecordService {
@@ -11,25 +12,28 @@ export class CallDetailRecordService {
         private _callDetailRecordRepo: FsCallDetailRecordRepository)
     {}
 
-    saveCDR(cdrParam: CDRModel){
+    async saveCDR(cdrParam: CDRModel):Promise<number>{
 
         let cdr = new FsCallDetailRecordEntity();
 
+        console.log('STARTED DATE -> ', cdrParam.StartedDate);
+
         cdr.CallUid = cdrParam.UUID;
         cdr.CallStatus = cdrParam.CallStatus;
-        cdr.DateCreated = cdrParam.StartedDate;
         cdr.RecordingUid = cdrParam.RecordingUUID;
         cdr.PhoneNumberFrom = cdrParam.PhoneNumberFrom;
         cdr.PhoneNumberTo = cdrParam.PhoneNumberTo;
-        cdr.CallDuration = cdrParam.CallDuration;
+        cdr.CallDuration = cdrParam.Duration;
         cdr.CallDirection = cdrParam.CallDirection;
         cdr.ParentCallUid = cdrParam.ParentCallUid;
+        cdr.DateCreated = cdrParam.StartedDate;
 
-        this._callDetailRecordRepo.saveCDR(cdr);
+        let record = await this._callDetailRecordRepo.saveCDR(cdr);
 
+        return record.Id;
     }
 
-    async updateCDR(cdrParam: CDRModel){
+    async updateCDR(cdrParam: CDRModel):Promise<number>{
 
         let result = await this.getByCallUid(cdrParam.UUID);
 
@@ -39,20 +43,22 @@ export class CallDetailRecordService {
 
         console.log('CDR RECORD UPDATE -> ' , result);
 
-        result.CallDuration = cdrParam.CallDuration;
+        result.CallDuration = cdrParam.Duration;
         result.CallStatus = cdrParam.CallStatus;
         result.PhoneNumberFrom = cdrParam.PhoneNumberFrom;
         result.PhoneNumberTo = cdrParam.PhoneNumberTo;
         result.RecordingUid = cdrParam.UUID;
         result.ParentCallUid = cdrParam.ParentCallUid;
 
-        await this._callDetailRecordRepo.saveCDR(result);
+        let record = await this._callDetailRecordRepo.saveCDR(result);
+
+        return record.Id
     }
 
     getByCallUid(callUid:string): Promise<FsCallDetailRecordEntity>{
 
         let record = this._callDetailRecordRepo.createQueryBuilder("CallDetailRecord")
-                    .where("CallDetailRecord.CallUUID = :callUid", { callUid: callUid})
+                    .where("CallDetailRecord.CallUid = :callUid", { callUid: callUid})
                     .getOne();
         return record;
     }

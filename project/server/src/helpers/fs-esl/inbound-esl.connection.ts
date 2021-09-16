@@ -6,9 +6,8 @@ import { FS_ESL } from '../constants/fs-esl.constants';
 import { CDRHelper } from './cdr.helper';
 import { DTMFHelper } from './dtmf.helper';
 import { FreeswitchConfigHelper } from './freeswitchConfig.helper';
-const esl = require('modesl');
-const http = require('http');
-
+import esl from 'modesl';
+import http from 'http';
 
 interface ConnResult {
   connectionObj: any;

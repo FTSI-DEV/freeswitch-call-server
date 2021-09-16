@@ -31,7 +31,7 @@ export class CDRHelper{
             CallDirection: callDirection,
             CallStatus: hangup_cause,
             StartedDate: started_date,
-            CallDuration: duration,
+            Duration: duration,
             Id: null,
             RecordingUUID: uuid
         };

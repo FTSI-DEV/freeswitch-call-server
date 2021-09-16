@@ -1,7 +1,6 @@
 import { InjectQueue } from '@nestjs/bull';
 import { Controller, Get, HttpException, HttpStatus, Inject, Param, Post, Query } from '@nestjs/common';
 import { Queue } from 'bull';
-import * as moment from 'moment';
 import { CDRModel } from 'src/modules/call-detail-record/models/cdr.models';
 import { CallDetailRecordService } from 'src/modules/call-detail-record/services/call-detail-record.service';
 import { JsonDataListReturnModel } from 'src/utils/jsonDataListReturnModel';

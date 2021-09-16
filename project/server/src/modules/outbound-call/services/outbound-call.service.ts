@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { FreeswitchConnectionResult } from 'src/helpers/fs-esl/inbound-esl.connection';
 import { CallDetailRecordService } from 'src/modules/call-detail-record/services/call-detail-record.service';
-import * as moment from 'moment';
+import moment from 'moment';
 
 @Injectable()
 export class OutboundCallService {
@@ -42,7 +42,7 @@ export class OutboundCallService {
                 this._callDetailRecordService.saveCDR({
                     UUID: callUid,
                     CallDirection: 'outbound',
-                    StartedDate:  moment().format('YYYY-MM-DDTHH:mm:ss.SSS'),
+                    StartedDate:  moment().format('YYYY-MM-DDTHH:mm:ss'),
                     PhoneNumberTo : phoneNumberTo
                 });
 

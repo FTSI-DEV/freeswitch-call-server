@@ -39,6 +39,7 @@
     "bull-arena": "^3.29.2",
     "dotenv": "^10.0.0",
     "modesl": "^1.2.1",
+    "moment": "^2.29.1",
     "mssql": "^4.3.9",
     "nestjs-typeorm-paginate": "^2.6.2",
     "passport": "^0.4.1",
