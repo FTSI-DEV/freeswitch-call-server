@@ -1,5 +1,16 @@
 <template>
-  <a-layout>
+ <div>
+    <a-form-item label="From" style="display: block; text-align: left">
+        <input :class="['ant-input', isInvalid(from)]" v-model="from" />
+      </a-form-item>
+      <a-form-item label="To" style="display: block; text-align: left">
+        <input :class="['ant-input', isInvalid(to)]" v-model="to" />
+      </a-form-item>
+    <a-form-item label="Caller Id" style="display: block; text-align: left">
+        <input :class="['ant-input', isInvalid(callerId)]" v-model="callerId" />
+      </a-form-item>
+ </div>
+  <!-- <a-layout>
     <a-layout style="padding: 24px 24px 24px">
       <a-layout-content
         :style="{
@@ -61,45 +72,21 @@
         </a-row>
       </a-layout-content>
     </a-layout>
-  </a-layout>
+  </a-layout> -->
 </template>
 <script lang="ts">
-
-import { reactive, toRefs, defineComponent } from "vue";
-import { useStore } from 'vuex';
+import { toRefs, defineComponent } from "vue";
+import methodsObj from "./helper/method";
 
 export default defineComponent({
   setup() {
-    const store = useStore();
-    const state = reactive({
-      from: null,
-      to: null,
-      callerId: null,
-      hasError: false,
-    })
-
-    // Methods
-    const isInvalid = (value: string): string => !value && state.hasError ? "invalid" : "";
-    const clickToCall = () => {
-      if (!state.from || !state.to || !state.callerId) {
-        state.hasError = true;
-        return;
-      }
-      state.hasError = false;
-      const params = {
-        phoneNumberFrom: state.from,
-        phoneNumberTo: state.to,
-        callerId: state.callerId,
-      };
-      store.dispatch("clickToCall", params);
-    }
-
+    const { isInvalid, state, clickToCall  } = methodsObj();
     return {
       ...toRefs(state),
       isInvalid,
-      clickToCall
-    }
-  }
+      clickToCall,
+    };
+  },
 });
 </script>
 <style scoped>

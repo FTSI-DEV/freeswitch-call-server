@@ -5,7 +5,8 @@
         <span style="font-size: 1.3em">FREESWITCH</span>
       </li>
     </a-menu>
-    <div>
+             <router-view></router-view>
+    <!-- <div>
       <div style="display: flex">
         <div style="width: 80px">
           <a-menu
@@ -23,12 +24,6 @@
               </template>
               <span>Home</span>
             </a-menu-item>
-            <a-menu-item key="2" @click="setCurrentCompnent('ClickToCall')">
-              <template #icon>
-                <NumberOutlined />
-              </template>
-              <span>Click To Call</span>
-            </a-menu-item>
             <a-menu-item key="3" @click="setCurrentCompnent('InboundCallConfig')">
               <template #icon>
                 <PhoneOutlined />
@@ -41,35 +36,51 @@
               </template>
               <span>Phone Number Config</span>
             </a-menu-item>
+              <a-menu-item key="5" @click="setCurrentCompnent('CallDetailRecords')">
+                <template #icon>
+                  <SettingOutlined />
+                </template>
+                <span>Call Detail Records</span>
+              </a-menu-item>
+              <a-menu-item key="6" @click="setCurrentCompnent('CallRecording')">
+                <template #icon>
+                  <SettingOutlined />
+                </template>
+                <span>Call Recording</span>
+              </a-menu-item>
           </a-menu>
         </div>
         <div style="flex: 1">
-          <component :is="currentComponent" />
+          <router-view></router-view>
         </div>
       </div>
-    </div>
+    </div> -->
   </div>
 </template>
 <script lang="ts">
-import PhoneNumberConfig from "./phoneNumberConfig/PhoneNumberConfig.vue";
-import Home from './Home.vue';
-import ClickToCall from "./clickToCall/ClickToCall.vue";
-import InboundCallConfig from "./inboundCallConfig/InboundCallConfig.vue";
+// import PhoneNumberConfig from "./phoneNumberConfig/PhoneNumberConfig.vue";
+// import Home from './Home.vue';
+// import ClickToCall from "./clickToCall/ClickToCall.vue";
+// import InboundCallConfig from "./inboundCallConfig/InboundCallConfig.vue";
+// import CallDetailRecords from "./callDetailRecords/CallDetailRecords.vue";
+// import CallRecording from "./callRecording/CallRecording.vue";
+import { useRouter } from "vue-router";
 import { 
   defineComponent, 
   reactive, 
   toRefs, 
   watch 
 } from "vue";
-import {
-  HomeOutlined,
-  NumberOutlined,
-  PhoneOutlined,
-  SettingOutlined,
-} from "@ant-design/icons-vue";
+// import {
+//   HomeOutlined,
+//   NumberOutlined,
+//   PhoneOutlined,
+//   SettingOutlined,
+// } from "@ant-design/icons-vue";
 
 export default defineComponent({
   setup() {
+    const router = useRouter();
     const state = reactive({
       collapsed: false,
       selectedKeys: ["1"],
@@ -88,7 +99,9 @@ export default defineComponent({
       state.openKeys = state.collapsed ? [] : state.preOpenKeys;
     };
     const setCurrentCompnent = (component: string) => {
-      state.currentComponent = component;
+      if (component === 'Home') {
+         router.push({ path: "/" })
+      }
     };
 
     return {
@@ -98,14 +111,16 @@ export default defineComponent({
     };
   },
   components: {
-    PhoneNumberConfig,
-    HomeOutlined,
-    NumberOutlined,
-    PhoneOutlined,
-    SettingOutlined,
-    ClickToCall,
-    InboundCallConfig,
-    Home
+    // PhoneNumberConfig,
+    // HomeOutlined,
+    // NumberOutlined,
+    // PhoneOutlined,
+    // SettingOutlined,
+    // ClickToCall,
+    // InboundCallConfig,
+    // Home,
+    // CallDetailRecords,
+    // CallRecording,
   },
 });
 </script>

@@ -18,7 +18,10 @@ import {
     Input,
     Dropdown,
     Alert,
-    Modal
+    Modal,
+    Tabs,
+    List,
+    Avatar
 } from 'ant-design-vue';
 
 export default function AntdvUi(app: any) {
@@ -42,4 +45,7 @@ export default function AntdvUi(app: any) {
     app.use(Dropdown);
     app.use(Alert);
     app.use(Modal);
+    app.use(Tabs);
+    app.use(List);
+    app.use(Avatar);
 }

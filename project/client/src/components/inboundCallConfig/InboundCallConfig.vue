@@ -1,6 +1,6 @@
 <template>
   <a-layout>
-    <a-layout style="padding: 24px 24px 24px">
+    <!-- <a-layout style="padding: 24px 24px 24px">
       <a-layout-content
         :style="{
           background: '#fff',
@@ -8,11 +8,10 @@
           margin: 0,
           minHeight: '280px',
         }"
-      >
-        <a-row>
-          <a-col>
-            <div style="padding: 20px">
-              <div class="call-config">Inbound Call Config</div>
+      > -->
+     
+            <div style="background: white; padding: 20px;  padding-top: 0">
+              <!-- <div class="call-config">Inbound Call Config</div> -->
               <a-alert
                 v-if="isSaved && !hasError"
                 message="Successfully saved"
@@ -83,8 +82,7 @@
                 </a-col>
               </a-row>
             </div>
-          </a-col>
-        </a-row>
+         
         <b-row v-if="inboundCallConfigData.length">
           <b-col>
             <a-table :dataSource="inboundCallConfigData" :columns="columns">
@@ -138,8 +136,8 @@
             <input :class="['ant-input']" v-model="selectedConfig.webhookUrl" />
           </a-form-item>
         </a-modal>
-      </a-layout-content>
-    </a-layout>
+      <!-- </a-layout-content>
+    </a-layout> -->
   </a-layout>
 </template>
 <script lang="ts">
@@ -201,7 +199,7 @@ export default defineComponent({
 <style scoped>
 .call-config {
   text-align: left;
-  font-size: 2em;
+  font-size: 1.5em;
   border-bottom: 1px solid #eaeaea;
   margin-bottom: 20px;
 }

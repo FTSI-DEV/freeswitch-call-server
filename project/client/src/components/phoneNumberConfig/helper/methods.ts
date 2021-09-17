@@ -47,7 +47,7 @@ export default function methodsObj() {
             state.selectedConfig.webhookUrl = webhookUrl;
         });
       }
-      const handleOk = () => {
+      const handleOk = (): void => {
         store.dispatch('updatePhoneNumberConfig', state.selectedConfig).then((res) => {
            state.modleVisibility = false;
         });
