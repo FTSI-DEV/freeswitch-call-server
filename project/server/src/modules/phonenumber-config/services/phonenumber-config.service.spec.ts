@@ -1,15 +1,15 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { FreeswitchPhoneNumberConfigService } from './phonenumber-config.service';
+import { PhoneNumberConfigService } from './phonenumber-config.service';
 
 describe('FreeswitchPhoneNumberConfigService', () => {
-  let service: FreeswitchPhoneNumberConfigService;
+  let service: PhoneNumberConfigService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [FreeswitchPhoneNumberConfigService],
+      providers: [PhoneNumberConfigService],
     }).compile();
 
-    service = module.get<FreeswitchPhoneNumberConfigService>(FreeswitchPhoneNumberConfigService);
+    service = module.get<PhoneNumberConfigService>(PhoneNumberConfigService);
   });
 
   it('should be defined', () => {

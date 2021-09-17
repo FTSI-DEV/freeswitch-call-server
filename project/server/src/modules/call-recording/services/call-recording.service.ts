@@ -1,19 +1,22 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { IPaginationMeta, IPaginationOptions, paginate, Pagination } from 'nestjs-typeorm-paginate';
 import { FsCallDetailRecordEntity } from 'src/entity/call-detail-record';
 import { CallRecordingStorageEntity, CallRecordingStorageRepository } from 'src/entity/callRecordingStorage.entity';
+import { CALL_DETAIL_RECORD_SERVICE, ICallDetailRecordService } from 'src/modules/call-detail-record/services/call-detail-record.interface';
 import { CallDetailRecordService } from 'src/modules/call-detail-record/services/call-detail-record.service';
 import { CallRecordingStorageDTO } from '../models/call-recording.dto';
 import { CallRecordingModel } from '../models/call-recording.model';
+import { ICallRecordingService } from './call-recording.interface';
 
 @Injectable()
-export class CallRecordingService {
+export class CallRecordingService implements ICallRecordingService{
 
     constructor(
         @InjectRepository(CallRecordingStorageEntity)
         private _recordingStorageRepo : CallRecordingStorageRepository,
-        private readonly _callRecordDetailService : CallDetailRecordService
+        @Inject(CALL_DETAIL_RECORD_SERVICE)
+        private readonly _callRecordDetailService : ICallDetailRecordService
     ) {}
     
     async saveCallRecording(param: CallRecordingModel){
@@ -63,7 +66,7 @@ export class CallRecordingService {
         return record;
     }
 
-    async getRecordingByCallUID(callUid:string):Promise<CallRecordingStorageEntity>{
+    async getByCallUid(callUid:string):Promise<CallRecordingStorageEntity>{
        
         let record = await this._recordingStorageRepo
             .createQueryBuilder("CallRecordingStorage")
@@ -89,7 +92,30 @@ export class CallRecordingService {
         return record;
     }
 
-    getCallRecordings(options:IPaginationOptions):Promise<Pagination<CallRecordingStorageDTO>>{
+    async getCallRecordings(options:IPaginationOptions):Promise<Pagination<CallRecordingStorageDTO>>{
+
+        let pageRecords = await paginate<CallRecordingStorageEntity>(this._recordingStorageRepo, options);
+
+        let itemObjs : CallRecordingStorageDTO[] = [];
+
+        pageRecords.items.forEach(element => {
+            let recordingDTO: CallRecordingStorageDTO = {
+                RecordingId : element.RecordingId,
+                RecordingUUID : element.RecordingUid,
+                CallUUID : element.CallUid,
+                FilePath : element.FilePath,
+                IsDeleted: element.IsDeleted,
+                DateCreated : element.DateCreated,
+            };
+
+            itemObjs.sort((n1,n2) => {
+                return (n2.RecordingId < n1.RecordingId) ? -1 : 1;
+            });
+
+            itemObjs.push(recordingDTO);
+        });
+
+        return new Pagination<CallRecordingStorageDTO, IPaginationMeta>(itemObjs, pageRecords.meta);
 
         return new Promise<Pagination<CallRecordingStorageDTO>>((resolve,reject) => {
 

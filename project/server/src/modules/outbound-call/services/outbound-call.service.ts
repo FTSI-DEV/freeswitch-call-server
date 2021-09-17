@@ -1,12 +1,13 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { FreeswitchConnectionResult } from 'src/helpers/fs-esl/inbound-esl.connection';
-import { CallDetailRecordService } from 'src/modules/call-detail-record/services/call-detail-record.service';
-import moment from 'moment';
+import { CALL_DETAIL_RECORD_SERVICE, ICallDetailRecordService } from 'src/modules/call-detail-record/services/call-detail-record.interface';
+import { IOutboundCallService } from './outbound-call.interface';
 
 @Injectable()
-export class OutboundCallService {
+export class OutboundCallService implements IOutboundCallService{
     constructor(
-        private readonly _callDetailRecordService : CallDetailRecordService
+        @Inject(CALL_DETAIL_RECORD_SERVICE)
+        private readonly _callDetailRecordService : ICallDetailRecordService
     ) {}
 
     async clickToCall(
@@ -39,32 +40,15 @@ export class OutboundCallService {
         
                 console.log('Originate CallUid -> ', callUid);
 
-                this._callDetailRecordService.saveCDR({
-                    UUID: callUid,
-                    CallDirection: 'outbound',
-                    StartedDate:  moment().format('YYYY-MM-DDTHH:mm:ss'),
-                    PhoneNumberTo : phoneNumberTo
-                });
+                // this._callDetailRecordService.saveCDR({
+                //     UUID: callUid,
+                //     CallDirection: 'outbound',
+                //     StartedDate:  moment().format('YYYY-MM-DDTHH:mm:ss'),
+                //     PhoneNumberTo : phoneNumberTo
+                // });
 
                 resolve(callUid);
             }
-        });
-    }
-
-    async getPhoneNumberToByUUID(uuid:string):Promise<string>{
-        
-        return new Promise<string>( async (resolve) => {
-
-            let retVal = await this._callDetailRecordService.getByCallUid(uuid);
-
-            if (retVal != null){
-
-                resolve(retVal.PhoneNumberTo);
-
-                return;
-            }
-
-            resolve(null);
         });
     }
 
@@ -76,9 +60,9 @@ export class OutboundCallService {
 
         return new Promise<string>((resolve,reject) => {
 
-            let app_args = `sofia/gateway/fs-test1/${phoneNumberFrom}`;
+            let app_args = `sofia/gateway/fs-test3/1000`;
             
-            let arg1 = `{ignore_early_media=true,origination_caller_id_number=${callerId},hangup_after_bridge=true}${app_args}`;
+            let arg1 = `{ignore_early_media=true,origination_caller_id_number=1000,hangup_after_bridge=true}${app_args}`;
 
             let arg4 = `${arg1} &socket(192.168.18.3:8000 async full)`;
 

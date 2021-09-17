@@ -56,20 +56,32 @@ export class InboundEslConnectionHelper {
     connection.on('esl::end', () => {
       console.log('ESL END ');
     })
+
+    connection.on(FS_ESL.RECEIVED, (evt) => {
+
+      let uid = evt.getHeader('Unique-ID');
+
+      if (uid != null){
+        console.log('CHANNEL STATE ESL', evt.getHeader('Channel-State'));
+        console.log(
+          `ESL -> ${evt.getHeader('Event-Name')} , 
+          Uid -> ${uid}`
+        );
+      }
+    })
   }
 
   private _onListenEvent(connection, dtmf: DTMFHelper){
 
     connection.on('esl::event::CHANNEL_HANGUP_COMPLETE::**', (fsEvent) => {
 
-      console.log('EVENT-NAME ->' , fsEvent.getHeader(EVENT_LIST.EVENT_NAME));
-
       let callId = fsEvent.getHeader(CHANNEL_VARIABLE.UNIQUE_ID);
 
+      console.log('ESL EVTNAME ->' , fsEvent.getHeader(EVENT_LIST.EVENT_NAME));
+      console.log('ESL legid ->' , callId);
+     
       let channelId = fsEvent.getHeader('Channel-Call-UUID');
-
-      console.log('CHANNEL ID -> ', channelId);
-
+      
       let cdrValues = new CDRHelper().getCallRecords(fsEvent);
 
       cdrValues.UUID = callId;
@@ -83,12 +95,12 @@ export class InboundEslConnectionHelper {
         cdrValues.ParentCallUid = channelId;
         console.log('Parent Call : ', channelId);
       }
-      if (cdrValues.CallDirection === "outbound"){
-        http.get(WebhookOutboundCallStatusCallBack(cdrValues));
-      }
-      else{
-        http.get(WebhookInboundCallStatusCallBack(cdrValues));
-      }
+      // if (cdrValues.CallDirection === "outbound"){
+      //   http.get(WebhookOutboundCallStatusCallBack(cdrValues));
+      // }
+      // else{
+      //   http.get(WebhookInboundCallStatusCallBack(cdrValues));
+      // }
     });
 
     connection.on('esl::event::BACKGROUND_JOB::*', (evt) =>{

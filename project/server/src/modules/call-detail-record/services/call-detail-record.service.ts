@@ -3,10 +3,10 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { IPaginationMeta, IPaginationOptions, paginate, Pagination } from 'nestjs-typeorm-paginate';
 import { FsCallDetailRecordEntity, FsCallDetailRecordRepository } from 'src/entity/call-detail-record';
 import { CallDetailRecordDTO, CDRModel } from 'src/modules/call-detail-record/models/cdr.models';
-import moment from 'moment';
+import { ICallDetailRecordService } from './call-detail-record.interface';
 
 @Injectable()
-export class CallDetailRecordService {
+export class CallDetailRecordService implements ICallDetailRecordService {
     constructor(
         @InjectRepository(FsCallDetailRecordRepository)
         private _callDetailRecordRepo: FsCallDetailRecordRepository)
@@ -70,9 +70,34 @@ export class CallDetailRecordService {
         return cdr;
     }
 
-    getCallLogs(options: IPaginationOptions): any {
+   async getCallLogs(options: IPaginationOptions): Promise<Pagination<CallDetailRecordDTO>> {
 
-        return this.getCallConfigRecords(options);
+        let pageRecords = await paginate<FsCallDetailRecordEntity>(this._callDetailRecordRepo, options);
+
+        let itemObjs : CallDetailRecordDTO[] = [];
+
+        pageRecords.items.forEach(element => {
+            let configModel: CallDetailRecordDTO = {
+                CallUUID: element.CallUid,
+                PhoneNumberFrom: element.PhoneNumberFrom,
+                PhoneNumberTo: element.PhoneNumberTo,
+                CallDirection: element.CallDirection,
+                CallStatus: element.CallStatus,
+                DateCreated: element.DateCreated,
+                Duration: element.CallDuration,
+                Id: element.Id,
+                RecordingUUID: element.RecordingUid,
+                ParentCallUid: element.ParentCallUid
+            };
+
+            itemObjs.push(configModel);
+        });
+
+        itemObjs.sort((n1,n2) => {
+            return (n2.Id < n1.Id) ? -1 : 1;
+        });
+
+        return new Pagination<CallDetailRecordDTO, IPaginationMeta>(itemObjs, pageRecords.meta);
     }
 
     private getCallConfigRecords(options: IPaginationOptions):Promise<any>{

@@ -1,13 +1,12 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import e from 'express';
 import { IPaginationMeta, IPaginationOptions, paginate, Pagination } from 'nestjs-typeorm-paginate';
-import { config } from 'rxjs';
 import { InboundCallConfigEntity, InboundCallConfigRepository } from 'src/entity/inboundCallConfig.entity';
 import { InboundCallConfigModel, InboundCallConfigParam } from '../models/inbound-call-config.model';
+import { IInboundCallConfigService } from './inbound-call-config.interface';
 
 @Injectable()
-export class InboundCallConfigService {
+export class InboundCallConfigService implements IInboundCallConfigService{
 
     constructor(
         @InjectRepository(InboundCallConfigRepository)
@@ -41,7 +40,7 @@ export class InboundCallConfigService {
         return true;
     }
 
-    getInboundConfigCallerId(callerId: string) : Promise<InboundCallConfigModel> {
+    getByCallerId(callerId: string) : Promise<InboundCallConfigModel> {
 
         return new Promise<InboundCallConfigModel>((resolve,reject) => {
 
@@ -64,7 +63,7 @@ export class InboundCallConfigService {
         });
     }
 
-    async getInboundCallConfigById(id:number):Promise<InboundCallConfigModel>{
+    async getById(id:number):Promise<InboundCallConfigModel>{
 
         let config = await this.getRecordById(id);
 
@@ -109,6 +108,21 @@ export class InboundCallConfigService {
         return new Pagination<InboundCallConfigModel, IPaginationMeta>(itemObjs, pageRecords.meta);
     }
 
+    async deleteInboundCallConfig(id: number): Promise<string> {
+        return new Promise<string>(async (resolve, reject) => {
+            const config = await this.getRecordById(id);
+            if (!config.IsDeleted) {
+                let inboundCallConfig = new InboundCallConfigEntity();
+                inboundCallConfig.Id = id;
+                inboundCallConfig.IsDeleted = true;
+                this._inboundCallConfigRepo.deleteRecord(inboundCallConfig);
+                resolve('Config successfully deleted');
+            } else {
+                reject("Unable to delete config");
+            }
+        });
+    }
+
     private getConfigByCallerId = (callerId:string) : Promise<InboundCallConfigEntity> => {
         return new Promise<InboundCallConfigEntity>((resolve,reject) => {
             this._inboundCallConfigRepo.createQueryBuilder("public.InboundCallConfig")
@@ -135,20 +149,5 @@ export class InboundCallConfigService {
             .getOne();
 
         return value;
-    }
-    
-    async deleteInboundCallConfig(id: number): Promise<string> {
-        return new Promise<string>(async (resolve, reject) => {
-            const config = await this.getRecordById(id);
-            if (!config.IsDeleted) {
-                let inboundCallConfig = new InboundCallConfigEntity();
-                inboundCallConfig.Id = id;
-                inboundCallConfig.IsDeleted = true;
-                this._inboundCallConfigRepo.deleteRecord(inboundCallConfig);
-                resolve('Config successfully deleted');
-            } else {
-                reject("Unable to delete config");
-            }
-        });
     }
 }

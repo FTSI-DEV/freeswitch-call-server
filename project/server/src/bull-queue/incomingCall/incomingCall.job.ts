@@ -1,78 +1,110 @@
 import { OnQueueActive, Process, Processor } from '@nestjs/bull';
 import { Job } from 'bull';
+import { time } from 'console';
 import { FsCallDetailRecordEntity } from 'src/entity/call-detail-record';
+import { CDRModel } from 'src/modules/call-detail-record/models/cdr.models';
 import { CallDetailRecordService } from 'src/modules/call-detail-record/services/call-detail-record.service';
 import { CallRecordingService } from 'src/modules/call-recording/services/call-recording.service';
+import { TimeProvider } from 'src/utils/timeProvider.utils';
+import path from 'path';
+import { Inject } from '@nestjs/common';
+import { CALL_DETAIL_RECORD_SERVICE, ICallDetailRecordService } from 'src/modules/call-detail-record/services/call-detail-record.interface';
+import { CALL_RECORDING_SERVICE, ICallRecordingService } from 'src/modules/call-recording/services/call-recording.interface';
 
 @Processor('default')
 export class IncomingCallJob {
   constructor(
-    private readonly _callDetailRecordService: CallDetailRecordService,
-    private readonly _callRecordingService: CallRecordingService
+    @Inject(CALL_DETAIL_RECORD_SERVICE)
+    private readonly _callDetailRecordService: ICallDetailRecordService,
+    @Inject(CALL_RECORDING_SERVICE)
+    private readonly _callRecordingService: ICallRecordingService
   ) {}
 
   @Process('inboundCall')
   async handleTranscode(parameter: Job){
 
-    let cdrRecord = await this._callDetailRecordService.getByCallUid(parameter.data.UUID);
+    let timeProvider = new TimeProvider();
 
-    await this.saveCallDetailRecord(cdrRecord, parameter);
+    let context = new InboundCallJobContext();
+    context.dateTime = timeProvider.getDateTimeNow();
+    context.unixTimeSeconds = timeProvider.getUnixTimeSeconds();
 
-    await this.saveCallRecordingStorage(cdrRecord);
-    
+    console.log('inbound call');
 
-  console.log('Transcoding complete InboundCall',); 
+    try
+    {
+
+      context.inboundCallParam = parameter.data;
+
+      context.inboundCallParam.StartedDate = context.dateTime;
+      
+      context.cdrRecord = await this._callDetailRecordService.getByCallUid(parameter.data.UUID);
+
+      let result = await this.saveCallDetailRecord(context);
   
+      context.inboundCallParam.Id = result;
+
+      await this.saveCallRecordingStorage(context);
+
+      console.log('Transcoding complete InboundCall'); 
+    }
+    catch(err){
+      console.log('Inbound Call Job ERROR -> ' ,err);
+    }
   }
 
-  private async saveCallDetailRecord(cdrRecord: FsCallDetailRecordEntity, parameter: Job){
-    if (cdrRecord === null || cdrRecord === undefined){
-            
-      console.log('Record does not exist', cdrRecord);
+  private async saveCallDetailRecord(context: InboundCallJobContext):Promise<number>{
+    if (context.cdrRecord === null || context.cdrRecord === undefined){
 
-      await this._callDetailRecordService.saveCDR({
-          UUID: parameter.data.UUID,
-          PhoneNumberFrom: parameter.data.PhoneNumberFrom,
-          PhoneNumberTo: parameter.data.PhoneNumberTo,
-          CallDirection: parameter.data.CallDirection,
-          StartedDate: parameter.data.StartedDate,
-          CallStatus: parameter.data.CallStatus,
-          Duration: parameter.data.Duration,
-          RecordingUUID: parameter.data.RecordingUUID,
-          ParentCallUid: parameter.data.ParentCallUid,
-          Id: parameter.data.Id
+      return await this._callDetailRecordService.saveCDR({
+          UUID: context.inboundCallParam.UUID,
+          PhoneNumberFrom: context.inboundCallParam.PhoneNumberFrom,
+          PhoneNumberTo: context.inboundCallParam.PhoneNumberTo,
+          CallDirection: context.inboundCallParam.CallDirection,
+          StartedDate: context.inboundCallParam.StartedDate,
+          CallStatus: context.inboundCallParam.CallStatus,
+          Duration: context.inboundCallParam.Duration,
+          RecordingUUID: context.inboundCallParam.RecordingUUID,
+          ParentCallUid: context.inboundCallParam.ParentCallUid,
+          Id:context.inboundCallParam.Id
       });
   }
   else{
-      console.log('Record exists');
 
-      console.log('UUID -> ', parameter.data.UUID);
-
-      await this._callDetailRecordService.updateCDR({
-          UUID: parameter.data.UUID,
-          PhoneNumberFrom: parameter.data.PhoneNumberFrom,
-          PhoneNumberTo: parameter.data.PhoneNumberTo,
-          CallDirection: parameter.data.CallDirection,
-          StartedDate: parameter.data.StartedDate,
-          CallStatus: parameter.data.CallStatus,
-          Duration: parameter.data.Duration,
-          RecordingUUID: parameter.data.RecordingUUID,
-          ParentCallUid: parameter.data.ParentCallUid,
-          Id: parameter.data.Id
+      return await this._callDetailRecordService.updateCDR({
+          UUID: context.inboundCallParam.UUID,
+          PhoneNumberFrom: context.inboundCallParam.PhoneNumberFrom,
+          PhoneNumberTo: context.inboundCallParam.PhoneNumberTo,
+          CallDirection: context.inboundCallParam.CallDirection,
+          StartedDate: context.inboundCallParam.StartedDate,
+          CallStatus: context.inboundCallParam.CallStatus,
+          Duration: context.inboundCallParam.Duration,
+          RecordingUUID: context.inboundCallParam.RecordingUUID,
+          ParentCallUid: context.inboundCallParam.ParentCallUid,
+          Id: context.inboundCallParam.Id
       });
   }
   }
 
   
-  private async saveCallRecordingStorage(cdrRecord: FsCallDetailRecordEntity){
+  private async saveCallRecordingStorage(context: InboundCallJobContext){
 
-    let callRecordingStorage = await this._callRecordingService.getByRecordingUUID(cdrRecord.RecordingUid);
+    let callRecordingStorage = await this._callRecordingService.getByRecordingUUID(context.inboundCallParam.RecordingUUID);
 
     if (callRecordingStorage === null || callRecordingStorage === undefined){
+
+        let toUnixTimeSeconds = context.unixTimeSeconds;
+
+        let fileName = `${toUnixTimeSeconds}_${context.inboundCallParam.RecordingUUID}.wav`;
+
+        let filePath = path.join(context.inboundCallParam.CallDirection, fileName);
+
         await this._callRecordingService.saveCallRecording({
-            RecordingUUID : cdrRecord.RecordingUid,
-            CallUUID : cdrRecord.CallUid,
-            FilePath : `${process.env.CALL_RECORDING_BASE_PATH}${cdrRecord.CallUid}`,
+            RecordingUUID : context.inboundCallParam.RecordingUUID,
+            CallUUID : context.inboundCallParam.UUID,
+            FilePath : filePath,
+            CallId : context.inboundCallParam.Id,
+            DateCreated : context.inboundCallParam.StartedDate
         });
     }
     else{
@@ -87,4 +119,11 @@ export class IncomingCallJob {
       `Processing job ${job.id} of type ${job.name} with data ${job.data}...`,
     );
   }
+}
+
+class InboundCallJobContext{
+  inboundCallParam: CDRModel;
+  cdrRecord: FsCallDetailRecordEntity;
+  dateTime: string;
+  unixTimeSeconds :number;
 }

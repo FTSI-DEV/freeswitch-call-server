@@ -17,11 +17,12 @@ export interface JsonDataListModel<T>{
 
 export class JsonDataListReturnModel extends JsonDataListModel<object>{
 
-    static Ok(message:string):JsonDataListModel<object>
+    static Ok(message:string):JsonDataListModel<object>;
 
-    static Ok(message:string,data?:object):JsonDataListModel<object>
+    static Ok(message?:string,data?:object):JsonDataListModel<object>;
 
     static Ok(message:string='Ok',data?:object):JsonDataListModel<object>{
+        
         let value = new JsonDataListModel<object>();
 
         value.Data = data;
@@ -65,13 +66,15 @@ export class JsonDataListReturnModel extends JsonDataListModel<object>{
         return value;
     }
 
-    static CreateGenericOKResponse(message:string='OK'):JsonDataListModel<object>{
+    static CreateGenericOKResponse(message:string='OK', data?:object):JsonDataListModel<object>{
 
         let value = new JsonDataListModel<object>();
 
         value.Message = message;
 
         value.Status = JsonResultStatus.OK;
+
+        value.Data = data;
 
         return value;
     }

@@ -1,6 +1,5 @@
 import axios from "axios";
 import { CDRModel } from "src/modules/call-detail-record/models/cdr.models";
-import { InboundCallConfigService } from "src/modules/config/inbound-call-config/services/inbound-call-config.service";
 import { WebhookInboundCallStatusCallBack } from "src/utils/webhooks";
 import { CHANNEL_VARIABLE } from "../constants/channel-variables.constants";
 import { ESL_SERVER, FS_DIALPLAN, FS_ESL } from "../constants/fs-esl.constants";
@@ -10,6 +9,7 @@ import http from 'http';
 import { inboundCallServer } from "./inboundCall.server";
 import { Instructions } from '../../helpers/parser/xmlCommandObject';
 import { InboundCallDTMFHelper } from "./inbound-call.dtmf.helper";
+import { InboundCallConfigService } from "src/modules/inbound-call-config/services/inbound-call-config.service";
 
 export class InboundCallHelper{
 
@@ -132,7 +132,7 @@ export class InboundCallHelper{
 
     private inboundCallExecute(conn, callerId:string){
         const self = this;
-        this._inboundCallConfig.getInboundConfigCallerId(callerId)
+        this._inboundCallConfig.getByCallerId(callerId)
             .then( async (result) => {
                 
                 if (!result)  conn.execute('playback', 'https://crm.dealerownedsoftware.com/hosted-files/audio/ConvertedSalesService.wav');

@@ -1,5 +1,6 @@
 import axios from 'axios';
-import { InboundCallConfigService } from 'src/modules/config/inbound-call-config/services/inbound-call-config.service';
+import { IInboundCallConfigService } from 'src/modules/inbound-call-config/services/inbound-call-config.interface';
+import { InboundCallConfigService } from 'src/modules/inbound-call-config/services/inbound-call-config.service';
 import { CHANNEL_VARIABLE } from '../constants/channel-variables.constants';
 import { EVENT_LIST } from '../constants/event-list.constants';
 import { CommandConstants } from '../constants/freeswitch-command.constants';
@@ -9,7 +10,8 @@ import { DialplanInstruction, TwiMLXMLParser } from '../parser/xmlParser';
 import { inboundCallServer } from './inboundCall.server';
 
 export class InboundCallHelper2 {
-  constructor(private readonly _inboundCallConfig: InboundCallConfigService) {}
+  constructor(
+    private readonly _inboundCallConfigService: IInboundCallConfigService) {}
 
   inboundCallEnter() {
     inboundCallServer.on('connection::ready', (conn) => {
@@ -31,12 +33,13 @@ export class InboundCallHelper2 {
 
       let hangupCompleteWrapper = (esl) => {
         context.legStop = true;
+        console.log('CHANNEL STATE ', esl.getHeader('Channel-State'));
         console.log('Leg-A hangup', esl.getHeader('Unique-ID'));
         conn.removeListener(hangupCompleteEvent, hangupCompleteWrapper);
       };
 
       conn.on('error', (err) => {
-        console.log('ERROR -> ', err);
+        console.log('Inbound Call ERROR -> ', err);
       });
 
       conn.on(hangupCompleteEvent, hangupCompleteWrapper);
@@ -44,7 +47,15 @@ export class InboundCallHelper2 {
       conn.subscribe('all');
 
       conn.on('esl::event::*::*', (evt) => {
-        console.log(`EVENT NAME -> ${evt.getHeader('Event-Name')} , UniqueId -> ${evt.getHeader('Unique-ID')}`);
+
+        let uid = evt.getHeader('Unique-ID');
+
+        if (uid != null){
+          console.log('CHANNEL STATE ', evt.getHeader('Channel-State'));
+          console.log(`Inbound Call -> 
+            EVENT NAME -> ${evt.getHeader('Event-Name')} , 
+            UniqueId -> ${uid}`);
+        }
       });
 
       if (!context.legStop) {
@@ -55,8 +66,8 @@ export class InboundCallHelper2 {
           () => {
             console.log('playback executed ');
 
-            this._inboundCallConfig
-              .getInboundConfigCallerId('8667468950')
+            this._inboundCallConfigService
+              .getByCallerId('8667468950')
               .then((config) => {
 
                 let voiceRequestParam = new VoiceRequestParam();
@@ -132,7 +143,13 @@ export class InboundCallHelper2 {
                 );
               })
               .catch((err) => {
-                console.log('ERROR -> ' ,err);
+                console.log('Catch ERROR -> ' ,err);
+                conn.execute('playback','ivr/ivr-call_cannot_be_completed_as_dialed.wav', () => {
+                  console.log('playback executed');
+                  conn.execute('hangup', 'MANAGER_REQUEST', () => {
+                    console.log('hangup completed');
+                  })
+                })
               });
           },
         );
