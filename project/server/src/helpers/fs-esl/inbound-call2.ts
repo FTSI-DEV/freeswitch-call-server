@@ -1,5 +1,6 @@
 import axios from 'axios';
-import { InboundCallConfigService } from 'src/modules/config/inbound-call-config/services/inbound-call-config.service';
+import { IInboundCallConfigService } from 'src/modules/inbound-call-config/services/inbound-call-config.interface';
+import { InboundCallConfigService } from 'src/modules/inbound-call-config/services/inbound-call-config.service';
 import { CHANNEL_VARIABLE } from '../constants/channel-variables.constants';
 import { EVENT_LIST } from '../constants/event-list.constants';
 import { CommandConstants } from '../constants/freeswitch-command.constants';
@@ -9,7 +10,8 @@ import { DialplanInstruction, TwiMLXMLParser } from '../parser/xmlParser';
 import { inboundCallServer } from './inboundCall.server';
 
 export class InboundCallHelper2 {
-  constructor(private readonly _inboundCallConfig: InboundCallConfigService) {}
+  constructor(
+    private readonly _inboundCallConfigService: IInboundCallConfigService) {}
 
   inboundCallEnter() {
     inboundCallServer.on('connection::ready', (conn) => {
@@ -64,8 +66,8 @@ export class InboundCallHelper2 {
           () => {
             console.log('playback executed ');
 
-            this._inboundCallConfig
-              .getInboundConfigCallerId('8667468950')
+            this._inboundCallConfigService
+              .getByCallerId('8667468950')
               .then((config) => {
 
                 let voiceRequestParam = new VoiceRequestParam();

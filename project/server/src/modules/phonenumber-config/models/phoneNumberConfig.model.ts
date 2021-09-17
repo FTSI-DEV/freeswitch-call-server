@@ -1,4 +1,4 @@
-export class FreeswitchPhoneNumberConfigParam{
+export class PhoneNumberConfigParam{
     friendlyName: string;
     phoneNumber: string;
     httpMethod: string;
@@ -7,7 +7,7 @@ export class FreeswitchPhoneNumberConfigParam{
     isDeleted:boolean;
 }
 
-export class FreeswitchPhoneNumberConfigModel{
+export class PhoneNumberConfigModel{
     friendlyName: string;
     phoneNumber: string;
     httpMethod: string;

@@ -2,18 +2,20 @@ import {
   Controller,
   DefaultValuePipe,
   Get,
+  Inject,
   Param,
   ParseIntPipe,
   Query,
 } from '@nestjs/common';
 import { CallDetailRecordDTO } from 'src/modules/call-detail-record/models/cdr.models';
 import { JsonDataListReturnModel } from 'src/utils/jsonDataListReturnModel';
-import { CallDetailRecordService } from '../services/call-detail-record.service';
+import { CALL_DETAIL_RECORD_SERVICE, ICallDetailRecordService } from '../services/call-detail-record.interface';
 
 @Controller('/call-detail-record')
 export class CallDetailRecordController {
   constructor(
-    private readonly _callDetailRecordService: CallDetailRecordService,
+    @Inject(CALL_DETAIL_RECORD_SERVICE)
+    private readonly _callDetailRecordService: ICallDetailRecordService,
   ) {}
 
   @Get('getCdrLogs')

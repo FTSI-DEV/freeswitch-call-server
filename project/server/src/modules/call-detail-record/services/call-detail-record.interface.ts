@@ -1,11 +1,14 @@
+import { IPaginationOptions, Pagination } from "nestjs-typeorm-paginate";
 import { FsCallDetailRecordEntity } from "src/entity/call-detail-record";
-import { CDRModel } from "src/modules/call-detail-record/models/cdr.models";
+import { CallDetailRecordDTO, CDRModel } from "src/modules/call-detail-record/models/cdr.models";
 
 
-export const FREESWITCH_CALL = 'FREESWITCH CALL';
+export const CALL_DETAIL_RECORD_SERVICE = 'CALL DETAIL RECORD SERVICE';
 
 export interface ICallDetailRecordService{
-    createRecord(cdrParam: CDRModel, storeId: number): Promise<FsCallDetailRecordEntity>;
-    getByCallId(callUid:string):Promise<FsCallDetailRecordEntity>;
+    saveCDR(cdrParam:CDRModel):Promise<number>;
+    updateCDR(cdrParam:CDRModel):Promise<number>;
+    getByCallUid(callUid:string):Promise<FsCallDetailRecordEntity>;
     getById(id:number):Promise<FsCallDetailRecordEntity>;
+    getCallLogs(options:IPaginationOptions):Promise<Pagination<CallDetailRecordDTO>>;
 }

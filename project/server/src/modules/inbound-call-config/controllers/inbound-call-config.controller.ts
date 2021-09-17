@@ -1,18 +1,23 @@
-import { Body, Controller, DefaultValuePipe, Get, Param, ParseIntPipe, Post, Query } from '@nestjs/common';
+import { Body, Controller, DefaultValuePipe, Get, Inject, Param, ParseIntPipe, Post, Query } from '@nestjs/common';
 import { Pagination } from 'nestjs-typeorm-paginate';
 import { JsonDataListReturnModel } from 'src/utils/jsonDataListReturnModel';
 import { InboundCallConfigModel, InboundCallConfigParam } from '../models/inbound-call-config.model';
+import { IInboundCallConfigService, INBOUND_CALL_CONFIG_SERVICE } from '../services/inbound-call-config.interface';
 import { InboundCallConfigService } from '../services/inbound-call-config.service';
 
 
 @Controller('/api/inbound-call-config')
 export class InboundCallConfigController {
-  constructor(private _inboundCallConfig: InboundCallConfigService) {}
+
+  constructor(
+    @Inject(INBOUND_CALL_CONFIG_SERVICE)
+    private _inboundCallConfigService: IInboundCallConfigService
+  ) {}
 
   @Get('getInboundCallConfigById/:id')
   async getInboundCallConfigById(@Param('id')id: number):Promise<JsonDataListReturnModel>{
     
-    let config = await this._inboundCallConfig.getInboundCallConfigById(id);
+    let config = await this._inboundCallConfigService.getById(id);
 
     return JsonDataListReturnModel.Ok(null, config);
   }
@@ -22,7 +27,7 @@ export class InboundCallConfigController {
     @Body() params: InboundCallConfigParam
   ): Promise<JsonDataListReturnModel> {
 
-    await this._inboundCallConfig.add({
+    await this._inboundCallConfigService.add({
       webhookUrl: params.webhookUrl,
       callerId: params.callerId,
       httpMethod: params.httpMethod
@@ -37,7 +42,7 @@ export class InboundCallConfigController {
   ): Promise<JsonDataListReturnModel> {
 
     try{
-      let isSuccess = await this._inboundCallConfig.update({
+      let isSuccess = await this._inboundCallConfigService.update({
               webhookUrl: params.webhookUrl,
               callerId: params.callerId,
               httpMethod : params.httpMethod,
@@ -65,7 +70,7 @@ export class InboundCallConfigController {
 
     limit = limit > 100 ? 100 : limit;
 
-    let retVal = await this._inboundCallConfig.getInboundCallConfigs({
+    let retVal = await this._inboundCallConfigService.getInboundCallConfigs({
         page,
         limit
     });
@@ -77,7 +82,7 @@ export class InboundCallConfigController {
   async deleteInboundCallConfig(@Param('id') id: number):Promise<JsonDataListReturnModel>{
     try {
 
-      let config =  await this._inboundCallConfig.deleteInboundCallConfig(id);
+      let config =  await this._inboundCallConfigService.deleteInboundCallConfig(id);
 
       return JsonDataListReturnModel.Ok(config);
     } 

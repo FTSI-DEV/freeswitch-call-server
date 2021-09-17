@@ -1,17 +1,15 @@
-import { Module } from '@nestjs/common';
+import { Inject, Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Connection } from 'typeorm';
 import { configService } from './config/config.service';
-import { PhoneNumberConfigModule } from './modules/config/fs-phonenumber-config/phonenumber-config.module';
+import { PhoneNumberConfigModule } from './modules/phonenumber-config/phonenumber-config.module';
 import { IvrModule } from './modules/ivr/ivr.module';
 import { IncomingCallModule } from './modules/incomingCall/incomingCall.module';
 import { CallDetailRecordModule } from './modules/call-detail-record/call-detail-record.module';
-import { InboundCallConfigModule } from './modules/config/inbound-call-config/inbound-call-config.module';
 import { EslServerHelper } from './helpers/fs-esl/inboundCall.server';
-import { InboundCallConfigService } from './modules/config/inbound-call-config/services/inbound-call-config.service';
 import { BullModule } from '@nestjs/bull';
 import { BullModuleQueue } from './bull-queue/bull.module';
 import { TestModule } from './modules/test/test.module';
@@ -21,6 +19,12 @@ import { CallRecordingModule } from './modules/call-recording/call-recording.mod
 import { OutboundCallModule } from './modules/outbound-call/outbound-call.module';
 import { ClickToCallServerHelper } from './helpers/fs-esl/click-to-call.server';
 import { OutboundCallService } from './modules/outbound-call/services/outbound-call.service';
+import { GreetingModule } from './modules/greeting/greeting.module';
+import { InboundCallConfigModule } from './modules/inbound-call-config/inbound-call-config.module';
+import { InboundCallConfigService } from './modules/inbound-call-config/services/inbound-call-config.service';
+import { GREETING_SERVICE, IGreetingService } from './modules/greeting/greeting-service.interface';
+import { IInboundCallConfigService, INBOUND_CALL_CONFIG_SERVICE } from './modules/inbound-call-config/services/inbound-call-config.interface';
+import { OUTBOUND_CALL_SERVICE } from './modules/outbound-call/services/outbound-call.interface';
 
 @Module({
   imports: [
@@ -40,19 +44,20 @@ import { OutboundCallService } from './modules/outbound-call/services/outbound-c
       }
     }),
     CallRecordingModule,
-    OutboundCallModule
-  ],
+    OutboundCallModule,
+    GreetingModule
+ ],
   controllers: [AppController],
   providers: [AppService],
 })
 export class AppModule {
-  constructor(private connection: Connection,
-              private readonly _inboundCall: InboundCallConfigService,
-              private readonly _freeswitchCallSystem: CallDetailRecordService,
+  constructor(@Inject(INBOUND_CALL_CONFIG_SERVICE)
+              private readonly _inboundCallConfigService: IInboundCallConfigService,
+              @Inject(OUTBOUND_CALL_SERVICE)
               private readonly _outboundCallService: OutboundCallService) {
 
     
-    new EslServerHelper(_inboundCall).startEslServer();
+    new EslServerHelper(_inboundCallConfigService).startEslServer();
 
     new InboundEslConnectionHelper().startConnection();
 

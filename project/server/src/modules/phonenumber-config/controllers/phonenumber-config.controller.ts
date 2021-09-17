@@ -1,38 +1,40 @@
-import { Body, Controller, Get, Post, Param, Query, ParseIntPipe, DefaultValuePipe } from '@nestjs/common';
+import { Body, Controller, Get, Post, Param, Query, ParseIntPipe, DefaultValuePipe, Inject } from '@nestjs/common';
 import { Pagination } from 'nestjs-typeorm-paginate';
-import { FreeswitchPhoneNumberConfigParam } from 'src/models/freeswitchCallConfigModel';
+import { PhoneNumberConfigParam } from 'src/modules/phonenumber-config/models/phoneNumberConfig.model';
 import { JsonDataListReturnModel } from 'src/utils/jsonDataListReturnModel';
-import { FreeswitchPhoneNumberConfigService } from '../services/phonenumber-config.service';
+import { IPhoneNumberConfigService, PHONENUMBER_CONFIG_SERVICE } from '../services/iphonenumber-config.interface';
+import { PhoneNumberConfigService } from '../services/phonenumber-config.service';
 
 @Controller('/api/freeswitch-phonenumber-config')
 export class FreeswitchPhoneNumberConfigController {
     constructor(
-        private _freeswitchCallConfigService: FreeswitchPhoneNumberConfigService
+        @Inject(PHONENUMBER_CONFIG_SERVICE)
+        private _phoneNumberConfigService: IPhoneNumberConfigService
     ) {}
 
     @Get('getPhoneNumberConfigById/:id')
     async getPhoneNumberConfigById(@Param('id')id: number):Promise<JsonDataListReturnModel>{
         
-        let config = await this._freeswitchCallConfigService.getPhoneNumberConfigById(id);
+        let config = await this._phoneNumberConfigService.getById(id);
 
-        return JsonDataListReturnModel.Ok(null, config);
+        return JsonDataListReturnModel.Ok(null,config);
     }
 
     @Post('add')
-    add(@Body() callConfigParam: FreeswitchPhoneNumberConfigParam):JsonDataListReturnModel{
+    add(@Body() callConfigParam: PhoneNumberConfigParam):JsonDataListReturnModel{
         console.log('entered', callConfigParam);
 
-        this._freeswitchCallConfigService.add(callConfigParam);
+        this._phoneNumberConfigService.add(callConfigParam);
 
         return JsonDataListReturnModel.Ok("Successfully saved record");
     }
 
     @Post('update')
     update(
-        @Body() callConfigParam: FreeswitchPhoneNumberConfigParam
+        @Body() callConfigParam: PhoneNumberConfigParam
     ):JsonDataListReturnModel{
 
-        this._freeswitchCallConfigService.update(callConfigParam);
+        this._phoneNumberConfigService.update(callConfigParam);
 
         return JsonDataListReturnModel.Ok("Successfully updated record");
     }
@@ -45,7 +47,7 @@ export class FreeswitchPhoneNumberConfigController {
 
         limit = limit > 100 ? 100 : limit;
 
-        let retVal = await this._freeswitchCallConfigService.getPhoneNumberConfigs({
+        let retVal = await this._phoneNumberConfigService.getPhoneNumberConfigs({
             page,
             limit
         });
@@ -56,7 +58,7 @@ export class FreeswitchPhoneNumberConfigController {
   @Post('delete/:id')
    async deletePhoneNumberConfig(@Param('id') id: number):Promise<JsonDataListReturnModel> {
     try {
-        let config = await this._freeswitchCallConfigService.deletePhoneNumberConfig(id);  
+        let config = await this._phoneNumberConfigService.deletePhoneNumberConfig(id);  
 
         return JsonDataListReturnModel.Ok(config);
 

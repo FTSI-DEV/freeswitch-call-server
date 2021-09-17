@@ -1,20 +1,18 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { rejects } from 'assert';
-import e from 'express';
 import { IPaginationMeta, IPaginationOptions, paginate, Pagination } from 'nestjs-typeorm-paginate';
 import { PhoneNumberConfigEntity, PhoneNumberConfigRepository } from 'src/entity/phoneNumberConfig.entity';
-import { FreeswitchPhoneNumberConfigParam } from 'src/models/freeswitchCallConfigModel';
-import { IFreeswitchPhoneNumberConfigService as IFreeswitchPhoneNumberConfigService } from './iphonenumber-config.interface';
+import { PhoneNumberConfigParam as PhoneNumberConfigParam } from 'src/modules/phonenumber-config/models/phoneNumberConfig.model';
+import { IPhoneNumberConfigService } from './iphonenumber-config.interface';
 
 @Injectable()
-export class FreeswitchPhoneNumberConfigService{
+export class PhoneNumberConfigService implements IPhoneNumberConfigService{
     constructor(
         @InjectRepository(PhoneNumberConfigRepository)
         private _phoneNumberConfigRepo: PhoneNumberConfigRepository,
     ) {}
 
-    async add(param: FreeswitchPhoneNumberConfigParam){
+    async add(param: PhoneNumberConfigParam){
 
         let phoneNumberConfig = new PhoneNumberConfigEntity();
 
@@ -26,9 +24,9 @@ export class FreeswitchPhoneNumberConfigService{
         await this._phoneNumberConfigRepo.saveUpdateRecord(phoneNumberConfig);
     }
 
-    async update(param: FreeswitchPhoneNumberConfigParam):Promise<boolean>{
+    async update(param: PhoneNumberConfigParam):Promise<boolean>{
 
-        let config = await this.getById(param.id);
+        let config = await this.getRecordById(param.id);
 
         if (config === null || config === undefined) return false;
 
@@ -42,13 +40,13 @@ export class FreeswitchPhoneNumberConfigService{
         return true;
     }
 
-    async getPhoneNumberConfigById(id: number): Promise<FreeswitchPhoneNumberConfigParam>{
+    async getById(id: number): Promise<PhoneNumberConfigParam>{
 
-        let config = await this.getById(id);
+        let config = await this.getRecordById(id);
 
         if (config === null || config === undefined) return null;
 
-        let configModel: FreeswitchPhoneNumberConfigParam = {
+        let configModel: PhoneNumberConfigParam = {
             friendlyName: config.FriendlyName,
             phoneNumber: config.PhoneNumber,
             httpMethod: config.HttpMethod,
@@ -60,15 +58,15 @@ export class FreeswitchPhoneNumberConfigService{
         return configModel;
     }
 
-    async getPhoneNumberConfigs(options:IPaginationOptions) : Promise<Pagination<FreeswitchPhoneNumberConfigParam>>{
+    async getPhoneNumberConfigs(options:IPaginationOptions) : Promise<Pagination<PhoneNumberConfigParam>>{
 
         let pageRecords = await paginate<PhoneNumberConfigEntity>(this._phoneNumberConfigRepo, options);
 
-        let itemObjs: FreeswitchPhoneNumberConfigParam[] = [];
+        let itemObjs: PhoneNumberConfigParam[] = [];
 
         pageRecords.items.forEach(element => {
             if (!element.IsDeleted){
-                let configModel: FreeswitchPhoneNumberConfigParam = {
+                let configModel: PhoneNumberConfigParam = {
                     webhookUrl : element.WebhookUrl,
                     httpMethod: element.HttpMethod,
                     phoneNumber: element.PhoneNumber,
@@ -93,31 +91,31 @@ export class FreeswitchPhoneNumberConfigService{
             return 0;
         });
 
-        return new Pagination<FreeswitchPhoneNumberConfigParam, IPaginationMeta>(itemObjs, pageRecords.meta);
+        return new Pagination<PhoneNumberConfigParam, IPaginationMeta>(itemObjs, pageRecords.meta);
     }
 
-    private getById = async (id: number): Promise<PhoneNumberConfigEntity> => {
+    deletePhoneNumberConfig(id: number): Promise<string> {
+        return new Promise<string>(async (resolve, reject) => {
+          const config = await this._phoneNumberConfigRepo.findOneOrFail({ where: { Id: id } });
+          if (!config.IsDeleted) {
+              let phoneNumberConfig = new PhoneNumberConfigEntity();
+              phoneNumberConfig.Id = id;
+              phoneNumberConfig.IsDeleted = true;
+              this._phoneNumberConfigRepo.deleteRecord(phoneNumberConfig);
+              resolve("Config successfully deleted");
+          } else {
+              reject("Unable to delete config");
+          }
+        });
+    }
+
+    private getRecordById = async (id: number): Promise<PhoneNumberConfigEntity> => {
         
         let value = await this._phoneNumberConfigRepo.createQueryBuilder("PhoneNumberConfig")
             .where("PhoneNumberConfig.Id = :id" , { id: id})
             .getOne();
 
         return value;
-    }
-
-    deletePhoneNumberConfig(id: number): Promise<string> {
-      return new Promise<string>(async (resolve, reject) => {
-        const config = await this._phoneNumberConfigRepo.findOneOrFail({ where: { Id: id } });
-        if (!config.IsDeleted) {
-            let phoneNumberConfig = new PhoneNumberConfigEntity();
-            phoneNumberConfig.Id = id;
-            phoneNumberConfig.IsDeleted = true;
-            this._phoneNumberConfigRepo.deleteRecord(phoneNumberConfig);
-            resolve("Config successfully deleted");
-        } else {
-            reject("Unable to delete config");
-        }
-      });
     }
 }
     

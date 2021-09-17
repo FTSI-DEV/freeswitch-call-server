@@ -6,13 +6,18 @@ import { CallRecordingService } from "src/modules/call-recording/services/call-r
 import path from 'path';
 import { CDRModel } from "src/modules/call-detail-record/models/cdr.models";
 import { TimeProvider } from "src/utils/timeProvider.utils";
+import { Inject } from "@nestjs/common";
+import { CALL_DETAIL_RECORD_SERVICE, ICallDetailRecordService } from "src/modules/call-detail-record/services/call-detail-record.interface";
+import { CALL_RECORDING_SERVICE, ICallRecordingService } from "src/modules/call-recording/services/call-recording.interface";
 
 @Processor('default')
 export class OutboundCallJob{
 
     constructor(
-        private readonly _callDetailRecordService: CallDetailRecordService,
-        private readonly _callRecordingService: CallRecordingService
+        @Inject(CALL_DETAIL_RECORD_SERVICE)
+        private readonly _callDetailRecordService: ICallDetailRecordService,
+        @Inject(CALL_RECORDING_SERVICE)
+        private readonly _callRecordingService: ICallRecordingService
     ) {}
 
     @Process('outboundCall')

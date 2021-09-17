@@ -1,15 +1,17 @@
-import { Controller, DefaultValuePipe, Get, Param, ParseIntPipe, Query, Request, Response } from '@nestjs/common';
+import { Controller, DefaultValuePipe, Get, Inject, Param, ParseIntPipe, Query, Request, Response } from '@nestjs/common';
 import { Pagination } from 'nestjs-typeorm-paginate';
 import { JsonDataListReturnModel } from 'src/utils/jsonDataListReturnModel';
 import { RangeFileStreamResult } from 'src/utils/rangeFileStreamResult';
 import { CallRecordingStorageDTO } from '../models/call-recording.dto';
+import { CALL_RECORDING_SERVICE, ICallRecordingService } from '../services/call-recording.interface';
 import { CallRecordingService } from '../services/call-recording.service';
 
 @Controller('call-recording')
 export class CallRecordingController {
 
     constructor(
-        private readonly _callRecordingStorageService: CallRecordingService
+        @Inject(CALL_RECORDING_SERVICE)
+        private readonly _callRecordingStorageService: ICallRecordingService
     ){}
 
     @Get('deleteCallRecording/:recordingId')
