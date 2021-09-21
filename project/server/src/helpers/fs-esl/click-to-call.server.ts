@@ -3,203 +3,215 @@ import { CHANNEL_VARIABLE } from '../constants/channel-variables.constants';
 import { ESL_SERVER, FS_ESL } from '../constants/fs-esl.constants';
 import esl from 'modesl';
 import { TimeProvider  } from 'src/utils/timeProvider.utils';
+import axios from 'axios';
+import { VoiceRequestParam } from './models/voiceRequestParam';
+import { CallDetailRecordService } from 'src/modules/call-detail-record/services/call-detail-record.service';
+import { ICallDetailRecordService } from 'src/modules/call-detail-record/services/call-detail-record.interface';
+import { DialplanInstruction, TwiMLXMLParser } from '../parser/xmlParser';
+import { CommandConstants } from '../constants/freeswitch-command.constants';
+import { FreeswitchDpConstants } from '../constants/freeswitchdp.constants';
 
 export class ClickToCallServerHelper {
   
   constructor(
-    private readonly _outboundCallService: OutboundCallService
+    private readonly _outboundCallService: OutboundCallService,
+    private readonly _callDetailRecordService: ICallDetailRecordService
   ) {}
 
   startClickToCallServer() {
+
     let server = new esl.Server(
       {
         port: 8000,
         host: '0.0.0.0',
         myevents: true,
-      },
-      () => {
-        console.log('CLICK TO CALL SERVER is up!!');
-      },
-    );
+      });
 
     server.on(ESL_SERVER.CONNECTION.READY, (conn) => {
-
-      console.log('CLICK TO CALL - server ready');
-
-      var legId = conn.getInfo().getHeader(CHANNEL_VARIABLE.UNIQUE_ID);
-
-      console.log('LEG ID - ', legId);
-
-      let legStop = false;
-
-      let hangupEvent = 'esl::event::CHANNEL_HANGUP::' + legId;
-
-      let hangupCompleteEvent = 'esl::event::CHANNEL_HANGUP_COMPLETE::' + legId;
-
-      // let hangupEvent = 'esl::event::CHANNEL_HANGUP_COMPLETE::**';
-
-      let hangupCompleteWrapper = (esl) => {
-        legStop = true;
-        console.log('Leg-A hangup complete event');
-        console.log('CHANNEL STATE ', esl.getHeader('Channel-State'));
-        console.log(`UID HANGUP COMPLETE -> ${esl.getHeader('Unique-ID')}`);
-        conn.removeListener(hangupCompleteEvent, hangupCompleteWrapper);
-      };
-
-      let hangupEventWrapper = (esl) => {
-        legStop = true;
-        console.log('Leg-A hangup event');
-        console.log('CHANNEL STATE ', esl.getHeader('Channel-State'));
-        console.log(`UID HANGUP COMPLETE -> ${esl.getHeader('Unique-ID')}`);
-        conn.removeListener(hangupEvent, hangupEventWrapper);
-      };
-
-
-      conn.on(hangupEvent, hangupEventWrapper);
-
-      conn.on(hangupCompleteEvent, hangupCompleteWrapper);
-
-      conn.subscribe('CHANNEL_HANGUP_COMPLETE');
-
-      conn.subscribe('CHANNEL_HANGUP');
       
+      console.log('Click To Call - server ready');
+
+      let context = new ClickToCallContext();
+
+      context.conn = conn;
+
+      let legId = conn
+        .getInfo()
+        .getHeader(CHANNEL_VARIABLE.UNIQUE_ID);
+
+      let phoneNumberFrom = conn 
+        .getInfo()
+        .getHeader(CHANNEL_VARIABLE.CALLER_CALLE_ID_NUMBER);
+
+      console.log('LEG-A', legId);
+
       conn.on('error', (err) => {
-        console.log('ERROR - ', err);
-      });
-      
-      conn.on('esl::end', () => {
-        console.log('ESL SERVER END -> ', legId);
-      })
-
-      conn.subscribe('all');
-
-      conn.on(FS_ESL.RECEIVED, (evt) => {
-        // console.log('CHANNEL STATE ', evt.getHeader('Channel-State'));
-        // console.log(`CTC EVENT NAME -> ${evt.getHeader('Event-Name')} , 
-        //         Uid -> ${evt.getHeader('Unique-ID')}`);
-      });
-
-      if (!legStop) {
-
-      let toUnixTimeSeconds = `${new TimeProvider().getUnixTimeSeconds()}`;
-
-      let filePath = '$${outbound_record_dir}/${uuid}';
-
-      let fullPath = `${filePath}_${toUnixTimeSeconds}.mp3`;
-
-      conn.execute('playback', 'https://crm.machaik.net/csvoice.mp3', () => {
-        console.log('playback executed');
-
-        conn.execute('sleep', 5000, () => {
-          console.log('sleep executed' );
-
-          if (legStop){
-            console.log('Leg hangup');
-            return;
-          }
-
-          conn.execute('bridge', 'sofia/gateway/fs-test3/1000', (cb2) => {
-            console.log('bridge completed');
-            console.log('B-Leg', cb2.getHeader(CHANNEL_VARIABLE.UNIQUE_ID));
-
-            if (legStop){
-              console.log('Leg hangup');
-              return;
-            }
-          });
-        });
-          // conn.execute('record_session', fullPath, () => {
-          
-          // });
+        console.log('Click To Call Error -> ', err);
       });
      
-      
+      context.outboundRequestParam.From = phoneNumberFrom;
 
-      // conn.execute('playback', 'https://crm.dealerownedsoftware.com/hosted-files/audio/ConvertedSalesService.wav', () => {
-      //   console.log('playback executed');
+      this._callDetailRecordService
+      .getByCallUid(legId)
+      .then((result) => {
 
-      //   conn.execute('sleep', '10000', () => {
-      //     console.log('sleep executed');
-      //   })
+          if (result === undefined){
+            this.callRejectedHandler(context, () =>{
+              console.log('Call rejected');
+              return;
+            });
+          }
 
-      //   // conn.execute('bridge', 'sofia/gateway/fs-test3/1000', (cb) => {
-      //   //   console.log('bridge completed');
-      //   //   console.log('B-Leg', cb.getHeader(CHANNEL_VARIABLE.UNIQUE_ID));
-      //   // });
-      // });
+          context.outboundRequestParam.NumberToCall = result.PhoneNumberTo;
 
-      // conn.execute('record_session', '$${sample_record_dir}/${strftime(%Y-%m-%d-%H-%M-%S)}_${uuid}.wav', (record) => {
+          this.getInstruction(context, () =>{
 
-      //     console.log('start recording... -> ');
+            if (context.legStop){
+              console.log('Cannot continue to process further instruction');
+              return;
+            }
 
-      //     conn.execute('playback', 'ivr/ivr-recording_started.wav', () => {
-      //         console.log('playback executed');
+            this.setInstruction(context);
 
-      //         conn.execute('playback', 'https://crm.dealerownedsoftware.com/hosted-files/audio/ConvertedSalesService.wav', () => {
+            if (context.legStop){
+              console.log('Cannot continue to process further instruction');
+              return;
+            }
 
-      //       console.log('playback executed');
-  
-      //       conn.execute(
-      //         'sleep',
-      //         '5000',
-      //         () => {
-  
-      //         console.log('1. sleep executed ' + new Date());
-  
-      //           if (legStop) {
-      //             console.log('Leg has stop', legStop);
-      //             return;
-      //           }
+            this.executeInstruction(context, () => {
 
-      //           conn.execute('speak', 'flite|kal|We are now connecting you to our team. Please hold!', () => {
-      //             console.log('SPEAK EXECUTED');
+            });
 
-      //             conn.execute('sleep', '3000', async () => {
-  
-      //               console.log('2. sleep executed ' + new Date());
-    
-      //               if (legStop) {
-      //                 console.log('Execution break', legStop);
-      //                 return;
-      //               }
-  
-      //               var phoneNumberTo = await this._outboundCallService.getPhoneNumberToByUUID(legId);
-  
-      //               console.log('PHONE NUMBER TO -> ', phoneNumberTo);
-    
-      //               let var_name = 'regex';
-    
-      //               conn.execute('play_and_get_digits', `1 5 2 10000 # ivr/ivr-enter_destination_telephone_number.wav ivr/ivr-that_was_an_invalid_entry.wav ${var_name} ${phoneNumberTo} 2000`, (e) => {
-    
-      //                 let validValue = e.getHeader(`variable_${var_name}`);
-    
-      //                 let invalidValue = e.getHeader(`variable_${var_name}_invalid`);
-    
-      //                 if (validValue != null || validValue != undefined){
-      //                     console.log('VALID -> ', validValue);
-      //                     conn.execute('bridge', 'sofia/gateway/fs-test3/${regex}');
-      //                 }
-      //                 else
-      //                 {
-      //                     console.log('INVALID -> ', invalidValue);
-    
-      //                     conn.execute('sleep', '3000', () => {
-      //                         console.log('3. Sleep executed . ' + new Date());
-      //                     });
-      //                 }
-  
-      //                 conn.execute('play_and_get_digits', `1 5 2 10000 # ivr/ivr-enter_destination_telephone_number.wav ivr/ivr-that_was_an_invalid_entry.wav ${var_name} ${phoneNumberTo} 2000`, (e) => {
-                      
-      //                 });
-      //               });
-      //             });
-      //           });
-      //         },
-      //       );
-      //     });
-      //     });
-      //   });
-      }
+          });
+      })
+      .catch((err) => {
+        console.log('ERROR ', err);
+      });
     });
   }
+
+  private getInstruction(context:ClickToCallContext,callback){
+    let dialNumber = 'http://localhost:8080/TwilioCallApi/DialNumber';
+
+    this.triggerWebhookUrl(dialNumber, 'POST', context.outboundRequestParam, (twiMLResponse) => {
+      console.log('TwiML Response ', twiMLResponse);
+
+      context.twiMLResponse = twiMLResponse;
+
+      callback(context);
+    })
+    .catch((err) => {
+      let errMessage = 'Error in requesting webhook url -> ' + err;
+
+      console.log(errMessage);
+
+      this.callRejectedHandler(context, () => {
+        console.log('Error handled!');
+        context.legStop = true;
+        callback(context);
+      });
+    });
+  }
+
+  private setInstruction(context:ClickToCallContext){
+    let parseResult = new TwiMLXMLParser().tryParse(context.twiMLResponse);
+
+    if (parseResult.length <= 0){
+      context.legStop = true;
+      return;
+    }
+
+    for (let i = 0; i < parseResult.length; i++){
+
+      let instruction = parseResult[i];
+
+      if (instruction.command === CommandConstants.exec){
+        if (instruction.name === FreeswitchDpConstants.bridge){
+          context.dialplanInstructions.push(instruction);
+        }
+      }
+    }
+
+    context.instructionValidated = true;
+  }
+
+  private executeInstruction(context:ClickToCallContext, callback){
+    let connection = context.conn;
+
+    let size = context.dialplanInstructions.length;
+
+    if (size === 1){
+      let instruction = context.dialplanInstructions[0];
+
+      if (instruction.name === FreeswitchDpConstants.bridge){
+        connection.execute('export',
+        'execute_on_answer=record_session $${recordings_dir}/${uuid}.wav', () =>{
+
+          if (instruction.children != undefined &&
+            instruction.children.name === 'Number'){
+              let numberToCall = instruction.value;
+
+              console.log('NumberToCall -> ' , context.outboundRequestParam.NumberToCall);
+
+              connection.execute('bridge', `sofia/gateway/fs-test3/1000`, (cb) => {
+                console.log('bridge completed');
+                console.log('B-Leg', cb.getHeader(CHANNEL_VARIABLE.UNIQUE_ID));
+                context.legStop = true;
+                context.dialplanInstruction= instruction;
+                callback(context);
+                return;
+              });
+            }
+        });
+      }
+    }
+  }
+
+  private async triggerWebhookUrl(
+    webhookUrl:string,
+    httpMethod:string,
+    params: VoiceRequestParam,
+    callback){
+
+    let record = null;
+
+    if (httpMethod === "POST"){
+      record = await axios.post(webhookUrl, params);
+    }
+    else
+    {
+      record = await axios.get(webhookUrl, { params : params });
+    }
+
+    callback(record.data)
+  }
+
+  private callRejectedHandler(context:ClickToCallContext, callback){
+    let connection = context.conn;
+
+    connection.execute('playback', 'ivr/ivr-call_cannot_be_completed_as_dialed.wav', () => {
+        console.log('Playback executed!');
+
+        connection.execute('hangup', 'CALL_REJECTED', () => {
+            console.log('hangup complete!');
+            context.legStop = true;
+            callback();
+        });
+    });
+  }
+}
+
+class ClickToCallContext{
+  conn:any;
+  outboundRequestParam: OutboundRequestParam = new OutboundRequestParam();
+  legStop:boolean=false;
+  twiMLResponse:string;
+  dialplanInstructions: DialplanInstruction[] = [];
+  instructionValidated:boolean=false;
+  dialplanInstruction:DialplanInstruction;
+}
+
+class OutboundRequestParam extends VoiceRequestParam{
+  NumberToCall:string;
+  DisplayCallerId:string;
 }

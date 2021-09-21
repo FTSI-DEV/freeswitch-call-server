@@ -22,6 +22,7 @@ import { InboundCallConfigModule } from './modules/inbound-call-config/inbound-c
 import { IInboundCallConfigService, INBOUND_CALL_CONFIG_SERVICE } from './modules/inbound-call-config/services/inbound-call-config.interface';
 import { OUTBOUND_CALL_SERVICE } from './modules/outbound-call/services/outbound-call.interface';
 import { IIncomingCallService, INCOMING_CALL_SERVICE } from './modules/incomingCall/services/incomingCall.interface';
+import { CALL_DETAIL_RECORD_SERVICE, ICallDetailRecordService } from './modules/call-detail-record/services/call-detail-record.interface';
 
 @Module({
   imports: [
@@ -53,12 +54,14 @@ export class AppModule {
               @Inject(OUTBOUND_CALL_SERVICE)
               private readonly _outboundCallService: OutboundCallService,
               @Inject(INCOMING_CALL_SERVICE)
-              private readonly _incomingCallService: IIncomingCallService) {        
+              private readonly _incomingCallService: IIncomingCallService,
+              @Inject(CALL_DETAIL_RECORD_SERVICE)
+              private readonly _callDetailRecordService: ICallDetailRecordService) {        
 
     new InboundEslConnectionHelper().startConnection();
 
     new EslServerHelper(_inboundCallConfigService,_incomingCallService).startEslServer();
 
-    new ClickToCallServerHelper(_outboundCallService).startClickToCallServer();
+    new ClickToCallServerHelper(_outboundCallService,_callDetailRecordService).startClickToCallServer();
   }
 }

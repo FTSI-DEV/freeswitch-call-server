@@ -1,6 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { FreeswitchConnectionResult } from 'src/helpers/fs-esl/inbound-esl.connection';
 import { CALL_DETAIL_RECORD_SERVICE, ICallDetailRecordService } from 'src/modules/call-detail-record/services/call-detail-record.interface';
+import { TimeProvider } from 'src/utils/timeProvider.utils';
 import { IOutboundCallService } from './outbound-call.interface';
 
 @Injectable()
@@ -40,12 +41,12 @@ export class OutboundCallService implements IOutboundCallService{
         
                 console.log('Originate CallUid -> ', callUid);
 
-                // this._callDetailRecordService.saveCDR({
-                //     UUID: callUid,
-                //     CallDirection: 'outbound',
-                //     StartedDate:  moment().format('YYYY-MM-DDTHH:mm:ss'),
-                //     PhoneNumberTo : phoneNumberTo
-                // });
+                this._callDetailRecordService.saveCDR({
+                    UUID: callUid,
+                    CallDirection: 'outbound',
+                    StartedDate:  new TimeProvider().getDateTimeNow(),
+                    PhoneNumberTo : phoneNumberTo
+                });
 
                 resolve(callUid);
             }

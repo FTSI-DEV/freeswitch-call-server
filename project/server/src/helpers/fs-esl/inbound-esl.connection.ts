@@ -12,16 +12,23 @@ import { CDRModel } from 'src/modules/call-detail-record/models/cdr.models';
 import moment from 'moment';
 import { DialplanInstruction } from '../parser/xmlParser';
 import axios from 'axios';
-import { VoiceRequestParam } from './inbound-call';
+import { VoiceRequestParam } from './models/voiceRequestParam';
 
 interface ConnResult {
   connectionObj: any;
   isSuccess: boolean;
   errorMessage: string;
-  inboundCallModel?: InboundCall
+  inboundCallModel?: InboundCall;
+  outboundCallModel?:OutboundCall;
 }
 
 interface InboundCall{
+  success:boolean;
+  lastDialplanInstruction:DialplanInstruction;
+  voiceRequestParam: VoiceRequestParam;
+}
+
+interface OutboundCall{
   success:boolean;
   lastDialplanInstruction:DialplanInstruction;
   voiceRequestParam: VoiceRequestParam;
@@ -147,6 +154,8 @@ export class InboundEslConnectionHelper {
 
       console.log('CHANNEL HANGUP COMPLETE ');
 
+      console.log('Call direction ', cdrValues.CallDirection);
+
       cdrValues.UUID = callId;
 
       if (callId === channelId){
@@ -165,8 +174,7 @@ export class InboundEslConnectionHelper {
       //   http.get(WebhookInboundCallStatusCallBack(cdrValues));
       // }
 
-      if (FreeswitchConnectionResult.inboundCallModel !== null &&
-        FreeswitchConnectionResult.inboundCallModel.success){
+      if (FreeswitchConnectionResult.inboundCallModel !== undefined){
 
           let lastDPInstruction = FreeswitchConnectionResult.inboundCallModel.lastDialplanInstruction;
 
@@ -185,6 +193,24 @@ export class InboundEslConnectionHelper {
           }
 
           console.log('SUCCESSFULLY END incoming call');
+      }
+      else if (FreeswitchConnectionResult.outboundCallModel !== undefined){
+
+        let lastDPInstruction = FreeswitchConnectionResult.outboundCallModel.lastDialplanInstruction;
+
+        let params = FreeswitchConnectionResult.outboundCallModel.voiceRequestParam;
+
+        params.CallDirection = cdrValues.CallDirection;
+        params.DialCallStatus = cdrValues.CallStatus;
+        params.CallSid = cdrValues.UUID;
+        params.DialCallDuration = cdrValues.Duration.toString();
+
+        if (lastDPInstruction.dialAttribute.method === "POST"){
+          axios.post(lastDPInstruction.dialAttribute.action, params);
+        }
+        else{
+          axios.get(lastDPInstruction.dialAttribute.action, { params : params });
+        }
       }
     });
 

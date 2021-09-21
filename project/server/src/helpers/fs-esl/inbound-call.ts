@@ -1,6 +1,4 @@
 import axios from "axios";
-import { connect } from "http2";
-import { parse } from "path/posix";
 import { InboundCallConfigModel } from "src/modules/inbound-call-config/models/inbound-call-config.model";
 import { IInboundCallConfigService } from "src/modules/inbound-call-config/services/inbound-call-config.interface";
 import { TimeConversion } from "src/utils/timeConversion.utils";
@@ -10,6 +8,7 @@ import { FreeswitchDpConstants } from "../constants/freeswitchdp.constants";
 import { DialplanInstruction, TwiMLXMLParser } from "../parser/xmlParser";
 import { FreeswitchConnectionResult } from "./inbound-esl.connection";
 import { inboundCallServer } from "./inboundCall.server";
+import { VoiceRequestParam } from "./models/voiceRequestParam";
 
 export class InboundCallHelper{
 
@@ -152,14 +151,7 @@ export class InboundCallHelper{
                                                                 },
                                                                 voiceRequestParam:context.voiceRequestParam
                                                             }
-
-                                                            // this.triggerWebhookUrl(context.dialplanInstruction.dialAttribute.action,
-                                                            //     context.dialplanInstruction.dialAttribute.method, context.voiceRequestParam, () => {
-
-                                                            //     });
                                                         }
-
-                                                        //execute webhook here;
                                                     });
                                                 }
                                             });
@@ -578,20 +570,6 @@ class InboundCallContext{
     callRejected:boolean = false;
 }
 
-export class VoiceRequestParam{
-    Digits: string;
-    To: string;
-    From:string;
-    RecordingUrl: string;
-    CallSid: string;
-    DialCallStatus: string;
-    CallDirection: string;
-    StoreId: number;
-    SystemId: number;
-    CallForwardingNumber:string;
-    DialCallDuration:string;
-}
-
 interface PlayAndGetDigitsParam{
     minValue:number; //minimum number of digits to collect
     maxValue:number; //maximum number of digits to collect
@@ -605,12 +583,11 @@ interface PlayAndGetDigitsParam{
     var_name:string; // channel variable that digits should be placed in
 }
 
-
 const RecordEnum = {
     DoNotRecord: 'do-not-record',
     RecordFromAnswer: 'record-from-answer',
     RecordFromRinging: 'record-from-ringing',
     RecordFromAnswerDual: 'record-from-answer-dual',
     RecordFromRingingDual: 'record-from-ringing-dual',
-  };
+};
   
