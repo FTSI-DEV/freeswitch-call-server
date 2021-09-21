@@ -32,22 +32,36 @@ export class ClickToCallServerHelper {
 
       let legStop = false;
 
-      // let hangupEvent = 'esl::event::CHANNEL_HANGUP::' + legId;
+      let hangupEvent = 'esl::event::CHANNEL_HANGUP::' + legId;
 
-      let hangupEvent = 'esl::event::CHANNEL_HANGUP_COMPLETE::**';
+      let hangupCompleteEvent = 'esl::event::CHANNEL_HANGUP_COMPLETE::' + legId;
+
+      // let hangupEvent = 'esl::event::CHANNEL_HANGUP_COMPLETE::**';
 
       let hangupCompleteWrapper = (esl) => {
         legStop = true;
-        console.log('Leg-A hangup');
+        console.log('Leg-A hangup complete event');
         console.log('CHANNEL STATE ', esl.getHeader('Channel-State'));
         console.log(`UID HANGUP COMPLETE -> ${esl.getHeader('Unique-ID')}`);
-        console.log('EVNT -> ', JSON.stringify(esl));
-        conn.removeListener(hangupEvent, hangupCompleteWrapper);
+        conn.removeListener(hangupCompleteEvent, hangupCompleteWrapper);
       };
 
-      conn.on(hangupEvent, hangupCompleteWrapper);
+      let hangupEventWrapper = (esl) => {
+        legStop = true;
+        console.log('Leg-A hangup event');
+        console.log('CHANNEL STATE ', esl.getHeader('Channel-State'));
+        console.log(`UID HANGUP COMPLETE -> ${esl.getHeader('Unique-ID')}`);
+        conn.removeListener(hangupEvent, hangupEventWrapper);
+      };
+
+
+      conn.on(hangupEvent, hangupEventWrapper);
+
+      conn.on(hangupCompleteEvent, hangupCompleteWrapper);
 
       conn.subscribe('CHANNEL_HANGUP_COMPLETE');
+
+      conn.subscribe('CHANNEL_HANGUP');
       
       conn.on('error', (err) => {
         console.log('ERROR - ', err);
@@ -60,9 +74,9 @@ export class ClickToCallServerHelper {
       conn.subscribe('all');
 
       conn.on(FS_ESL.RECEIVED, (evt) => {
-        console.log('CHANNEL STATE ', evt.getHeader('Channel-State'));
-        console.log(`CTC EVENT NAME -> ${evt.getHeader('Event-Name')} , 
-                Uid -> ${evt.getHeader('Unique-ID')}`);
+        // console.log('CHANNEL STATE ', evt.getHeader('Channel-State'));
+        // console.log(`CTC EVENT NAME -> ${evt.getHeader('Event-Name')} , 
+        //         Uid -> ${evt.getHeader('Unique-ID')}`);
       });
 
       if (!legStop) {
@@ -76,15 +90,27 @@ export class ClickToCallServerHelper {
       conn.execute('playback', 'https://crm.machaik.net/csvoice.mp3', () => {
         console.log('playback executed');
 
-          conn.execute('record_session', fullPath, () => {
-            conn.execute('sleep', 2000, () => {
-              console.log('sleep executed' );
-              conn.execute('bridge', 'sofia/gateway/fs-test1/1003', (cb2) => {
-                console.log('bridge completed');
-                console.log('B-Leg', cb2.getHeader(CHANNEL_VARIABLE.UNIQUE_ID));
-              });
-            });
+        conn.execute('sleep', 5000, () => {
+          console.log('sleep executed' );
+
+          if (legStop){
+            console.log('Leg hangup');
+            return;
+          }
+
+          conn.execute('bridge', 'sofia/gateway/fs-test3/1000', (cb2) => {
+            console.log('bridge completed');
+            console.log('B-Leg', cb2.getHeader(CHANNEL_VARIABLE.UNIQUE_ID));
+
+            if (legStop){
+              console.log('Leg hangup');
+              return;
+            }
           });
+        });
+          // conn.execute('record_session', fullPath, () => {
+          
+          // });
       });
      
       

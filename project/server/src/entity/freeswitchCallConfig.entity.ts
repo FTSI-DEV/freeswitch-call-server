@@ -18,17 +18,4 @@ export class FreeswitchCallConfigRepository extends Repository<FreeswitchCallCon
     saveUpdateRecord = async (fsCallConfig: FreeswitchCallConfigEntity) => {
         return await this.save(fsCallConfig);
     }
-
-    getById = async (id:number) => {
-        let retVal = null;
-        
-        let record = this.findOneOrFail(id)
-        .then(result => {
-            retVal = result;
-        }).catch((err) => {
-            retVal = null;
-        });
-
-        return retVal;
-    }
 }

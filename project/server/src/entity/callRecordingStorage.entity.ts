@@ -40,10 +40,6 @@ export class CallRecordingStorageRepository extends Repository<CallRecordingStor
 
     async saveCallRecording(param:CallRecordingStorageEntity){
         return await this.save(param);
-    } 
-
-    async saveHere(param: CallRecordingStorageEntity){
-        await this.save(param);
     }
 
     getById = async (id: number): Promise<CallRecordingStorageEntity> => {

@@ -8,6 +8,8 @@ import { DTMFHelper } from './dtmf.helper';
 import { FreeswitchConfigHelper } from './freeswitchConfig.helper';
 import esl from 'modesl';
 import http from 'http';
+import { CDRModel } from 'src/modules/call-detail-record/models/cdr.models';
+import moment from 'moment';
 
 interface ConnResult {
   connectionObj: any;
@@ -49,6 +51,9 @@ export class InboundEslConnectionHelper {
       connection.subscribe('CHANNEL_ANSWER');
       connection.subscribe('DTMF');
       connection.subscribe('BACKGROUND_JOB');
+      connection.subscribe('all');
+      connection.subscribe('CHANNEL_CREATE');
+      connection.subscribe('CHANNEL_STATE');
     });
 
     this._onListenEvent(connection, dtmf);
@@ -61,28 +66,76 @@ export class InboundEslConnectionHelper {
 
       let uid = evt.getHeader('Unique-ID');
 
-      if (uid != null){
-        console.log('CHANNEL STATE ESL', evt.getHeader('Channel-State'));
-        console.log(
-          `ESL -> ${evt.getHeader('Event-Name')} , 
-          Uid -> ${uid}`
-        );
-      }
+      // if (uid != null){
+      //   console.log('CHANNEL STATE ESL', evt.getHeader('Channel-State'));
+      //   console.log(`ESL -> ${evt.getHeader('Event-Name')} , Uid -> ${uid}`
+      //   );
+      // }
     })
   }
 
   private _onListenEvent(connection, dtmf: DTMFHelper){
 
-    connection.on('esl::event::CHANNEL_HANGUP_COMPLETE::**', (fsEvent) => {
+    connection.on('esl::event::CHANNEL_CREATE::*', (fsEvent) => {
+
+      let eventName = fsEvent.getHeader('Event-Name');
+
+      let callId = fsEvent.getHeader(CHANNEL_VARIABLE.UNIQUE_ID);
+      
+      let callDirection = fsEvent.getHeader(CHANNEL_VARIABLE.CALL_DIRECTION);
+
+      if (callDirection === CallTypes.Inbound){
+
+        console.log('Call direction -> ' ,callDirection);
+        console.log('Call Id -> ', callId);
+        console.log('Event Name -> ', eventName);
+
+        let cdrValues: CDRModel = {
+          UUID: callId,
+          CallDirection: callDirection,
+          StartedDate : moment().format('YYYY-MM-DDTHH:mm:ss')
+        }
+
+        // http.get(WebhookInboundCallStatusCallBack(cdrValues));
+      }
+    });
+
+    connection.on('esl::event::CHANNEL_STATE::*', (fsEvent) => {
 
       let callId = fsEvent.getHeader(CHANNEL_VARIABLE.UNIQUE_ID);
 
-      console.log('ESL EVTNAME ->' , fsEvent.getHeader(EVENT_LIST.EVENT_NAME));
-      console.log('ESL legid ->' , callId);
+      let channelId = fsEvent.getHeader('Channel-Call-UUID');
+      
+      let cdrValues = new CDRHelper().getCallRecords(fsEvent);
+
+      cdrValues.UUID = callId;
+
+      console.log('CS STATE');
+
+      if (callId === channelId){
+        console.log('Call : ' , callId);
+      }
+      else{
+        console.log('Call : ' , callId);
+        dtmf.stopDTMF(connection, callId);
+        cdrValues.ParentCallUid = channelId;
+        console.log('Parent Call : ', channelId);
+      }
+
+    });
+
+    connection.on('esl::event::CHANNEL_HANGUP_COMPLETE::*', (fsEvent) => {
+
+      let callId = fsEvent.getHeader(CHANNEL_VARIABLE.UNIQUE_ID);
+
+      // console.log('ESL EVTNAME ->' , fsEvent.getHeader(EVENT_LIST.EVENT_NAME));
+      // console.log('ESL legid ->' , callId);
      
       let channelId = fsEvent.getHeader('Channel-Call-UUID');
       
       let cdrValues = new CDRHelper().getCallRecords(fsEvent);
+
+      console.log('CHANNEL HANGUP COMPLETE ');
 
       cdrValues.UUID = callId;
 

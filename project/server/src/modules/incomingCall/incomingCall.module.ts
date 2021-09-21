@@ -11,6 +11,7 @@ import { IncomingCallService } from './services/incomingCall.service';
         useClass: IncomingCallService,
         provide: INCOMING_CALL_SERVICE
     }],
-    imports: [CallDetailRecordModule, BullModuleQueue]
+    imports: [CallDetailRecordModule, BullModuleQueue],
+    exports: [INCOMING_CALL_SERVICE]
 })
 export class IncomingCallModule {}

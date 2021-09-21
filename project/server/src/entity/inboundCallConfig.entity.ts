@@ -27,7 +27,6 @@ export class InboundCallConfigEntity{
 export class InboundCallConfigRepository extends Repository<InboundCallConfigEntity>{
 
     saveUpdateRecord = async (inboundCallConfig: InboundCallConfigEntity) => {
-        console.log('config ->', inboundCallConfig);
         return await this.save(inboundCallConfig);
     }
 

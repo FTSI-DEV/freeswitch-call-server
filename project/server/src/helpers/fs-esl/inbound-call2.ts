@@ -25,11 +25,15 @@ export class InboundCallHelper2 {
 
       let legId = conn.getInfo().getHeader(CHANNEL_VARIABLE.UNIQUE_ID);
 
+      let callerDestinationNumber = conn
+        .getInfo()
+        .getHeader(CHANNEL_VARIABLE.CALLER_DESTINATION_NUMBER);
+
       console.log('LEG-A', legId);
 
       let hangupCompleteEvent = 'esl::event::CHANNEL_HANGUP_COMPLETE::' + legId;
 
-      conn.subscribe(EVENT_LIST.CHANNEL_HANGUP_COMPLETE);
+      // conn.subscribe(EVENT_LIST.CHANNEL_HANGUP_COMPLETE);
 
       let hangupCompleteWrapper = (esl) => {
         context.legStop = true;
@@ -38,24 +42,26 @@ export class InboundCallHelper2 {
         conn.removeListener(hangupCompleteEvent, hangupCompleteWrapper);
       };
 
+      console.log('leg A ', legId);
+
       conn.on('error', (err) => {
         console.log('Inbound Call ERROR -> ', err);
       });
 
-      conn.on(hangupCompleteEvent, hangupCompleteWrapper);
+      // conn.on(hangupCompleteEvent, hangupCompleteWrapper);
 
       conn.subscribe('all');
 
       conn.on('esl::event::*::*', (evt) => {
 
-        let uid = evt.getHeader('Unique-ID');
+        // let uid = evt.getHeader('Unique-ID');
 
-        if (uid != null){
-          console.log('CHANNEL STATE ', evt.getHeader('Channel-State'));
-          console.log(`Inbound Call -> 
-            EVENT NAME -> ${evt.getHeader('Event-Name')} , 
-            UniqueId -> ${uid}`);
-        }
+        // if (uid != null){
+        //   console.log('CHANNEL STATE ', evt.getHeader('Channel-State'));
+        //   console.log(`Inbound Call -> 
+        //     EVENT NAME -> ${evt.getHeader('Event-Name')} , 
+        //     UniqueId -> ${uid}`);
+        // }
       });
 
       if (!context.legStop) {
@@ -67,7 +73,7 @@ export class InboundCallHelper2 {
             console.log('playback executed ');
 
             this._inboundCallConfigService
-              .getByCallerId('8667468950')
+              .getByCallerId(callerDestinationNumber)
               .then((config) => {
 
                 let voiceRequestParam = new VoiceRequestParam();
@@ -279,20 +285,24 @@ export class InboundCallHelper2 {
                         console.log('bridge validated!');
                         if (nextInstruction.dialAttribute.recordCondition === RecordEnum.RecordFromAnswer) {
 
-                          conn.execute(
-                            'export',
-                            'execute_on_answer=record_session $${recordings_dir}/${strftime(%Y-%m-%d-%T%H-%M-%S)}_${uuid}.wav',
-                            () => {
+                          conn.execute('set', 'hangup_after_bridge=true', () => {
+                            console.log('hangup after bridge set');
 
-                              conn.execute(nextInstruction.name, `sofia/gateway/fs-test3/1000`,(cb) => {
-
-                                  console.log('bridge completed');
-                                  console.log('B-Leg', cb.getHeader(CHANNEL_VARIABLE.UNIQUE_ID));
-                                  context.bridgeCompleted = true;
-
-                                  //insert handler for inboundStatusCallback
-                                  callback();
-                              });
+                            conn.execute(
+                              'export',
+                              'execute_on_answer=record_session $${recordings_dir}/${strftime(%Y-%m-%d-%T%H-%M-%S)}_${uuid}.wav',
+                              () => {
+  
+                                conn.execute(nextInstruction.name, `sofia/gateway/fs-test3/1000`,(cb) => {
+  
+                                    console.log('bridge completed');
+                                    console.log('B-Leg', cb.getHeader(CHANNEL_VARIABLE.UNIQUE_ID));
+                                    context.bridgeCompleted = true;
+  
+                                    //insert handler for inboundStatusCallback
+                                    callback();
+                                });
+                            });
                           });
                         }
                       }

@@ -60,9 +60,9 @@ export class OutboundCallService implements IOutboundCallService{
 
         return new Promise<string>((resolve,reject) => {
 
-            let app_args = `sofia/gateway/fs-test3/1000`;
+            let app_args = `sofia/gateway/fs-test1/1000`;
             
-            let arg1 = `{ignore_early_media=true,origination_caller_id_number=1000,hangup_after_bridge=true}${app_args}`;
+            let arg1 = `{ignore_early_media=true,origination_caller_id_number=1000,hangup_after_bridge=true,call_timeout=10}${app_args}`;
 
             let arg4 = `${arg1} &socket(192.168.18.3:8000 async full)`;
 
