@@ -31,24 +31,9 @@ export class InboundCallHelper2 {
 
       console.log('LEG-A', legId);
 
-      let hangupCompleteEvent = 'esl::event::CHANNEL_HANGUP_COMPLETE::' + legId;
-
-      // conn.subscribe(EVENT_LIST.CHANNEL_HANGUP_COMPLETE);
-
-      let hangupCompleteWrapper = (esl) => {
-        context.legStop = true;
-        console.log('CHANNEL STATE ', esl.getHeader('Channel-State'));
-        console.log('Leg-A hangup', esl.getHeader('Unique-ID'));
-        conn.removeListener(hangupCompleteEvent, hangupCompleteWrapper);
-      };
-
-      console.log('leg A ', legId);
-
       conn.on('error', (err) => {
         console.log('Inbound Call ERROR -> ', err);
       });
-
-      // conn.on(hangupCompleteEvent, hangupCompleteWrapper);
 
       conn.subscribe('all');
 
@@ -145,14 +130,21 @@ export class InboundCallHelper2 {
                         console.log('HANGUP COMPLETE');
                       });
                     }
-                  },
-                );
+                  })
+                  .catch(err => {
+                    console.log('CATCH ERROR -> ' ,err);
+                    conn.execute('playback', 'ivr/ivr-call_cannot_be_completed_as_dialed.wav', () => {
+                      conn.execute('hangup', 'CALL_REJECTED', () => {
+                        console.log('hangup completed');
+                      });
+                    });
+                  });
               })
               .catch((err) => {
                 console.log('Catch ERROR -> ' ,err);
                 conn.execute('playback','ivr/ivr-call_cannot_be_completed_as_dialed.wav', () => {
                   console.log('playback executed');
-                  conn.execute('hangup', 'MANAGER_REQUEST', () => {
+                  conn.execute('hangup', 'CALL_REJECTED', () => {
                     console.log('hangup completed');
                   })
                 })
@@ -330,7 +322,13 @@ export class InboundCallHelper2 {
             }
           },
         ).catch((err) => {
-          console.log('ERRO -> ', err);
+          console.log('Catch ERROR -> ' ,err);
+                conn.execute('playback','ivr/ivr-call_cannot_be_completed_as_dialed.wav', () => {
+                  console.log('playback executed');
+                  conn.execute('hangup', 'CALL_REJECTED', () => {
+                    console.log('hangup completed');
+                  });
+                });
         });
   }
 
@@ -376,7 +374,13 @@ export class InboundCallHelper2 {
         }
       })
       .catch(err => {
-        console.log('ERROR -> ', err);
+        console.log('Catch ERROR -> ' ,err);
+                conn.execute('playback','ivr/ivr-call_cannot_be_completed_as_dialed.wav', () => {
+                  console.log('playback executed');
+                  conn.execute('hangup', 'CALL_REJECTED', () => {
+                    console.log('hangup completed');
+                  });
+                });
         callback();
       });
   }

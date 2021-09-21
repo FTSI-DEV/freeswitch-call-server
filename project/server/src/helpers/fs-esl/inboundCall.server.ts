@@ -2,7 +2,6 @@ import { IGreetingService } from 'src/modules/greeting/greeting-service.interfac
 import { IInboundCallConfigService } from 'src/modules/inbound-call-config/services/inbound-call-config.interface';
 import { InboundCallConfigService } from 'src/modules/inbound-call-config/services/inbound-call-config.service';
 import { IIncomingCallService } from 'src/modules/incomingCall/services/incomingCall.interface';
-import { InboundCallHelper } from './inbound-call';
 import { InboundCallHelper2 } from './inbound-call2';
 const esl = require('modesl');
 
