@@ -150,10 +150,17 @@ export class InboundCallHelper{
                                     }
                                     else
                                     {
-
+                                        this.callRejectedHandler(context, () => {
+                                            console.log('Call has rejected or hangup');
+                                        });
                                     }
                                 });
                            });
+                        }
+                        {
+                            this.callRejectedHandler(context, () => {
+                                console.log('Call has rejected or hangup');
+                            });
                         }
                     });
                 })
