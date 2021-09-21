@@ -132,35 +132,22 @@ export class InboundCallHelper{
                                                     this.executeThirdInstruction(context, () => {
                                                         console.log('All instructions are executed!');
 
-                                                        if (context.callRejected){
-                                                            this.callRejectedHandler(context, () => {
-                                                                console.log('Call has rejected or hangup');
-                                                            });
-                                                        }
-                                                    });
-                                                }
-                                                else
-                                                {
-                                                    this.callRejectedHandler(context, () => {
-                                                        console.log('Call has rejected or hangup');
+                                                        // if (context.legStop){
+
+                                                        //     this.triggerWebhookUrl(context.dialplanInstruction.dialAttribute.action,
+                                                        //         context.dialplanInstruction.dialAttribute.method, context.voiceRequestParam, () => {
+
+                                                        //         });
+                                                        // }
+
+                                                        //execute webhook here;
                                                     });
                                                 }
                                             });
                                         });
                                     }
-                                    else
-                                    {
-                                        this.callRejectedHandler(context, () => {
-                                            console.log('Call has rejected or hangup');
-                                        });
-                                    }
                                 });
                            });
-                        }
-                        {
-                            this.callRejectedHandler(context, () => {
-                                console.log('Call has rejected or hangup');
-                            });
                         }
                     });
                 })
@@ -492,12 +479,13 @@ export class InboundCallHelper{
                                         connection.execute(instruction.name, `sofia/gateway/fs-test3/1000`, (cb) => {
                                             console.log('bridge completed');
                                             console.log('B-LEG', cb.getHeader(CHANNEL_VARIABLE.UNIQUE_ID));
+                                            context.legStop = true;
+                                            console.log('dp' , instruction);
+                                            context.dialplanInstruction = instruction;
                                             callback(context);
                                             return;
                                         });
                                     }
-                                    context.callRejected = true;
-                                    callback(context);
                                 });
                             });
                         }
@@ -524,7 +512,7 @@ export class InboundCallHelper{
     }
 
     //#endregion
-
+    
     private callRejectedHandler(context:InboundCallContext, callback){
         let connection = context.conn;
 
@@ -562,7 +550,7 @@ class InboundCallContext{
     conn:any;
     voiceRequestParam: VoiceRequestParam = new VoiceRequestParam();
     dialplanInstructions: DialplanInstruction[] = [];
-    dialplanInstruction : DialplanInstruction;
+    dialplanInstruction : DialplanInstruction; 
     legStop: boolean = false;
     errorMessage: string;
     hasError: boolean = false;
