@@ -8,6 +8,7 @@ import { CHANNEL_VARIABLE } from "../constants/channel-variables.constants";
 import { CommandConstants } from "../constants/freeswitch-command.constants";
 import { FreeswitchDpConstants } from "../constants/freeswitchdp.constants";
 import { DialplanInstruction, TwiMLXMLParser } from "../parser/xmlParser";
+import { FreeswitchConnectionResult } from "./inbound-esl.connection";
 import { inboundCallServer } from "./inboundCall.server";
 
 export class InboundCallHelper{
@@ -132,13 +133,31 @@ export class InboundCallHelper{
                                                     this.executeThirdInstruction(context, () => {
                                                         console.log('All instructions are executed!');
 
-                                                        // if (context.legStop){
+                                                        if (context.legStop){
 
-                                                        //     this.triggerWebhookUrl(context.dialplanInstruction.dialAttribute.action,
-                                                        //         context.dialplanInstruction.dialAttribute.method, context.voiceRequestParam, () => {
+                                                            let connectionResult = FreeswitchConnectionResult;
 
-                                                        //         });
-                                                        // }
+                                                            connectionResult.inboundCallModel = {
+                                                                success: true,
+                                                                lastDialplanInstruction : {
+                                                                    dialAttribute : {
+                                                                        action: context.dialplanInstruction.dialAttribute.action,
+                                                                        method: context.dialplanInstruction.dialAttribute.method,
+                                                                        callerId: null,
+                                                                        recordCondition: null
+                                                                    },
+                                                                    name: "",
+                                                                    command: "",
+                                                                    value: ""
+                                                                },
+                                                                voiceRequestParam:context.voiceRequestParam
+                                                            }
+
+                                                            // this.triggerWebhookUrl(context.dialplanInstruction.dialAttribute.action,
+                                                            //     context.dialplanInstruction.dialAttribute.method, context.voiceRequestParam, () => {
+
+                                                            //     });
+                                                        }
 
                                                         //execute webhook here;
                                                     });
@@ -512,7 +531,7 @@ export class InboundCallHelper{
     }
 
     //#endregion
-    
+
     private callRejectedHandler(context:InboundCallContext, callback){
         let connection = context.conn;
 
@@ -559,7 +578,7 @@ class InboundCallContext{
     callRejected:boolean = false;
 }
 
-class VoiceRequestParam{
+export class VoiceRequestParam{
     Digits: string;
     To: string;
     From:string;
@@ -570,6 +589,7 @@ class VoiceRequestParam{
     StoreId: number;
     SystemId: number;
     CallForwardingNumber:string;
+    DialCallDuration:string;
 }
 
 interface PlayAndGetDigitsParam{

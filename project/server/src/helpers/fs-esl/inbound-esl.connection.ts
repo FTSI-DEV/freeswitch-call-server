@@ -10,17 +10,27 @@ import esl from 'modesl';
 import http from 'http';
 import { CDRModel } from 'src/modules/call-detail-record/models/cdr.models';
 import moment from 'moment';
+import { DialplanInstruction } from '../parser/xmlParser';
+import axios from 'axios';
+import { VoiceRequestParam } from './inbound-call';
 
 interface ConnResult {
   connectionObj: any;
   isSuccess: boolean;
   errorMessage: string;
+  inboundCallModel?: InboundCall
+}
+
+interface InboundCall{
+  success:boolean;
+  lastDialplanInstruction:DialplanInstruction;
+  voiceRequestParam: VoiceRequestParam;
 }
 
 export const FreeswitchConnectionResult: ConnResult = {
   connectionObj: null,
   isSuccess: false,
-  errorMessage: null,
+  errorMessage: null
 };
 
 export class InboundEslConnectionHelper {
@@ -154,6 +164,28 @@ export class InboundEslConnectionHelper {
       // else{
       //   http.get(WebhookInboundCallStatusCallBack(cdrValues));
       // }
+
+      if (FreeswitchConnectionResult.inboundCallModel !== null &&
+        FreeswitchConnectionResult.inboundCallModel.success){
+
+          let lastDPInstruction = FreeswitchConnectionResult.inboundCallModel.lastDialplanInstruction;
+
+          let params = FreeswitchConnectionResult.inboundCallModel.voiceRequestParam;
+
+          params.CallDirection = cdrValues.CallDirection;
+          params.DialCallStatus = cdrValues.CallStatus;
+          params.CallSid = cdrValues.UUID;
+          params.DialCallDuration = cdrValues.Duration.toString();
+
+          if (lastDPInstruction.dialAttribute.method === "POST"){
+              axios.post(lastDPInstruction.dialAttribute.action, params);
+          }
+          else{
+            axios.get(lastDPInstruction.dialAttribute.action, { params : params });
+          }
+
+          console.log('SUCCESSFULLY END incoming call');
+      }
     });
 
     connection.on('esl::event::BACKGROUND_JOB::*', (evt) =>{
