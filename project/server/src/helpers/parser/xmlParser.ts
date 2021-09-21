@@ -76,6 +76,8 @@ export class TwiMLXMLParser{
                         name: child.name
                     };
 
+                    console.log('child ', dpInstruction);
+
                     dpInstructions.push(dpInstruction);
                }
                else if (element.name === TwiMLContants.Reject){
@@ -83,6 +85,13 @@ export class TwiMLXMLParser{
                        name: FreeswitchDpConstants.hangup,
                        command: CommandConstants.exec,
                        value : ""
+                   });
+               }
+               else if (element.name === TwiMLContants.Hangup){
+                   dpInstructions.push({
+                       name : FreeswitchDpConstants.hangup,
+                       command: CommandConstants.exec,
+                       value: ""
                    });
                }
             }

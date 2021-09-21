@@ -53,12 +53,11 @@ export class AppModule {
               @Inject(OUTBOUND_CALL_SERVICE)
               private readonly _outboundCallService: OutboundCallService,
               @Inject(INCOMING_CALL_SERVICE)
-              private readonly _incomingCallService: IIncomingCallService) {
-
-    
-    new EslServerHelper(_inboundCallConfigService,_incomingCallService).startEslServer();
+              private readonly _incomingCallService: IIncomingCallService) {        
 
     new InboundEslConnectionHelper().startConnection();
+
+    new EslServerHelper(_inboundCallConfigService,_incomingCallService).startEslServer();
 
     new ClickToCallServerHelper(_outboundCallService).startClickToCallServer();
   }
