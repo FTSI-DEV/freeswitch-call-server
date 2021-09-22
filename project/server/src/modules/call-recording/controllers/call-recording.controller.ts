@@ -6,7 +6,7 @@ import { CallRecordingStorageDTO } from '../models/call-recording.dto';
 import { CALL_RECORDING_SERVICE, ICallRecordingService } from '../services/call-recording.interface';
 import { CallRecordingService } from '../services/call-recording.service';
 
-@Controller('call-recording')
+@Controller('/api/call-recording')
 export class CallRecordingController {
 
     constructor(
