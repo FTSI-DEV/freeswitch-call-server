@@ -1,8 +1,6 @@
 import { OnQueueActive, Process, Processor } from "@nestjs/bull";
 import { Job } from "bull";
 import { FsCallDetailRecordEntity } from "src/entity/call-detail-record";
-import { CallDetailRecordService } from "src/modules/call-detail-record/services/call-detail-record.service";
-import { CallRecordingService } from "src/modules/call-recording/services/call-recording.service";
 import path from 'path';
 import { CDRModel } from "src/modules/call-detail-record/models/cdr.models";
 import { TimeProvider } from "src/utils/timeProvider.utils";

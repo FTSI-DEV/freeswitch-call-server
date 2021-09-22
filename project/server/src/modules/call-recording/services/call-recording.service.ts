@@ -63,6 +63,8 @@ export class CallRecordingService implements ICallRecordingService{
                    })
             .getOne();
 
+        console.log(record);
+
         return record;
     }
 
@@ -116,41 +118,5 @@ export class CallRecordingService implements ICallRecordingService{
         });
 
         return new Pagination<CallRecordingStorageDTO, IPaginationMeta>(itemObjs, pageRecords.meta);
-
-        return new Promise<Pagination<CallRecordingStorageDTO>>((resolve,reject) => {
-
-            let callRecordings = paginate<CallRecordingStorageEntity>(this._recordingStorageRepo, options);
-
-            callRecordings
-                .then(result => {
-                    let itemObjs : CallRecordingStorageDTO[] = [];
-
-                    result.items.forEach(element => {
-
-                        let recordingDTO: CallRecordingStorageDTO = {
-                            RecordingId : element.RecordingId,
-                            RecordingUUID : element.RecordingUid,
-                            CallUUID : element.CallUid,
-                            FilePath : element.FilePath,
-                            IsDeleted: element.IsDeleted,
-                            DateCreated : element.DateCreated,
-                            // CallId : element.callDetailRecord.Id
-                        };
-
-                        itemObjs.push(recordingDTO);
-                    });
-
-                    resolve(new Pagination<CallRecordingStorageDTO, IPaginationMeta>(itemObjs, result.meta));
-                })
-                .catch(err => {
-                    reject(new Pagination<CallRecordingStorageDTO, IPaginationMeta> (null, {
-                        itemCount: 0,
-                        itemsPerPage: 0,
-                        totalPages: 0,
-                        totalItems: 0,
-                        currentPage: 0
-                    }));
-                });
-        });
     }
 }

@@ -4,7 +4,7 @@ import fileSystem from 'fs';
 export class RangeFileStreamResult{
 
     constructor(req,res, filepath:string,contentType:string) {
-        
+        console.log('filepath ', filepath);
         var stat = fileSystem.statSync(filepath);
         var total = stat.size;
 

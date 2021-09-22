@@ -5,6 +5,7 @@ import { RangeFileStreamResult } from 'src/utils/rangeFileStreamResult';
 import { CallRecordingStorageDTO } from '../models/call-recording.dto';
 import { CALL_RECORDING_SERVICE, ICallRecordingService } from '../services/call-recording.interface';
 import { CallRecordingService } from '../services/call-recording.service';
+import path from 'path';
 
 @Controller('/api/call-recording')
 export class CallRecordingController {
@@ -72,11 +73,22 @@ export class CallRecordingController {
         @Param('recordingId') recordingId: number,
         @Request() request,
         @Response() response
-    ){
+    ):Promise<any>{
+
         let callRecording = await this._callRecordingStorageService.getByRecordingId(recordingId);
 
-        let filePath = "var/lib/freeswitch/recordings/2b0deac8-3b14-4618-97e7-7e75b7bf2687.wav";
+        if (callRecording !== undefined){
+            let basePath = process.env.CALL_RECORDING_BASE_PATH;
 
-        return new RangeFileStreamResult(request, response, filePath, "audio/wav");
+            let filePath = path.join(basePath, callRecording.FilePath);
+
+            return new RangeFileStreamResult(request, response, filePath, "audio/wav");
+        }
+        else
+        {
+            return 'No recording file found.';
+        }
+
+        // let filePath = "/var/lib/freeswitch/recordings/2b0deac8-3b14-4618-97e7-7e75b7bf2687.wav";
     }
 }
