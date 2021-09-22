@@ -75,8 +75,12 @@ export class CallRecordingController {
     ){
         let callRecording = await this._callRecordingStorageService.getByRecordingId(recordingId);
 
+        // callRecording.FilePath = "var/lib/freeswitch/recordings/2b0deac8-3b14-4618-97e7-7e75b7bf2687.wav";
+
+        let filePath = "var/lib/freeswitch/recordings/2b0deac8-3b14-4618-97e7-7e75b7bf2687.wav";
+        console.log('callrecording ', callRecording.FilePath);
         if (callRecording != null){
-            new RangeFileStreamResult(request, response, callRecording.FilePath, "audio/wav");
+            return new RangeFileStreamResult(request, response, filePath, "audio/wav");
         }
         
         console.log('No recording file');
