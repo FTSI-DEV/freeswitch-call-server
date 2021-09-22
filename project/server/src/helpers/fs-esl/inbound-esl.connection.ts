@@ -53,8 +53,6 @@ export class InboundEslConnectionHelper {
       fsConfig.password,
     );
 
-    let dtmf = new DTMFHelper();
-
     connection.on(FS_ESL.CONNECTION.ERROR, () => {
       FreeswitchConnectionResult.errorMessage = 'Connection Error';
     });
@@ -64,15 +62,11 @@ export class InboundEslConnectionHelper {
       FreeswitchConnectionResult.isSuccess = true;
       FreeswitchConnectionResult.connectionObj = connection;
       connection.subscribe('CHANNEL_HANGUP_COMPLETE');
-      connection.subscribe('CHANNEL_ANSWER');
-      connection.subscribe('DTMF');
-      connection.subscribe('BACKGROUND_JOB');
       connection.subscribe('all');
       connection.subscribe('CHANNEL_CREATE');
-      connection.subscribe('CHANNEL_STATE');
     });
 
-    this._onListenEvent(connection, dtmf);
+    this._onListenEvent(connection);
 
     connection.on('esl::end', () => {
       console.log('ESL END ');
@@ -90,7 +84,7 @@ export class InboundEslConnectionHelper {
     })
   }
 
-  private _onListenEvent(connection, dtmf: DTMFHelper){
+  private _onListenEvent(connection){
 
     connection.on('esl::event::CHANNEL_CREATE::*', (fsEvent) => {
 
@@ -116,42 +110,13 @@ export class InboundEslConnectionHelper {
       }
     });
 
-    connection.on('esl::event::CHANNEL_STATE::*', (fsEvent) => {
-
-      let callId = fsEvent.getHeader(CHANNEL_VARIABLE.UNIQUE_ID);
-
-      let channelId = fsEvent.getHeader('Channel-Call-UUID');
-      
-      let cdrValues = new CDRHelper().getCallRecords(fsEvent);
-
-      cdrValues.UUID = callId;
-
-      console.log('CS STATE');
-
-      if (callId === channelId){
-        console.log('Call : ' , callId);
-      }
-      else{
-        console.log('Call : ' , callId);
-        dtmf.stopDTMF(connection, callId);
-        cdrValues.ParentCallUid = channelId;
-        console.log('Parent Call : ', channelId);
-      }
-
-    });
-
     connection.on('esl::event::CHANNEL_HANGUP_COMPLETE::*', (fsEvent) => {
 
       let callId = fsEvent.getHeader(CHANNEL_VARIABLE.UNIQUE_ID);
-
-      // console.log('ESL EVTNAME ->' , fsEvent.getHeader(EVENT_LIST.EVENT_NAME));
-      // console.log('ESL legid ->' , callId);
      
       let channelId = fsEvent.getHeader('Channel-Call-UUID');
       
       let cdrValues = new CDRHelper().getCallRecords(fsEvent);
-
-      console.log('CHANNEL HANGUP COMPLETE ');
 
       console.log('Call direction ', cdrValues.CallDirection);
 
@@ -162,7 +127,6 @@ export class InboundEslConnectionHelper {
       }
       else{
         console.log('Call : ' , callId);
-        dtmf.stopDTMF(connection, callId);
         cdrValues.ParentCallUid = channelId;
         console.log('Parent Call : ', channelId);
       }
@@ -172,32 +136,19 @@ export class InboundEslConnectionHelper {
       // else{
       //   http.get(WebhookInboundCallStatusCallBack(cdrValues));
       // }
+    });
 
+    connection.on('esl::event::BACKGROUND_JOB::*', (evt) =>{
+      console.log('BG - EVT -> ', evt);
+    });
+  }
+
+  private statusCallback(cdrValues:CDRModel){
       if (FreeswitchConnectionResult.inboundCallModel !== undefined){
 
-          let lastDPInstruction = FreeswitchConnectionResult.inboundCallModel.lastDialplanInstruction;
+        let lastDPInstruction = FreeswitchConnectionResult.inboundCallModel.lastDialplanInstruction;
 
-          let params = FreeswitchConnectionResult.inboundCallModel.voiceRequestParam;
-
-          params.CallDirection = cdrValues.CallDirection;
-          params.DialCallStatus = cdrValues.CallStatus;
-          params.CallSid = cdrValues.UUID;
-          params.DialCallDuration = cdrValues.Duration.toString();
-
-          if (lastDPInstruction.dialAttribute.method === "POST"){
-              axios.post(lastDPInstruction.dialAttribute.action, params);
-          }
-          else{
-            axios.get(lastDPInstruction.dialAttribute.action, { params : params });
-          }
-
-          console.log('SUCCESSFULLY END incoming call');
-      }
-      else if (FreeswitchConnectionResult.outboundCallModel !== undefined){
-
-        let lastDPInstruction = FreeswitchConnectionResult.outboundCallModel.lastDialplanInstruction;
-
-        let params = FreeswitchConnectionResult.outboundCallModel.voiceRequestParam;
+        let params = FreeswitchConnectionResult.inboundCallModel.voiceRequestParam;
 
         params.CallDirection = cdrValues.CallDirection;
         params.DialCallStatus = cdrValues.CallStatus;
@@ -205,50 +156,31 @@ export class InboundEslConnectionHelper {
         params.DialCallDuration = cdrValues.Duration.toString();
 
         if (lastDPInstruction.dialAttribute.method === "POST"){
+            axios.post(lastDPInstruction.dialAttribute.action, params);
+        }
+        else{
+          axios.get(lastDPInstruction.dialAttribute.action, { params : params });
+        }
+
+        console.log('SUCCESSFULLY END incoming call');
+    }
+    else if (FreeswitchConnectionResult.outboundCallModel !== undefined){
+
+      let lastDPInstruction = FreeswitchConnectionResult.outboundCallModel.lastDialplanInstruction;
+
+      let params = FreeswitchConnectionResult.outboundCallModel.voiceRequestParam;
+
+      params.CallDirection = cdrValues.CallDirection;
+      params.DialCallStatus = cdrValues.CallStatus;
+      params.CallSid = cdrValues.UUID;
+      params.DialCallDuration = cdrValues.Duration.toString();
+
+        if (lastDPInstruction.dialAttribute.method === "POST"){
           axios.post(lastDPInstruction.dialAttribute.action, params);
         }
         else{
           axios.get(lastDPInstruction.dialAttribute.action, { params : params });
         }
-      }
-    });
-
-    connection.on('esl::event::BACKGROUND_JOB::*', (evt) =>{
-      console.log('BG - EVT -> ', evt);
-    })
-
-    connection.on('esl::event::CHANNEL_ANSWER::**', (evt) => {
-
-      console.log('EVENT-NAME ->' , evt.getHeader(EVENT_LIST.EVENT_NAME));
-
-      let callId = evt.getHeader(CHANNEL_VARIABLE.UNIQUE_ID);
-
-      let channelId = evt.getHeader('Channel-Call-UUID');
-
-      // connection.bgapi('sofia status', (res) => {
-      //   console.log('SOFIA STATUS -> ' , res);
-      // });
-
-      // connection.bgapi('show calls', (res) => {
-
-      //   let jobUUID = res.getHeader('Job-UUID');
-
-      //   console.log('show calls -> ' , jobUUID);
-
-      //   console.log('ALL -> ', res);
-      // });
-
-      // console.log('CHANNEL ID -> ', channelId);
-
-      // if (callId === channelId){
-      //   console.log('Call : ' , callId);
-      // }
-      // else{
-      //   console.log('Call : ' , callId);
-      //   console.log('Parent Call : ', channelId);
-      //   dtmf.startDTMF(connection, callId);
-      //   dtmf.captureDTMF(connection, callId);
-      // }
-    });
+    }
   }
 }

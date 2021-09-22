@@ -5,6 +5,7 @@ import { TimeConversion } from "src/utils/timeConversion.utils";
 import { CHANNEL_VARIABLE } from "../constants/channel-variables.constants";
 import { CommandConstants } from "../constants/freeswitch-command.constants";
 import { FreeswitchDpConstants } from "../constants/freeswitchdp.constants";
+import { FS_ESL } from "../constants/fs-esl.constants";
 import { DialplanInstruction, TwiMLXMLParser } from "../parser/xmlParser";
 import { FreeswitchConnectionResult } from "./inbound-esl.connection";
 import { inboundCallServer } from "./inboundCall.server";
@@ -26,23 +27,15 @@ export class InboundCallHelper{
 
             context.conn = conn;
 
-            let legId = conn
-                .getInfo()
-                .getHeader(CHANNEL_VARIABLE.UNIQUE_ID);
+            context.legId = this.getChannelVariable(CHANNEL_VARIABLE.UNIQUE_ID, context);
+            
+            let phoneNumberFrom = this.getChannelVariable(CHANNEL_VARIABLE.CALLER_CALLER_ID_NUMBER,context);
 
-            let phoneNumberFrom = conn
-                .getInfo()
-                .getHeader(CHANNEL_VARIABLE.CALLER_CALLER_ID_NUMBER);
+            let callerDestinationNumber = this.getChannelVariable(CHANNEL_VARIABLE.CALLER_DESTINATION_NUMBER, context);
 
-            let callerDestinationNumber = conn
-                .getInfo()
-                .getHeader(CHANNEL_VARIABLE.CALLER_DESTINATION_NUMBER);
+            console.log('Leg-A' , context.legId );
 
-            console.log('Leg-A' , legId);
-
-            conn.on('error', (err) => {
-                console.log('Inbound Call Error -> ', err);
-            });
+            this._onListenEvent(context);
 
             //Play welcome message
             conn.execute('playback', 'https://crm.dealerownedsoftware.com/hosted-files/ivr-rec-2/WelcomeMessage.mp3', () => {
@@ -134,23 +127,27 @@ export class InboundCallHelper{
 
                                                         if (context.legStop){
 
-                                                            let connectionResult = FreeswitchConnectionResult;
+                                                            this.triggerWebhookUrl(context.dialplanInstruction.dialAttribute.action, 
+                                                                context.dialplanInstruction.dialAttribute.method,
+                                                                context.voiceRequestParam, () => {});
 
-                                                            connectionResult.inboundCallModel = {
-                                                                success: true,
-                                                                lastDialplanInstruction : {
-                                                                    dialAttribute : {
-                                                                        action: context.dialplanInstruction.dialAttribute.action,
-                                                                        method: context.dialplanInstruction.dialAttribute.method,
-                                                                        callerId: null,
-                                                                        recordCondition: null
-                                                                    },
-                                                                    name: "",
-                                                                    command: "",
-                                                                    value: ""
-                                                                },
-                                                                voiceRequestParam:context.voiceRequestParam
-                                                            }
+                                                            // let connectionResult = FreeswitchConnectionResult;
+
+                                                            // connectionResult.inboundCallModel = {
+                                                            //     success: true,
+                                                            //     lastDialplanInstruction : {
+                                                            //         dialAttribute : {
+                                                            //             action: context.dialplanInstruction.dialAttribute.action,
+                                                            //             method: context.dialplanInstruction.dialAttribute.method,
+                                                            //             callerId: null,
+                                                            //             recordCondition: null
+                                                            //         },
+                                                            //         name: "",
+                                                            //         command: "",
+                                                            //         value: ""
+                                                            //     },
+                                                            //     voiceRequestParam:context.voiceRequestParam
+                                                            // }
                                                         }
                                                     });
                                                 }
@@ -555,6 +552,36 @@ export class InboundCallHelper{
 
         callback(record.data);
     }
+
+    private _onListenEvent(context:InboundCallContext){
+        
+        let connection = context.conn;
+
+        connection.on('error', (err) => {
+            console.log('Inbound Call Error -> ', err);
+        });
+
+        connection.send('linger');
+
+        let hangupCompleteEvent = 'esl::event::CHANNEL_HANGUP_COMPLETE::' + context.legId;
+
+        let hangupCompleteWrapper = (evt) => {
+            context.legStop = true;
+            console.log('Leg-A hangup');
+            connection.removeListener(hangupCompleteEvent, hangupCompleteWrapper);
+        };
+
+        connection.subscribe('CHANNEL_HANGUP_COMPLETE');
+
+        connection.on(hangupCompleteEvent, hangupCompleteWrapper);
+    }
+
+    private getChannelVariable(headerName:string,context:InboundCallContext){
+
+        let connection = context.conn;
+
+        return connection.getInfo().getHeader(headerName);
+    }
 }
 
 class InboundCallContext{
@@ -568,6 +595,7 @@ class InboundCallContext{
     twiMLResponse:string;
     instructionValidated: boolean = false;
     callRejected:boolean = false;
+    legId:string;
 }
 
 interface PlayAndGetDigitsParam{
