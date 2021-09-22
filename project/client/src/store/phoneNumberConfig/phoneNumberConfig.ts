@@ -40,7 +40,7 @@ export default {
         } as PhoneNumberConfig
     },
     getters: {
-        getPhoneNumberConfig: (state: PhoneNumberConfig): Array<PhoneNumberConfigItem> => state.Data.items,
+        getPhoneNumberConfig: (state: PhoneNumberConfig): PhoneNumberConfigItem[] => state.Data.items,
         getPhoneNumberPager: (state: PhoneNumberConfig): PhoneNumberConfigPager => state.Data.meta,
         getPhoneNumberConfigById: (state: PhoneNumberConfig): PhoneNumberConfigItem => state.phoneConfigById,
     },
@@ -88,11 +88,6 @@ export default {
         },
         getPhoneNumberConfigById({ commit }: { commit: Commit }, params: any) {
             return HTTP.get(`/api/freeswitch-phonenumber-config/getPhoneNumberConfigById/${params.id}`)
-            //     .then(res => {
-            //         if (res.status === Status.OK) {
-            //             commit('setPhoneNumberConfigById', res.data)
-            //         }
-            // });
         },
         addPhoneNumberConfig({ dispatch }: { dispatch: Dispatch }, params: PhoneNumberConfigItem) {
             return HTTP.post('/api/freeswitch-phonenumber-config/add', params).then(res => {

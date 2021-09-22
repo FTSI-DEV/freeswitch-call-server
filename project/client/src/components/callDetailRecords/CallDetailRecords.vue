@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div style="padding: 10px">
     <div class="call-config">Call Logs</div>
     <!-- <a-list item-layout="horizontal" :data-source="data">
       <template #renderItem="{ item }">
@@ -23,7 +23,7 @@
         </a-list-item>
       </template>
     </a-list> -->
-    <a-table :columns="CDRColumns" :data-source="data">
+    <a-table :columns="CDRColumns" :data-source="cdrData">
       <template #name="{ text }">
         <a>{{ text }}</a>
       </template>
@@ -33,56 +33,42 @@
           Name
         </span>
       </template>
-      <template #callStatus="{ text }">
+      <template #CallStatus="{ text }">
         <span>
           <a-tag :color="'green'"> {{ text }} </a-tag>
         </span>
       </template>
-      <!-- <template #action="{ record }">
-        <a title="Edit" @click="editConfig(record)"
-          ><EditOutlined style="font-size: 1.2em; margin-right: 15px" />
-        </a>
-      </template> -->
+      <template #action="{  }">
+       <router-link to="/call-logs/details">
+            <MenuFoldOutlined @click="viewDetails" style="font-size: 1.5em; color: #3d56b2; cursor: pointer" />
+        </router-link>
+      </template>
     </a-table>
   </div>
 </template>
 <script lang="ts">
 // import { EditOutlined } from "@ant-design/icons-vue";
-import { defineComponent } from "vue";
-import { data, CDRColumns } from "./helper/helper";
+import { defineComponent, computed } from "vue";
+import { useStore } from 'vuex';
+import { CDRColumns } from "./helper/helper";
 import methodsObj from "./helper/methods";
-// interface DataItem {
-//   title: string;
-// }
-// const data: DataItem[] = [
-//   {
-//     title: "Ant Design Title 1",
-//   },
-//   {
-//     title: "Ant Design Title 2",
-//   },
-//   {
-//     title: "Ant Design Title 3",
-//   },
-//   {
-//     title: "Ant Design Title 4",
-//   },
-// ];
+import { MenuFoldOutlined } from "@ant-design/icons-vue";
 export default defineComponent({
   components: {
-    // EditOutlined,
+    MenuFoldOutlined
   },
   setup() {
+    const store = useStore();
     const { getCallDetailRecords } = methodsObj();
-
+    const cdrData = computed(() => store.getters["getCallDetailRecords"])
     getCallDetailRecords();
     const editConfig = (data: any) => {
       console.log(data);
     };
     return {
-      data,
       CDRColumns,
       editConfig,
+      cdrData
     };
   },
 });

@@ -1,8 +1,9 @@
 import { HTTP } from '../../axios/httpClient';
-import { Commit } from 'vuex';
+import { Commit, Dispatch } from 'vuex';
 import { Status } from '../status';
+import { CallRecording, CallRecordingItem } from '../../types/callRecording';
+import { callRecording } from '../mock/mockData';
 
-import { CallRecording} from '../../types/callRecording';
 export default {
     state: {
         Data: {
@@ -16,20 +17,54 @@ export default {
             }
         }
     } as CallRecording,
-    getters: {},
+    getters: {
+        getCallRecordings: (state: CallRecording): CallRecordingItem[] => state.Data.items
+    },
     mutations: {
         setCallRecordings(state: CallRecording, payload: CallRecording) {
+                const { items, meta } = payload.Data;
+            
                 state.Data.items = [];
-                console.log('setCallRecordings: ', payload)
+                state.Data.meta.totalItems = meta.totalItems;
+                state.Data.meta.itemCount = meta.itemCount;
+                state.Data.meta.itemsPerPage = meta.itemsPerPage;
+                state.Data.meta.totalPages = meta.totalPages;
+                state.Data.meta.currentPage = meta.currentPage;
+
+                items.forEach((prop: CallRecordingItem) => {
+                    state.Data.items.push({
+                        RecordingId: prop.RecordingId,
+                        RecordingUUID: prop.RecordingUUID,
+                        CallUUID: prop.CallUUID,
+                        FilePath: prop.FilePath,
+                        IsDeleted: prop.IsDeleted,
+                        DateCreated: prop.DateCreated,
+                        CallId: prop.CallId,
+                    })
+                });
         }
     },
     actions: {
         getCallRecordings({ commit }: { commit: Commit }, params: any) {
-            return HTTP.get('/call-recording/getCallRecordings', { params: params }).then(res => {
+            return HTTP.get('/api/call-recording/getCallRecordings', { params: params }).then(res => {
                 if (res.data.Status === Status.OK) {
-                    commit('setCallRecordings', res.data.Data);
+                   // commit('setCallRecordings', res.data.Data);
+                    commit('setCallRecordings', callRecording);
                 }
-            })
+            });
+        },
+        getCallRecord({ commit }: { commit: Commit }, params: any) {
+            return HTTP.get('/api/call-recording/getCallRecord', { params: params });
+        },
+        getRecordFile({ commit }: { commit: Commit }, params: any) {
+            return HTTP.get('/api/call-recording/getRecordFile', { params: params });
+        },
+        deleteCallRecording({ dispatch }: { dispatch: Dispatch }, params: any) {
+            return HTTP.get('/api/call-recording/deleteCallRecording', { params: params }).then(res => {
+                if (res.data.Status === Status.OK) {
+                    dispatch('getCallRecordings', { page: 1, limit: 1 });
+                }
+            });
         }
     }
 }

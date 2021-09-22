@@ -28,7 +28,7 @@ export default {
         }
     } as InboundConfig,
     getters: {
-        inboundCallConfigData: (state: InboundConfig): Array<InboundConfigItem> => state.Data.items,
+        inboundCallConfigData: (state: InboundConfig): InboundConfigItem[] => state.Data.items,
         inboundCallConfigPager: (state: InboundConfig): InboundConfigPager => state.Data.meta,
         inboundConfigById: (state: InboundConfig): InboundConfigItem => state.inboundConfigById
     },
@@ -70,11 +70,6 @@ export default {
         },
         getInboundCallConfigById({commit}: { commit: Commit }, params: number) {
             return HTTP.get(`/api/inbound-call-config/getInboundCallConfigById/${params}`)
-            // .then(res => {
-            //     if (res.status === Status.OK) {
-            //         commit("setInboundConfigById", res.data);
-            //     }
-            // });
         },
         addInboundCallConfig({ dispatch }: { dispatch: Dispatch }, params: InboundConfigItem) {
             console.log('params: ', params)

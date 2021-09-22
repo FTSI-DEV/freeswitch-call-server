@@ -1,29 +1,29 @@
 <template>
-  <a-layout style="padding: 24px">
+  <a-layout>
     <!-- <div style="padding: 10px; text-align: left; fontSize: 1.5em">
       Freeswitch
     </div> -->
-    <a-layout-content
+    <!-- <a-layout-content
       :style="{
         background: '#fff',
         padding: '10px',
         marginBottom: '10px',
         fontSize: '1.3em',
       }"
-    >
-      <div class="grid-container">
-        <div class="item1" @click="openClickToCall">
+    > -->
+      <div class="grid-container" style="padding: 10px">
+        <div class="item1" @click="openClickToCall" title="Click To Call">
           <PhoneFilled style="font" :style="{ fontSize: '30px' }" />
-          <div>Click To Call</div>
+          <div style="font-weight: 500; margin-top: 3px;">Click To Call</div>
         </div>
-         <div class="item2" @click="openConfig">
+         <!-- <div class="item2" @click="openConfig">
          <SettingFilled style="font" :style="{ fontSize: '30px' }" />
           <div>Call Config</div>
         </div>
         <div class="item3" @click="openCallRecording">
          <PlayCircleFilled style="font" :style="{ fontSize: '30px' }" />
           <div>Call Recording</div>
-        </div>
+        </div> -->
       </div>
       <a-modal
           v-model:visible="modeVisibility"
@@ -33,7 +33,18 @@
         >
           <ClickToCall ref="childRef"/>
       </a-modal>
+      <a-layout-content
+      :style="{
+        background: '#fff',
+        padding: '24px',
+        margin: 0,
+        minHeight: '280px',
+        fontSize: '1.3em',
+      }"
+    >
+      <!-- <CallDetailRecords /> -->
     </a-layout-content>
+    <!-- </a-layout-content>
     <a-layout-content
       :style="{
         background: '#fff',
@@ -44,18 +55,16 @@
       }"
     >
       <CallDetailRecords />
-    </a-layout-content>
+    </a-layout-content> -->
   </a-layout>
 </template>
 <script lang="ts">
 import { defineComponent, ref, toRefs, reactive } from "vue";
-import { useStore } from "vuex";
-import CallDetailRecords from "./callDetailRecords/CallDetailRecords.vue";
-import { PhoneFilled, SettingFilled, PlayCircleFilled } from "@ant-design/icons-vue";
+import { PhoneFilled } from "@ant-design/icons-vue";
 import ClickToCall from "./clickToCall/ClickToCall.vue";
 import { useRouter } from "vue-router";
 export default defineComponent({
-  components: { CallDetailRecords, PhoneFilled, ClickToCall, SettingFilled, PlayCircleFilled},
+  components: { PhoneFilled, ClickToCall},
   setup() {
      const router = useRouter()
     const state = reactive({
@@ -102,7 +111,7 @@ export default defineComponent({
 }
 .grid-container {
   display: grid;
-  grid-template-columns: 200px 200px 200px;
+  grid-template-columns: 100px 100px 100px;
   grid-gap: 10px;
   /* background-color: #2196F3; */
   padding: 5px;
@@ -110,7 +119,7 @@ export default defineComponent({
 
 .grid-container > div {
   text-align: center;
-  padding: 18px 0px;
+  padding: 10px 0px;
 }
 .item1 {
   background: #F8485E;
