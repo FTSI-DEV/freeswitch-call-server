@@ -1,111 +1,16 @@
 import axios from "axios";
-import { configService } from "src/config/config.service";
-import { InboundCallConfigModel } from "src/modules/inbound-call-config/models/inbound-call-config.model";
-import { IInboundCallConfigService } from "src/modules/inbound-call-config/services/inbound-call-config.interface";
 import { TimeConversion } from "src/utils/timeConversion.utils";
-import { CHANNEL_VARIABLE } from "../constants/channel-variables.constants";
-import { CommandConstants } from "../constants/freeswitch-command.constants";
-import { FreeswitchDpConstants } from "../constants/freeswitchdp.constants";
-import { FS_ESL } from "../constants/fs-esl.constants";
-import { DialplanInstruction, TwiMLXMLParser } from "../parser/xmlParser";
-import { FreeswitchConnectionResult } from "./inbound-esl.connection";
-import { inboundCallServer } from "./inboundCall.server";
+import { CommandConstants } from "../../constants/freeswitch-command.constants";
+import { FreeswitchDpConstants } from "../../constants/freeswitchdp.constants";
+import { TwiMLXMLParser } from "../../parser/xmlParser";
+import { InboundCallHelper } from "./inbound-call";
+import { InboundCallContext } from "./models/inboundCallContext";
+import { PlayAndGetDigitsParam } from "./models/plagParam";
 import { VoiceRequestParam } from "./models/voiceRequestParam";
 
-export class InboundCallHelper{
+export class InboundCallDialplan{
 
-    constructor(
-        private readonly _inboundCallConfigService: IInboundCallConfigService
-    ){}
-
-    inboundCallEnter(){
-
-        inboundCallServer.on('connection::ready', async (conn) => {
-
-            console.log('Inbound Call - server ready');
-
-            let context = new InboundCallContext();
-
-            context.conn = conn;
-
-            context.legId = this.getChannelVariable(CHANNEL_VARIABLE.UNIQUE_ID, context);
-            
-            let phoneNumberFrom = this.getChannelVariable(CHANNEL_VARIABLE.CALLER_CALLER_ID_NUMBER,context);
-
-            let callerDestinationNumber = this.getChannelVariable(CHANNEL_VARIABLE.CALLER_DESTINATION_NUMBER, context);
-
-            console.log('Leg-A' , context.legId );
-
-            this._onListenEvent(context);
-
-            //Play welcome message
-            conn.execute('playback', 'https://crm.dealerownedsoftware.com/hosted-files/ivr-rec-2/WelcomeMessage.mp3', () => {
-                console.log('Playback executed');
-
-                console.log('callerdest', callerDestinationNumber);
-                this._inboundCallConfigService
-                .getByCallerId(callerDestinationNumber)
-                .then((config) => {
-
-                    console.log('callerid', config.callerId);
-
-                    context.voiceRequestParam.From = phoneNumberFrom;
-                    context.voiceRequestParam.To = config.callerId;
-                    context.voiceRequestParam.StoreId = 60;
-                    context.voiceRequestParam.SystemId = 0;
-
-                    context.webhookParam = {
-                        httpMethod : config.httpMethod,
-                        actionUrl : config.webhookUrl
-                    };
-
-                    this.getInstruction(context, async (result) => {
-
-                        if (result.hasError){
-                            console.log('Error. Cannot continue to process the further instructions.');
-                            console.log('error message -> ' , result.errorMessage);
-                            return;
-                        }
-
-                        console.log('TwiML Response -> ', result.twiMLResponse);
-
-                        this.setInstruction(context.twiMLResponse, context);
-
-                        if (context.callRejected){
-                            context.legStop = true;
-                            this.callRejectedHandler(context, () => {
-                                console.log('Call rejected!');
-                                return;
-                            });
-                        }
-
-                        if (context.instructionValidated){
-
-                            if (context.isLastDialplan){
-                                this.executeLastDialplanInstruction(context, () => {
-                                    console.log('validated bridge');
-                                });
-                            }
-                            else
-                            {
-                               this.executeNextInstruction(context, () => {
-                                    console.log('All instructions are executed');
-                               });
-                            }
-                        }
-                    });
-                })
-                .catch((err) => {
-                    console.log('Error while retrieving records to database.', err);
-                    this.callRejectedHandler(context, () => {
-                        console.log('Error handled!');
-                    });
-                });
-            });
-        });
-    }
-
-    private executeNextInstruction(context:InboundCallContext,callback){
+    executeNextInstruction(context:InboundCallContext,callback){
 
         this.executeFirstInstruction(context,(result) => {
             if (result.legStop){
@@ -186,7 +91,7 @@ export class InboundCallHelper{
         }); 
     }
 
-    private getInstruction(context:InboundCallContext,
+    getInstruction(context:InboundCallContext,
         callback){
 
         this.triggerWebhookUrl(context.webhookParam.actionUrl, 
@@ -209,7 +114,7 @@ export class InboundCallHelper{
         });
     }
 
-    private setInstruction(twiMLResponse:string, context: InboundCallContext){
+    setInstruction(twiMLResponse:string, context: InboundCallContext){
 
         let parseResult = new TwiMLXMLParser().tryParse(twiMLResponse);
 
@@ -266,7 +171,7 @@ export class InboundCallHelper{
         context.instructionValidated = context.callRejected ? false : true;
     }
 
-    private executeLastDialplanInstruction(context:InboundCallContext, callback){
+    executeLastDialplanInstruction(context:InboundCallContext, callback){
 
         let connection = context.conn;
 
@@ -354,70 +259,6 @@ export class InboundCallHelper{
             regexValue: context.dialplanInstruction.gatherAttribute.numDigits,
             var_name : 'inboundCall_target_num'
         };
-    }
-
-    private setFirstInstruction(twiMLResponse:string, context: InboundCallContext){
-
-        let parseResult = new TwiMLXMLParser().tryParse(twiMLResponse);
-
-        let gatherInstructionExists: boolean = false;
-
-        if (parseResult.length <= 0 ){
-            context.instructionValidated = false;
-            return;
-        }
-
-        for (let i = 0; i < parseResult.length; i++){
-
-            let instruction = parseResult[i];
-
-            if (instruction.command === CommandConstants.exec){
-
-                let hasGatherInstruction = parseResult.find((i) => i.name === FreeswitchDpConstants.play_and_get_digits);
-
-                if (hasGatherInstruction){
-                    gatherInstructionExists = true;
-                }
-
-                if (gatherInstructionExists){
-                    if (instruction.name === FreeswitchDpConstants.play_and_get_digits){
-                        context.dialplanInstruction = instruction;
-                    }
-                }
-                
-                if (instruction.name === FreeswitchDpConstants.hangup){
-                    context.dialplanInstruction = instruction;
-                    context.callRejected = true;
-                    break;
-                }
-            }
-        }
-
-        context.instructionValidated = context.callRejected ? false : true;
-    }
-
-    private getFirstInstruction(
-        context:InboundCallContext,
-        config:InboundCallConfigModel, 
-        callback){
-
-        this.triggerWebhookUrl(config.webhookUrl, config.httpMethod, context.voiceRequestParam, (twiMLResponse) => {
-            context.twiMLResponse = twiMLResponse;
-            callback(context);
-        })
-        .catch((err) => {
-            let errMessage = 'Error in requesting webhook url -> ' + err;
-
-            console.log(errMessage);
-            this.callRejectedHandler(context, () => {
-                console.log('Error handled!');
-                
-                context.hasError = true;
-                context.errorMessage = errMessage;
-
-                callback(context);
-            });
-        });
     }
 
     //#endregion
@@ -545,91 +386,9 @@ export class InboundCallHelper{
         context.instructionValidated = true;
     }
 
-    private executeThirdInstruction(
-        context:InboundCallContext,
-        callback
-    ){
-        let connection = context.conn;
-
-        let size = context.dialplanInstructions.length;
-
-        if (size === 2 ){
-
-            let instruction = context.dialplanInstructions[0];
-
-            if (instruction.name === FreeswitchDpConstants.playback){
-                connection.execute(`${instruction.name}`, `${instruction.value}`, () => {
-                    console.log('playback executed!');
-
-                    instruction = context.dialplanInstructions[1];
-
-                    if (instruction.name === FreeswitchDpConstants.bridge){
-
-                        if (instruction.dialAttribute.recordCondition === RecordEnum.RecordFromAnswer){
-
-                            connection.execute('set', 'hangup_after_bridge=true', () => {
-                                console.log('hangup after bridge set');
-                               
-                                connection.execute('export',
-                                    'execute_on_answer=record_session $${recordings_dir}/${uuid}.wav', () => {
-                                    
-                                    if (instruction.children != null && 
-                                        instruction.children.name === 'Number'){
-                                        
-                                        let callForwardingNumber = instruction.value;
-
-                                        connection.execute(instruction.name, `sofia/gateway/fs-test3/1000`, (cb) => {
-                                            console.log('bridge completed');
-                                            console.log('B-LEG', cb.getHeader(CHANNEL_VARIABLE.UNIQUE_ID));
-                                            context.legStop = true;
-                                            console.log('dp' , instruction);
-                                            context.dialplanInstruction = instruction;
-                                            callback(context);
-                                            return;
-                                        });
-                                    }
-                                });
-                            });
-                        }
-                    }
-                });
-            }
-        }
-        else
-        {
-            let instruction = context.dialplanInstructions[0];
-            if (instruction.name === FreeswitchDpConstants.speak){
-
-                connection.execute(instruction.name, `flite|kal|${instruction.value}`, () => {
-                    console.log('speak executed!');
-
-                    this.callRejectedHandler(context, () => {
-                        context.legStop = true;
-                        context.callRejected = true;
-                        callback(context);
-                    });
-                });
-            }
-        }
-    }
-
     //#endregion
 
-    private callRejectedHandler(context:InboundCallContext, callback){
-        let connection = context.conn;
-
-        connection.execute('playback', 'ivr/ivr-call_cannot_be_completed_as_dialed.wav', () => {
-            console.log('Playback executed!');
-
-            connection.execute('hangup', 'CALL_REJECTED', () => {
-                console.log('hangup complete!');
-                context.legStop = true;
-                callback();
-            });
-        });
-    }
-
-    private async triggerWebhookUrl(
+    async triggerWebhookUrl(
         webhookUrl:string,
         httpMethod:string,
         params: VoiceRequestParam,
@@ -647,86 +406,17 @@ export class InboundCallHelper{
         callback(record.data);
     }
 
-    private _onListenEvent(context:InboundCallContext){
-        
+    callRejectedHandler(context:InboundCallContext, callback){
         let connection = context.conn;
 
-        connection.on('error', (err) => {
-            console.log('Inbound Call Error -> ', err);
-        });
+        connection.execute('playback', 'ivr/ivr-call_cannot_be_completed_as_dialed.wav', () => {
+            console.log('Playback executed!');
 
-        connection.send('linger');
-
-        let hangupCompleteEvent = 'esl::event::CHANNEL_HANGUP_COMPLETE::' + context.legId;
-
-        let hangupCompleteWrapper = (evt) => {
-
-            context.legStop = true;
-
-            console.log('Leg-A hangup');
-
-            this.triggerWebhookUrl(context.dialplanInstruction.dialAttribute.action,
-                context.dialplanInstruction.dialAttribute.method,
-                context.voiceRequestParam, () => {
-                    console.log('triggered webhook end call');
+            connection.execute('hangup', 'CALL_REJECTED', () => {
+                console.log('hangup complete!');
+                context.legStop = true;
+                callback();
             });
-
-            connection.removeListener(hangupCompleteEvent, hangupCompleteWrapper);
-        };
-
-        connection.subscribe('CHANNEL_HANGUP_COMPLETE');
-
-        connection.on(hangupCompleteEvent, hangupCompleteWrapper);
-    }
-
-    private getChannelVariable(headerName:string,context:InboundCallContext){
-
-        let connection = context.conn;
-
-        return connection.getInfo().getHeader(headerName);
+        });
     }
 }
-
-class InboundCallContext{
-    conn:any;
-    voiceRequestParam: VoiceRequestParam = new VoiceRequestParam();
-    dialplanInstructions: DialplanInstruction[] = [];
-    dialplanInstruction : DialplanInstruction; 
-    legStop: boolean = false;
-    errorMessage: string;
-    hasError: boolean = false;
-    twiMLResponse:string;
-    instructionValidated: boolean = false;
-    callRejected:boolean = false;
-    legId:string;
-    instructionOrder:number;
-    isLastDialplan:boolean=false;
-    webhookParam:WebhookParam=new WebhookParam();
-}
-
-class WebhookParam{
-    httpMethod:string;
-    actionUrl:string;
-}
-
-interface PlayAndGetDigitsParam{
-    minValue:number; //minimum number of digits to collect
-    maxValue:number; //maximum number of digits to collect
-    tries:number; // number of attempts to play the file and collect the digits
-    timeout:number; // number of milliseconds to wait before assuming the caller is done entering the digits
-    terminator:string; // digits used to end input
-    soundFile:string; // sound file to play while digits are fetched.
-    invalidFile:string; // sound file to play when digits don't match the regex
-    regexValue:string; // regular expression to match digits
-    digit_Timeout?:number; // (optional) number of milliseconds to wait between digits
-    var_name:string; // channel variable that digits should be placed in
-}
-
-const RecordEnum = {
-    DoNotRecord: 'do-not-record',
-    RecordFromAnswer: 'record-from-answer',
-    RecordFromRinging: 'record-from-ringing',
-    RecordFromAnswerDual: 'record-from-answer-dual',
-    RecordFromRingingDual: 'record-from-ringing-dual',
-};
-  

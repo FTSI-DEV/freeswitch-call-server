@@ -11,7 +11,7 @@ import { CDRModel } from 'src/modules/call-detail-record/models/cdr.models';
 import moment from 'moment';
 import { DialplanInstruction } from '../parser/xmlParser';
 import axios from 'axios';
-import { VoiceRequestParam } from './models/voiceRequestParam';
+import { VoiceRequestParam } from './inbound-call/models/voiceRequestParam';
 
 interface ConnResult {
   connectionObj: any;

@@ -4,7 +4,7 @@ import { ESL_SERVER, FS_ESL } from '../constants/fs-esl.constants';
 import esl from 'modesl';
 import { TimeProvider  } from 'src/utils/timeProvider.utils';
 import axios from 'axios';
-import { VoiceRequestParam } from './models/voiceRequestParam';
+import { VoiceRequestParam } from './inbound-call/models/voiceRequestParam';
 import { CallDetailRecordService } from 'src/modules/call-detail-record/services/call-detail-record.service';
 import { ICallDetailRecordService } from 'src/modules/call-detail-record/services/call-detail-record.interface';
 import { DialplanInstruction, TwiMLXMLParser } from '../parser/xmlParser';
