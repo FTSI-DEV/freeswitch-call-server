@@ -5,7 +5,7 @@ import { FreeswitchDpConstants } from "../../constants/freeswitchdp.constants";
 import { TwiMLXMLParser } from "../../parser/xmlParser";
 import { InboundCallHelper } from "./inbound-call";
 import { InboundCallContext } from "./models/inboundCallContext";
-import { PlayAndGetDigitsParam } from "./models/plagParam";
+import { PlayAndGetDigitsParam } from "./models/plagdParam";
 import { VoiceRequestParam } from "./models/voiceRequestParam";
 
 export class InboundCallDialplan{
@@ -222,15 +222,15 @@ export class InboundCallDialplan{
         
         let connection = context.conn;
 
-        let PLAG = this.setPlayAndGetDigits(context);
+        let PLAGD = this.setPlayAndGetDigits(context);
 
         connection.execute(context.dialplanInstruction.name,
-            `${PLAG.minValue} ${PLAG.maxValue} ${PLAG.tries} ${PLAG.timeout} ${PLAG.terminator} ${PLAG.soundFile} ${PLAG.invalidFile} ${PLAG.var_name} ${PLAG.regexValue}`, 
+            `${PLAGD.minValue} ${PLAGD.maxValue} ${PLAGD.tries} ${PLAGD.timeout} ${PLAGD.terminator} ${PLAGD.soundFile} ${PLAGD.invalidFile} ${PLAGD.var_name} ${PLAGD.regexValue}`, 
             (e) => {
 
-            let inputtedDigit = e.getHeader(`variable_${PLAG.var_name}`);
+            let inputtedDigit = e.getHeader(`variable_${PLAGD.var_name}`);
 
-            if (inputtedDigit === PLAG.regexValue){
+            if (inputtedDigit === PLAGD.regexValue){
                 context.voiceRequestParam.Digits = inputtedDigit;
                 callback(context);
             }
