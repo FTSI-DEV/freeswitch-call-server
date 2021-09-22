@@ -1,4 +1,4 @@
-import { CHANNEL_VARIABLE } from "../constants/channel-variables.constants";
+import { CHANNEL_VARIABLE } from "../../constants/channel-variables.constants";
 
 var dtmfArray : string[] = [];
 
