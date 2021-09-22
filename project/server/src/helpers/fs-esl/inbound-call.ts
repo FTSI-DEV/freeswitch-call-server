@@ -1,4 +1,5 @@
 import axios from "axios";
+import { configService } from "src/config/config.service";
 import { InboundCallConfigModel } from "src/modules/inbound-call-config/models/inbound-call-config.model";
 import { IInboundCallConfigService } from "src/modules/inbound-call-config/services/inbound-call-config.interface";
 import { TimeConversion } from "src/utils/timeConversion.utils";
@@ -41,121 +42,51 @@ export class InboundCallHelper{
             conn.execute('playback', 'https://crm.dealerownedsoftware.com/hosted-files/ivr-rec-2/WelcomeMessage.mp3', () => {
                 console.log('Playback executed');
 
+                console.log('callerdest', callerDestinationNumber);
                 this._inboundCallConfigService
                 .getByCallerId(callerDestinationNumber)
                 .then((config) => {
+
+                    console.log('callerid', config.callerId);
 
                     context.voiceRequestParam.From = phoneNumberFrom;
                     context.voiceRequestParam.To = config.callerId;
                     context.voiceRequestParam.StoreId = 60;
                     context.voiceRequestParam.SystemId = 0;
 
-                    this.getFirstInstruction(context, config, (result) => {
-
+                    this.parseInstruction(context, config, async (result) => {
+                        
                         if (result.hasError){
-                            console.log('Error. Cannot continue to process the further instructions');
-                            console.log('error message -> ', result.errorMessage);
+                            console.log('Error. Cannot continue to process the further instructions.');
+                            console.log('error message -> ' , result.errorMessage);
                             return;
                         }
 
                         console.log('TwiML Response -> ', result.twiMLResponse);
-                        
-                        this.setFirstInstruction(result.twiMLResponse, context);
+
+                        this.setInstruction(context.twiMLResponse, context);
 
                         if (context.callRejected){
                             context.legStop = true;
-                            this.callRejectedHandler(context,() => {
-                                console.log('Call rejected');
+                            this.callRejectedHandler(context, () => {
+                                console.log('Call rejected!');
                                 return;
                             });
                         }
 
                         if (context.instructionValidated){
 
-                           this.executeFirstInstruction(context, (result) => {
-
-                                if (result.legStop){
-                                    console.log('Leg has stop. Cannot continue to process further instructions');
-                                    return;
-                                }
-
-                                //continue to second instruction.
-                                this.getSecondInstruction(context, () => {
-
-                                    if (context.hasError){
-                                        console.log('Error. Cannot continue to process the further instructions');
-                                        console.log('error message -> ', context.errorMessage);
-                                        return;
-                                    }
-
-                                    console.log('TwiML Response 2 -> ', context.twiMLResponse);
-
-                                    this.setSecondInstruction(context.twiMLResponse, context);
-
-                                    if (context.instructionValidated){
-
-                                        this.executeSecondInstruction(context, () => {
-
-                                            if (context.legStop){
-                                                console.log('Leg has stop. Cannot continue to process further instructions.');
-                                                return;
-                                            }
-
-                                            if (context.callRejected){
-                                                this.callRejectedHandler(context, () => {
-                                                    console.log('Call has rejected or hangup');
-                                                });
-                                            }
-
-                                            //continue to third instruction.
-                                            this.getThirdInstruction(context, () =>{
-
-                                                if (context.hasError){
-                                                    console.log('Error. Cannot continue to process the further instructions');
-                                                    console.log('error message -> ', context.errorMessage);
-                                                    return;
-                                                }
-
-                                                console.log('TwiML Response 3-> ', context.twiMLResponse);
-
-                                                this.setThirdInstruction(context.twiMLResponse, context);
-
-                                                if (context.instructionValidated){
-
-                                                    this.executeThirdInstruction(context, () => {
-                                                        console.log('All instructions are executed!');
-
-                                                        if (context.legStop){
-
-                                                            this.triggerWebhookUrl(context.dialplanInstruction.dialAttribute.action, 
-                                                                context.dialplanInstruction.dialAttribute.method,
-                                                                context.voiceRequestParam, () => {});
-
-                                                            // let connectionResult = FreeswitchConnectionResult;
-
-                                                            // connectionResult.inboundCallModel = {
-                                                            //     success: true,
-                                                            //     lastDialplanInstruction : {
-                                                            //         dialAttribute : {
-                                                            //             action: context.dialplanInstruction.dialAttribute.action,
-                                                            //             method: context.dialplanInstruction.dialAttribute.method,
-                                                            //             callerId: null,
-                                                            //             recordCondition: null
-                                                            //         },
-                                                            //         name: "",
-                                                            //         command: "",
-                                                            //         value: ""
-                                                            //     },
-                                                            //     voiceRequestParam:context.voiceRequestParam
-                                                            // }
-                                                        }
-                                                    });
-                                                }
-                                            });
-                                        });
-                                    }
+                            if (context.isLastDialplan){
+                                this.executeLastDialplanInstruction(context, () => {
+                                    console.log('validated bridge');
                                 });
-                           });
+                            }
+                            else
+                            {
+                               this.executeNextInstruction(context, () => {
+                                    console.log('All instructions are executed');
+                               });
+                            }
                         }
                     });
                 })
@@ -167,6 +98,200 @@ export class InboundCallHelper{
                 });
             });
         });
+    }
+
+    private executeNextInstruction(context:InboundCallContext,callback){
+
+        this.executeFirstInstruction(context,(result) => {
+            if (result.legStop){
+                console.log('Leg has stop. Cannot continue to process further instructions.');
+                callback();
+                return;
+            }
+
+            //continue to secondInstruction
+            this.getSecondInstruction(context, () => {
+
+                if (context.hasError){
+                    console.log('Error. Cannot continue to process the further instructions.');
+                    console.log('error message -> ', context.errorMessage);
+                    return;
+                }
+
+                console.log('TwiML Response 2 -> ', context.twiMLResponse);
+
+                this.setSecondInstruction(context.twiMLResponse, context);
+
+                if (context.instructionValidated){
+
+                    this.executeSecondInstruction(context, () =>{
+                        if (context.legStop){
+                            console.log('Leg has stop. Cannot continue to process further instructions.');
+                            callback();
+                            return;
+                        }
+
+                        if (context.callRejected){
+                            this.callRejectedHandler(context, () => {
+                                console.log('Call has rejected or hangup');
+                            });
+                        }
+
+                        //continue to third instructions
+
+                        this.getThirdInstruction(context, () =>{
+                            if (context.hasError){
+                                console.log('Error. Canot continue to process the further instructions.');
+                                console.log('error message -> ', context.errorMessage);
+                                callback();
+                                return;
+                            }
+
+                            console.log('TwiML Response 3 -> ', context.twiMLResponse);
+
+                            this.setThirdInstruction(context.twiMLResponse, context);
+
+                            if (context.instructionValidated){
+                                if (context.isLastDialplan)
+                                {
+                                    this.executeThirdInstruction(context, () => {
+                                        console.log('All instructions are executed!');
+                                    });
+                                }
+                                else
+                                {
+                                    //ignore..
+                                }
+                            }
+                        });
+                    });
+                }
+            });
+
+        }); 
+    }
+
+    private parseInstruction(context:InboundCallContext,
+        config:InboundCallConfigModel, 
+        callback){
+
+        this.triggerWebhookUrl(config.webhookUrl, config.httpMethod, context.voiceRequestParam, (twiMLResponse) => {
+            context.twiMLResponse = twiMLResponse;
+            callback(context);
+        })
+        .catch((err) => {
+            let errMessage = 'Error in requesting webhook url -> ' + err;
+
+            console.log(errMessage);
+            this.callRejectedHandler(context, () => {
+                console.log('Error handled!');
+                
+                context.hasError = true;
+                context.errorMessage = errMessage;
+
+                callback(context);
+            });
+        });
+    }
+
+    private setInstruction(twiMLResponse:string, context: InboundCallContext){
+
+        let parseResult = new TwiMLXMLParser().tryParse(twiMLResponse);
+
+        let gatherInstructionExists: boolean = false;
+
+        if (parseResult.length <= 0 ){
+            context.instructionValidated = false;
+            return;
+        }
+
+        for (let i = 0; i < parseResult.length; i++){
+
+            let instruction = parseResult[i];
+
+            if (instruction.command === CommandConstants.exec){
+
+                let hasGatherInstruction = parseResult.find((i) => i.name === FreeswitchDpConstants.play_and_get_digits);
+
+                let hasDialInstruction = parseResult.find((i) => i.name === FreeswitchDpConstants.bridge);
+
+                if (hasGatherInstruction){
+                    gatherInstructionExists = true;
+                }
+
+                if (gatherInstructionExists){
+                    if (instruction.name === FreeswitchDpConstants.play_and_get_digits){
+                        context.dialplanInstruction = instruction;
+                        context.instructionOrder = 1;
+                        break;
+                    }
+                }
+                
+                if (instruction.name === FreeswitchDpConstants.hangup){
+                    context.dialplanInstruction = instruction;
+                    context.callRejected = true;
+                    break;
+                }
+
+                if (hasDialInstruction){
+                    if (instruction.name === FreeswitchDpConstants.bridge){
+                        instruction.order = 2;
+                        context.dialplanInstructions.push(instruction);
+                        context.isLastDialplan=true;
+                    }
+                    else if (instruction.name === FreeswitchDpConstants.playback){
+                        instruction.order = 1;
+                        context.dialplanInstructions.push(instruction);
+                    }
+                }
+              
+            }
+        }
+
+        context.instructionValidated = context.callRejected ? false : true;
+    }
+
+    private executeLastDialplanInstruction(context:InboundCallContext, callback){
+
+        let connection = context.conn;
+
+        let size = context.dialplanInstructions.length;
+
+        if (size === 2){
+
+            let instruction = context.dialplanInstructions[0];
+
+            if (instruction.order === 1){
+                if (instruction.name === FreeswitchDpConstants.playback){
+                    connection.execute(instruction.name, instruction.value, () => {
+                        console.log('playback executed');
+
+                        instruction = context.dialplanInstructions[1];
+
+                        connection.execute('set', 'hangup_after_bridge=true', () => {
+
+                            connection.execute('export', 
+                            'execute_on_answer=record_session $${recordings_dir}/${uuid}.mp3', () => {
+
+                                if (instruction.children != null &&
+                                    instruction.children.name === 'Number'){
+                                        
+                                    let callForwardingNumber = instruction.value;
+
+                                    connection.execute(instruction.name, `sofia/gateway/fs-test3/1000`, () =>{
+                                        console.log('bridge executed');
+                                        context.dialplanInstruction = instruction;
+                                        callback(context);
+                                        return;
+                                    });
+                                }
+                            });
+                            
+                        });
+                    });
+                }
+            }
+        }
     }
 
     //#region FIRST INSTRUCTION DIALPLAN
@@ -440,6 +565,7 @@ export class InboundCallHelper{
                 }
                 else if (instruction.name === FreeswitchDpConstants.bridge){
                     instruction.order = 2;
+                    context.isLastDialplan=true;
                     context.dialplanInstructions.push(instruction);
                 }
                 else if (instruction.name === FreeswitchDpConstants.speak){
@@ -566,8 +692,17 @@ export class InboundCallHelper{
         let hangupCompleteEvent = 'esl::event::CHANNEL_HANGUP_COMPLETE::' + context.legId;
 
         let hangupCompleteWrapper = (evt) => {
+
             context.legStop = true;
+
             console.log('Leg-A hangup');
+
+            this.triggerWebhookUrl(context.dialplanInstruction.dialAttribute.action,
+                context.dialplanInstruction.dialAttribute.method,
+                context.voiceRequestParam, () => {
+                    console.log('triggered webhook end call');
+            });
+
             connection.removeListener(hangupCompleteEvent, hangupCompleteWrapper);
         };
 
@@ -596,6 +731,8 @@ class InboundCallContext{
     instructionValidated: boolean = false;
     callRejected:boolean = false;
     legId:string;
+    instructionOrder:number;
+    isLastDialplan:boolean=false;
 }
 
 interface PlayAndGetDigitsParam{
