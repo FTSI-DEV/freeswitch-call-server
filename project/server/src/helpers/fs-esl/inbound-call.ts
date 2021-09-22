@@ -54,8 +54,13 @@ export class InboundCallHelper{
                     context.voiceRequestParam.StoreId = 60;
                     context.voiceRequestParam.SystemId = 0;
 
-                    this.parseInstruction(context, config, async (result) => {
-                        
+                    context.webhookParam = {
+                        httpMethod : config.httpMethod,
+                        actionUrl : config.webhookUrl
+                    };
+
+                    this.getInstruction(context, async (result) => {
+
                         if (result.hasError){
                             console.log('Error. Cannot continue to process the further instructions.');
                             console.log('error message -> ' , result.errorMessage);
@@ -110,7 +115,12 @@ export class InboundCallHelper{
             }
 
             //continue to secondInstruction
-            this.getSecondInstruction(context, () => {
+            context.webhookParam = {
+                actionUrl : context.dialplanInstruction.gatherAttribute.action,
+                httpMethod: context.dialplanInstruction.gatherAttribute.method
+            };
+
+            this.getInstruction(context, () => {
 
                 if (context.hasError){
                     console.log('Error. Cannot continue to process the further instructions.');
@@ -139,7 +149,12 @@ export class InboundCallHelper{
 
                         //continue to third instructions
 
-                        this.getThirdInstruction(context, () =>{
+                        context.webhookParam = {
+                            actionUrl: context.dialplanInstruction.value,
+                            httpMethod : null
+                        };
+
+                        this.getInstruction(context, () =>{
                             if (context.hasError){
                                 console.log('Error. Canot continue to process the further instructions.');
                                 console.log('error message -> ', context.errorMessage);
@@ -154,7 +169,7 @@ export class InboundCallHelper{
                             if (context.instructionValidated){
                                 if (context.isLastDialplan)
                                 {
-                                    this.executeThirdInstruction(context, () => {
+                                    this.executeLastDialplanInstruction(context, () => {
                                         console.log('All instructions are executed!');
                                     });
                                 }
@@ -171,11 +186,11 @@ export class InboundCallHelper{
         }); 
     }
 
-    private parseInstruction(context:InboundCallContext,
-        config:InboundCallConfigModel, 
+    private getInstruction(context:InboundCallContext,
         callback){
 
-        this.triggerWebhookUrl(config.webhookUrl, config.httpMethod, context.voiceRequestParam, (twiMLResponse) => {
+        this.triggerWebhookUrl(context.webhookParam.actionUrl, 
+            context.webhookParam.httpMethod, context.voiceRequestParam, (twiMLResponse) => {
             context.twiMLResponse = twiMLResponse;
             callback(context);
         })
@@ -408,34 +423,6 @@ export class InboundCallHelper{
     //#endregion
 
     //#region SECOND INSTRUCTION DIALPLAN
-    private getSecondInstruction(
-        context:InboundCallContext,
-        callback
-    ){
-        this.triggerWebhookUrl(context.dialplanInstruction.gatherAttribute.action,
-            context.dialplanInstruction.gatherAttribute.method, 
-            context.voiceRequestParam, 
-            (twiMLResponse) => {
-
-                context.twiMLResponse = twiMLResponse;
-
-                callback(context);
-        })
-        .catch((err) => {
-
-            let errMessage = 'Error in requesting webhook url -> ' + err;
-
-            console.log(errMessage);
-            this.callRejectedHandler(context, () => {
-                console.log('Error handled!');
-                
-                context.hasError = true;
-                context.errorMessage = errMessage;
-
-                callback(context);
-            });
-        })
-    }
 
     private setSecondInstruction(twiMLResponse:string, context:InboundCallContext){
 
@@ -522,25 +509,6 @@ export class InboundCallHelper{
     //#endregion
 
    //#region SECOND INSTRUCTION DIALPLAN
-
-    private getThirdInstruction(
-        context:InboundCallContext,
-        callback
-    ){
-        this.triggerWebhookUrl(context.dialplanInstruction.value, null, context.voiceRequestParam, (twiMLResponse) => {
-            context.twiMLResponse  = twiMLResponse;
-            callback(context);
-        })
-        .catch((err) => {
-            this.callRejectedHandler(context, () =>{
-                let errMessage = 'Error in requesting webhook url -> ' + err;
-                context.hasError = true;
-                context.errorMessage = errMessage
-                console.log('Handled error' , err);
-                callback(context);
-            });
-        });
-    }
 
     private setThirdInstruction(twiMLResponse:string,context:InboundCallContext){
 
@@ -733,6 +701,12 @@ class InboundCallContext{
     legId:string;
     instructionOrder:number;
     isLastDialplan:boolean=false;
+    webhookParam:WebhookParam=new WebhookParam();
+}
+
+class WebhookParam{
+    httpMethod:string;
+    actionUrl:string;
 }
 
 interface PlayAndGetDigitsParam{
