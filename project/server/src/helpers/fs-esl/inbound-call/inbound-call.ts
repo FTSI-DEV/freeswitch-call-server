@@ -116,7 +116,9 @@ export class InboundCallHelper{
             console.log('Inbound Call Error -> ', err);
         });
 
-        connection.send('linger');
+        connection.sendRecv('linger', (cb) => {
+            console.log('cbbb -> ' , cb);
+        });
 
         let hangupCompleteEvent = 'esl::event::CHANNEL_HANGUP_COMPLETE::' + context.legId;
 

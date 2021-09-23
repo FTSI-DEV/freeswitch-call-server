@@ -10,6 +10,8 @@ import { ICallDetailRecordService } from 'src/modules/call-detail-record/service
 import { DialplanInstruction, TwiMLXMLParser } from '../parser/xmlParser';
 import { CommandConstants } from '../constants/freeswitch-command.constants';
 import { FreeswitchDpConstants } from '../constants/freeswitchdp.constants';
+import { TimeConversion } from 'src/utils/timeConversion.utils';
+import { PlayAndGetDigitsParam } from './inbound-call/models/plagdParam';
 
 export class ClickToCallServerHelper {
   
@@ -62,33 +64,76 @@ export class ClickToCallServerHelper {
             });
           }
 
-          context.outboundRequestParam.NumberToCall = result.PhoneNumberTo;
+          let PLAGD = this.setPlayAndGetDigits();
 
-          this.getInstruction(context, () =>{
+          conn.execute('play_and_get_digits',
+            `${PLAGD.minValue} ${PLAGD.maxValue} ${PLAGD.tries} ${PLAGD.timeout} ${PLAGD.terminator} ${PLAGD.soundFile} ${PLAGD.invalidFile} ${PLAGD.var_name} ${PLAGD.regexValue}`, 
+            (e) => {
 
-            if (context.legStop){
-              console.log('Cannot continue to process further instruction');
-              return;
+            let inputtedDigit = e.getHeader(`variable_${PLAGD.var_name}`);
+
+            if (inputtedDigit === PLAGD.regexValue){
+              conn.execute('export', 
+              'execute_on_answer=record_session $${recordings_dir}/${uuid}.mp3', () => {
+                  
+                  conn.execute('bridge', `sofia/gateway/fs-test3/${result.PhoneNumberTo}`, () => {
+                  });
+              });
             }
-
-            this.setInstruction(context);
-
-            if (context.legStop){
-              console.log('Cannot continue to process further instruction');
-              return;
+            else
+            {
+                this.callRejectedHandler(context, () => {
+                    console.log('Call rejected');
+                    return;
+                });
             }
+        });
 
-            this.executeInstruction(context, () => {
-              //call webhook url
-            });
+          // context.outboundRequestParam.NumberToCall = result.PhoneNumberTo;
 
-          });
+          // this.getInstruction(context, () =>{
+
+          //   if (context.legStop){
+          //     console.log('Cannot continue to process further instruction');
+          //     return;
+          //   }
+
+          //   this.setInstruction(context);
+
+          //   if (context.legStop){
+          //     console.log('Cannot continue to process further instruction');
+          //     return;
+          //   }
+
+          //   this.executeInstruction(context, () => {
+          //     //call webhook url
+          //   });
+
+          // });
       })
       .catch((err) => {
         console.log('ERROR ', err);
       });
     });
   }
+
+  private setPlayAndGetDigits():PlayAndGetDigitsParam{
+
+    let timeout = new TimeConversion().secondsToMS(10000);
+
+    return {
+        minValue: 1,
+        maxValue: 11,
+        tries : 2,
+        timeout: timeout,
+        terminator: '#',
+        soundFile : 'ivr/ivr-enter_destination_telephone_number.wav',
+        invalidFile: 'ivr/ivr-that_was_an_invalid_entry.wav',
+        regexValue: '1',
+        var_name : 'inboundCall_target_num'
+    };
+}
+
 
   private getInstruction(context:ClickToCallContext,callback){
     let dialNumber = 'http://localhost:8080/TwilioCallApi/DialNumber';

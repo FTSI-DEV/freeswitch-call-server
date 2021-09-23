@@ -36,6 +36,7 @@ export default {
                 id: 1,
                 phoneNumber: "",
                 webhookUrl: "",
+                isDeleted: false
             }
         } as PhoneNumberConfig
     },
@@ -48,7 +49,6 @@ export default {
         setPhoneNumberConfigs(state: PhoneNumberConfig, payload: PhoneNumberConfig) {
             const { items, meta } = payload.Data;
             const { currentPage, itemCount, itemsPerPage, totalItems, totalPages } = meta;
-            
             state.Data.items = [];
             state.Data.meta.currentPage = currentPage;
             state.Data.meta.itemCount = itemCount;
@@ -62,11 +62,10 @@ export default {
                     httpMethod: prop.httpMethod,
                     id: prop.id,
                     phoneNumber: prop.phoneNumber,
-                    webhookUrl: prop.friendlyName,
+                    webhookUrl: prop.webhookUrl,
+                    isDeleted: prop.isDeleted
                 });
             });
-
-            console.log('phonenumber -> ', state.Data);
         },
         setPhoneNumberConfigById(state: PhoneNumberConfig, payload: PhoneNumberConfigItem) {
             const { friendlyName, httpMethod, id, phoneNumber, webhookUrl } = payload;
@@ -81,7 +80,7 @@ export default {
     actions: {
         getPhoneNumberConfigs({ commit }: { commit: Commit }) {
             return HTTP.get('/api/freeswitch-phonenumber-config/getPhonenumberConfigs').then(res => {
-                if (res.status === Status.OK) {
+                if (res.data.Status === Status.OK){
                     commit('setPhoneNumberConfigs', res.data);
                 }
             });
