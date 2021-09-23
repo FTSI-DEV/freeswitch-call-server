@@ -1,18 +1,15 @@
 <template>
-  <a-layout style="padding: 24px 24px 24px">
+  <a-layout style="padding: 10px;   background: #fff">
     <div class="call-config">
       <div style="text-align: left; flex: 1">
         Call Configuration
       </div>
-      <div style="text-align: right; flex: 1">
-        <router-link to="/">Back</router-link>
-      </div>
     </div>
 
-    <a-layout-content
+    <div
       :style="{
-        background: '#fff',
-        padding: '24px',
+      
+        padding: '10px',
         margin: 0,
         minHeight: '280px',
       }"
@@ -26,7 +23,7 @@
           <InboundCallConfig />
         </a-tab-pane>
       </a-tabs>
-    </a-layout-content>
+    </div>
   </a-layout>
 </template>
 <script>

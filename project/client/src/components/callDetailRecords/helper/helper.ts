@@ -27,72 +27,45 @@ export const columns = [
     },
   ];
   
-  export const data = [
-    {
-      key: '1',
-      phoneNumberTo: 'John Brown',
-      phoneNumberFrom: 32,
-      callStatus: 'New York No. 1 Lake Park',
-      duration: ['nice', 'developer'],
-      dateCreated: ['nice', 'developer'],
-      callDirection: ['nice', 'developer'],
-    },
-    {
-      key: '1',
-      phoneNumberTo: 'John Brown',
-      phoneNumberFrom: 32,
-      callStatus: 'New York No. 1 Lake Park',
-      duration: ['nice', 'developer'],
-      dateCreated: ['nice', 'developer'],
-      callDirection: ['nice', 'developer'],
-    },
-    {
-      key: '1',
-      phoneNumberTo: 'John Brown',
-      phoneNumberFrom: 32,
-      callStatus: 'New York No. 1 Lake Park',
-      duration: ['nice', 'developer'],
-      dateCreated: ['nice', 'developer'],
-      callDirection: ['nice', 'developer'],
-    },
-  ];
+  
 
   export const CDRColumns = [
     {
-      title: 'PhoneNumberTo',
-      key: 'phoneNumberTo',
-      dataIndex: 'phoneNumberTo',
-      slots: { customRender: 'phoneNumberTo' },
+      title: 'Phone Number From',
+      key: 'PhoneNumberFrom',
+      dataIndex: 'PhoneNumberFrom',
+      slots: { customRender: 'PhoneNumberFrom' },
     },
     {
-      title: 'PhoneNumberFrom',
-      key: 'phoneNumberFrom',
-      dataIndex: 'phoneNumberFrom',
-      slots: { customRender: 'phoneNumberFrom' },
-    },
-    {
-      title: 'CallStatus',
-      key: 'callStatus',
-      dataIndex: 'callStatus',
-      slots: { customRender: 'callStatus' },
+      title: 'Phone Number To',
+      key: 'PhoneNumberTo',
+      dataIndex: 'PhoneNumberTo',
+      slots: { customRender: 'PhoneNumberTo' },
     },
     {
       title: 'Duration',
-      key: 'duration',
-      dataIndex: 'duration',
-      slots: { customRender: 'duration' },
+      key: 'Duration',
+      dataIndex: 'Duration',
+      slots: { customRender: 'Duration' },
     },
     {
-      title: 'DateCreated',
-      key: 'dateCreated',
-      dataIndex: 'dateCreated',
-      slots: { customRender: 'dateCreated' },
+      title: 'Date Created',
+      key: 'DateCreated',
+      dataIndex: 'DateCreated',
+      slots: { customRender: 'DateCreated' },
     },
     {
-      title: 'CallDirection',
-      key: 'callDirection',
-      dataIndex: 'callDirection',
-      slots: { customRender: 'callDirection' },
+      title: 'Call Direction',
+      key: 'CallDirection',
+      dataIndex: 'CallDirection',
+      slots: { customRender: 'CallDirection' },
+    },
+
+    {
+      title: 'Call Status',
+      key: 'CallStatus',
+      dataIndex: 'CallStatus',
+      slots: { customRender: 'CallStatus' },
     },
     {
       title: 'Action',

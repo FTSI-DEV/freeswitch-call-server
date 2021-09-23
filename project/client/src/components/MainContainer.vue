@@ -1,132 +1,105 @@
 <template>
-  <div>
-    <a-menu  mode="horizontal" theme="dark">
-      <li style="padding: 0px 20px">
-        <span style="font-size: 1.3em">FREESWITCH</span>
-      </li>
-    </a-menu>
-             <router-view></router-view>
-    <!-- <div>
-      <div style="display: flex">
-        <div style="width: 80px">
-          <a-menu
-            class="menu-style"
-            style="height: 100%"
-            mode="inline"
-            theme="dark"
-            :inline-collapsed="true"
-            v-model:openKeys="openKeys"
-            v-model:selectedKeys="selectedKeys"
-          >
-            <a-menu-item key="1" @click="setCurrentCompnent('Home')">
-              <template #icon>
-                <HomeOutlined />
-              </template>
-              <span>Home</span>
-            </a-menu-item>
-            <a-menu-item key="3" @click="setCurrentCompnent('InboundCallConfig')">
-              <template #icon>
-                <PhoneOutlined />
-              </template>
-              <span>Inbound Call Config</span>
-            </a-menu-item>
-            <a-menu-item key="4" @click="setCurrentCompnent('PhoneNumberConfig')">
-              <template #icon>
-                <SettingOutlined />
-              </template>
-              <span>Phone Number Config</span>
-            </a-menu-item>
-              <a-menu-item key="5" @click="setCurrentCompnent('CallDetailRecords')">
-                <template #icon>
-                  <SettingOutlined />
-                </template>
-                <span>Call Detail Records</span>
-              </a-menu-item>
-              <a-menu-item key="6" @click="setCurrentCompnent('CallRecording')">
-                <template #icon>
-                  <SettingOutlined />
-                </template>
-                <span>Call Recording</span>
-              </a-menu-item>
-          </a-menu>
-        </div>
-        <div style="flex: 1">
-          <router-view></router-view>
-        </div>
+  <a-layout>
+    <a-layout-header class="header" style="padding-left: 30px; font-size: 2em">
+      <div class="logo" style="color: #ffb344; text-align: left">
+        <cluster-outlined style="margin-right: 15px" />Freeswitch
       </div>
-    </div> -->
-  </div>
+    </a-layout-header>
+    <a-layout>
+      <a-layout-sider width="200">
+        <a-menu
+          theme="dark"
+          mode="inline"
+          class="menu-style"
+          v-model:selectedKeys="selectedKeys2"
+          v-model:openKeys="openKeys"
+          :style="{ height: '93.5vh !important', borderRight: 0 }"
+        >
+          <a-menu-item key="1" @click="navigateRoute('/')">
+            <home-filled />
+            <span>Home</span>
+          </a-menu-item>
+          <a-menu-item key="2" @click="navigateRoute('/call-logs')">
+            <read-filled />
+            <span>Call Logs</span>
+          </a-menu-item>
+          <a-menu-item key="3" @click="navigateRoute('/call-recording')">
+            <play-circle-filled />
+            <span>Call Recording</span>
+          </a-menu-item>
+          <a-menu-item key="4" @click="navigateRoute('/call-config')">
+            <setting-filled />
+            <span>Config</span>
+          </a-menu-item>
+        </a-menu>
+      </a-layout-sider>
+      <a-layout>
+        <a-layout-content
+          :style="{
+            background: '#fff',
+            padding: '10px',
+            minHeight: '280px',
+          }"
+        >
+          <router-view></router-view>
+        </a-layout-content>
+      </a-layout>
+    </a-layout>
+  </a-layout>
 </template>
 <script lang="ts">
-// import PhoneNumberConfig from "./phoneNumberConfig/PhoneNumberConfig.vue";
-// import Home from './Home.vue';
-// import ClickToCall from "./clickToCall/ClickToCall.vue";
-// import InboundCallConfig from "./inboundCallConfig/InboundCallConfig.vue";
-// import CallDetailRecords from "./callDetailRecords/CallDetailRecords.vue";
-// import CallRecording from "./callRecording/CallRecording.vue";
+import {
+  SettingFilled,
+  PlayCircleFilled,
+  HomeFilled,
+  ClusterOutlined,
+  ReadFilled
+} from "@ant-design/icons-vue";
+import { defineComponent, ref } from "vue";
 import { useRouter } from "vue-router";
-import { 
-  defineComponent, 
-  reactive, 
-  toRefs, 
-  watch 
-} from "vue";
-// import {
-//   HomeOutlined,
-//   NumberOutlined,
-//   PhoneOutlined,
-//   SettingOutlined,
-// } from "@ant-design/icons-vue";
-
 export default defineComponent({
+  components: {
+    SettingFilled,
+    PlayCircleFilled,
+    HomeFilled,
+    ClusterOutlined,
+    ReadFilled
+    // NotificationOutlined,
+  },
   setup() {
     const router = useRouter();
-    const state = reactive({
-      collapsed: false,
-      selectedKeys: ["1"],
-      openKeys: ["sub1"],
-      preOpenKeys: ["sub1"],
-      currentComponent: "Home",
-    });
-    watch(
-      () => state.openKeys,
-      (val, oldVal) => {
-        state.preOpenKeys = oldVal;
-      }
-    );
-    const toggleCollapsed = () => {
-      state.collapsed = !state.collapsed;
-      state.openKeys = state.collapsed ? [] : state.preOpenKeys;
+    const navigateRoute = (path: string) => {
+      router.push({ path });
     };
-    const setCurrentCompnent = (component: string) => {
-      if (component === 'Home') {
-         router.push({ path: "/" })
-      }
-    };
-
+    navigateRoute("/");
     return {
-      ...toRefs(state),
-      toggleCollapsed,
-      setCurrentCompnent,
+      navigateRoute,
+      selectedKeys1: ref<string[]>(["2"]),
+      selectedKeys2: ref<string[]>(["1"]),
+      collapsed: ref<boolean>(false),
+      openKeys: ref<string[]>(["sub1"]),
     };
-  },
-  components: {
-    // PhoneNumberConfig,
-    // HomeOutlined,
-    // NumberOutlined,
-    // PhoneOutlined,
-    // SettingOutlined,
-    // ClickToCall,
-    // InboundCallConfig,
-    // Home,
-    // CallDetailRecords,
-    // CallRecording,
   },
 });
 </script>
-<style scoped>
+<style>
+#components-layout-demo-top-side-2 .logo {
+  float: left;
+  width: 120px;
+  height: 31px;
+  margin: 16px 24px 16px 0;
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.ant-row-rtl #components-layout-demo-top-side-2 .logo {
+  float: right;
+  margin: 16px 0 16px 24px;
+}
+
+.site-layout-background {
+  background: #fff;
+}
 .menu-style {
   height: 100vh;
-  position: fixed;
 }
 </style>
