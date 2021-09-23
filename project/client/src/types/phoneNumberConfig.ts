@@ -12,6 +12,7 @@ export interface PhoneNumberConfigItem {
     id?: number;
     phoneNumber: string;
     webhookUrl: string;
+    isDeleted:boolean;
 }
 
 export interface PhoneNumberConfig {

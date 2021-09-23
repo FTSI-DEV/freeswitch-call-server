@@ -42,7 +42,6 @@ export default {
             state.Data.meta.itemCount = itemCount;
             state.Data.meta.itemsPerPage = itemsPerPage;
             state.Data.meta.totalItems = totalItems;
-
             items.forEach(prop => {
                 state.Data.items.push({
                     callerId: prop.callerId,
