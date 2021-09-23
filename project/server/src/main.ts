@@ -21,8 +21,6 @@ async function bootstrap() {
 
   // BullQueue Arena initialization
   Arena(ArenaConfig);
-
-  // app.useLogger(app.get(CustomLogger));
   
   await app.listen(3000);
 }
