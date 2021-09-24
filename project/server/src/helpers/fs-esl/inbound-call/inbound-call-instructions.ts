@@ -214,7 +214,8 @@ export class InboundCallDialplan{
                                 webhookParam: context.webhookParam,
                                 calldDirection: "inbound",
                                 voiceRequestParam: context.voiceRequestParam,
-                                callRejected:false
+                                callRejected:false,
+                                legId:context.legId
                             }
                         }
 

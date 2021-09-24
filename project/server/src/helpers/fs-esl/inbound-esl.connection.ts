@@ -27,6 +27,7 @@ interface CallModel{
   webhookParam: WebhookParam;
   voiceRequestParam: VoiceRequestParam;
   callRejected:boolean;
+  legId:string;
 }
 
 export const InboundEslConnResult: ConnResult = {
@@ -153,16 +154,21 @@ export class InboundEslConnectionHelper {
 
       if (InboundEslConnResult.callModel !== undefined){
 
-        if (!InboundEslConnResult.callModel.callRejected){
+        if (!InboundEslConnResult.callModel.callRejected &&
+           cdrValues.UUID === InboundEslConnResult.callModel.legId){
 
           let webhook = InboundEslConnResult.callModel.webhookParam;
 
           let params = InboundEslConnResult.callModel.voiceRequestParam;
   
-          params.CallDirection = cdrValues.CallDirection;
+          params.Direction = cdrValues.CallDirection;
           params.DialCallStatus = cdrValues.CallStatus;
           params.CallSid = cdrValues.UUID;
           params.DialCallDuration = cdrValues.Duration.toString();
+          params.RecordingSid = cdrValues.RecordingUUID;
+        
+          console.log('FROM -> ', cdrValues.PhoneNumberFrom);
+          console.log('TO -> ', cdrValues.PhoneNumberTo);
   
           if (webhook.httpMethod === "POST"){
               axios.post(webhook.actionUrl, params);

@@ -5,9 +5,10 @@ export class VoiceRequestParam{
     RecordingUrl: string;
     CallSid: string;
     DialCallStatus: string;
-    CallDirection: string;
+    Direction: string;
     StoreId: number;
     SystemId: number;
     CallForwardingNumber:string;
     DialCallDuration:string;
+    RecordingSid:string;
 }
