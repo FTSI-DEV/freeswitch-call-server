@@ -23,8 +23,8 @@ export default {
     mutations: {
         setCallDetailRecords(state: CDR, payload: CDR) {
                 const { items, meta } = payload.Data;
-                
                 state.Data.items = [];
+                
                 state.Data.meta.totalItems = meta.totalItems;
                 state.Data.meta.itemCount = meta.itemCount;
                 state.Data.meta.itemsPerPage = meta.itemsPerPage;

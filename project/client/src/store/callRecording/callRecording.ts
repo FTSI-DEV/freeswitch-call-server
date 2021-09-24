@@ -40,6 +40,7 @@ export default {
                         IsDeleted: prop.IsDeleted,
                         DateCreated: prop.DateCreated,
                         CallId: prop.CallId,
+                        Duration: "30 sec"
                     })
                 });
         }

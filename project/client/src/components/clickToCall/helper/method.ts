@@ -22,11 +22,10 @@ export default function methodsObj() {
         const params = {
             phoneNumberFrom: state.from,
             phoneNumberTo: state.to,
-            callerId: state.callerId,
+            displayCallerId: state.callerId,
         };
         store.dispatch("clickToCall", params);
     };
-
 
     return {
         isInvalid,

@@ -8,7 +8,6 @@
 
     <div
       :style="{
-      
         padding: '10px',
         margin: 0,
         minHeight: '280px',

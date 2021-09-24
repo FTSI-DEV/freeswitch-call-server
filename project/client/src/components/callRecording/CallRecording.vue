@@ -11,22 +11,26 @@
               <div class="item-container">
                 <div>
                   <div class="d-flex">
-                    <span style="margin-right: 15px">Recording Id</span>
-                    <h5 style="line-height: 2">{{ item.RecordingId }}</h5>
+                       <span style="margin-right: 15px">Date Created</span>
+                    <h5 style="font-size: 1em">{{ item.DateCreated }}</h5>
+                  </div>
+                  <div class="d-flex">
+                    <span style="margin-right: 15px">Duration</span>
+                    <h5 style="font-size: 1em">{{ item.Duration }}</h5>
                   </div>
                   <div class="d-flex">
                     <span style="margin-right: 15px">Recording UUID</span>
-                    <h5 style="line-height: 2">{{ item.RecordingUUID }}</h5>
+                    <h5 style="font-size: 1em">{{ item.RecordingUUID }}</h5>
                   </div>
                 </div>
-                <div style="text-align: right">
+                <div style="text-align: right; margin-top: 20px">
                   <MenuFoldOutlined @click="viewDetails" style="font-size: 1.5em; color: #3d56b2; cursor: pointer" />
                 </div>
               </div>
             </template>
-            <template #title>
+            <!-- <template #title>
               <a href="https://www.antdv.com/">{{ item.DateCreated }}</a>
-            </template>
+            </template> -->
             <template #avatar>
               <PhoneFilled style="font-size: 2em; line-height: 3; color: #3d56b2"/>
             </template>

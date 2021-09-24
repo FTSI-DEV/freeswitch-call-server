@@ -6,6 +6,7 @@ export interface CallRecordingItem {
     IsDeleted:boolean;
     DateCreated:Date;
     CallId?: number;
+    Duration: string;
 }
 
 export interface CallRecordingPager {
