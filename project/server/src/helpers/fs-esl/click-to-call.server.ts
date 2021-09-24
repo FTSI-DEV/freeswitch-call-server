@@ -12,9 +12,12 @@ import { CommandConstants } from '../constants/freeswitch-command.constants';
 import { FreeswitchDpConstants } from '../constants/freeswitchdp.constants';
 import { TimeConversion } from 'src/utils/timeConversion.utils';
 import { PlayAndGetDigitsParam } from './inbound-call/models/plagdParam';
+import { CustomAppLogger } from 'src/logger/customLogger';
 
 export class ClickToCallServerHelper {
   
+  private readonly _logger = new CustomAppLogger(ClickToCallServerHelper.name);
+
   constructor(
     private readonly _outboundCallService: OutboundCallService,
     private readonly _callDetailRecordService: ICallDetailRecordService
@@ -30,12 +33,14 @@ export class ClickToCallServerHelper {
       });
 
     server.on(ESL_SERVER.CONNECTION.READY, (conn) => {
-      
-      console.log('Click To Call - server ready');
 
       let context = new ClickToCallContext();
 
       context.conn = conn;
+
+      context.logger = this._logger;
+
+      context.Log('Click To Call -- server ready');
 
       let legId = conn
         .getInfo()
@@ -45,10 +50,10 @@ export class ClickToCallServerHelper {
         .getInfo()
         .getHeader(CHANNEL_VARIABLE.CALLER_CALLE_ID_NUMBER);
 
-      console.log('LEG-A', legId);
+      context.Log(`Leg-A : ${legId}`);
 
       conn.on('error', (err) => {
-        console.log('Click To Call Error -> ', err);
+        context.Log(`Click To Call Error -> ${err}`, true);
       });
      
       context.outboundRequestParam.From = phoneNumberFrom;
@@ -59,7 +64,7 @@ export class ClickToCallServerHelper {
 
           if (result === undefined){
             this.callRejectedHandler(context, () =>{
-              console.log('Call rejected');
+              context.Log('Call rejected', true);
               return;
             });
           }
@@ -83,7 +88,7 @@ export class ClickToCallServerHelper {
             else
             {
                 this.callRejectedHandler(context, () => {
-                    console.log('Call rejected');
+                    context.Log('Call rejected', true);
                     return;
                 });
             }
@@ -235,10 +240,10 @@ export class ClickToCallServerHelper {
     let connection = context.conn;
 
     connection.execute('playback', 'ivr/ivr-call_cannot_be_completed_as_dialed.wav', () => {
-        console.log('Playback executed!');
+        context.Log('Playback executed');
 
         connection.execute('hangup', 'CALL_REJECTED', () => {
-            console.log('hangup complete!');
+            context.Log('hnagup completed!');
             context.legStop = true;
             callback();
         });
@@ -254,6 +259,14 @@ class ClickToCallContext{
   dialplanInstructions: DialplanInstruction[] = [];
   instructionValidated:boolean=false;
   dialplanInstruction:DialplanInstruction;
+  legId:string;
+  logger:CustomAppLogger;
+  Log(message:string, error:boolean=false){
+    let lmsg = `CallUId: ${this.legId} => ${message}`;
+
+    if (error) this.logger.error(lmsg, new Error(message));
+    else this.logger.info(lmsg);
+}
 }
 
 class OutboundRequestParam extends VoiceRequestParam{

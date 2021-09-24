@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { FreeswitchConnectionResult } from 'src/helpers/fs-esl/inbound-esl.connection';
+import { InboundEslConnResult } from 'src/helpers/fs-esl/inbound-esl.connection';
 import { CALL_DETAIL_RECORD_SERVICE, ICallDetailRecordService } from 'src/modules/call-detail-record/services/call-detail-record.interface';
 import { TimeProvider } from 'src/utils/timeProvider.utils';
 import { IOutboundCallService } from './outbound-call.interface';
@@ -19,7 +19,7 @@ export class OutboundCallService implements IOutboundCallService{
 
         return new Promise<string>( async (resolve,reject) => {
 
-            let connectionResult = FreeswitchConnectionResult;
+            let connectionResult = InboundEslConnResult;
 
             if (!connectionResult.isSuccess){
 

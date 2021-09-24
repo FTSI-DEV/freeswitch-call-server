@@ -1,4 +1,6 @@
 import { DialplanInstruction } from "src/helpers/parser/xmlParser";
+import { CustomAppLogger } from "src/logger/customLogger";
+import { ConnResult } from "../../inbound-esl.connection";
 import { VoiceRequestParam } from "./voiceRequestParam";
 import { WebhookParam } from "./webhookParam";
 
@@ -9,7 +11,6 @@ export class InboundCallContext{
     dialplanInstruction : DialplanInstruction; 
     legStop: boolean = false;
     errorMessage: string;
-    hasError: boolean = false;
     twiMLResponse:string;
     instructionValidated: boolean = false;
     callRejected:boolean = false;
@@ -17,4 +18,13 @@ export class InboundCallContext{
     instructionOrder:number;
     isLastDialplan:boolean=false;
     webhookParam:WebhookParam=new WebhookParam();
+    logger:CustomAppLogger;
+    inboundESLConnResult:ConnResult;
+    Log(message:string, error:boolean=false){
+
+        let lmsg = `CallUId: ${this.legId} => ${message}`;
+
+        if (error) this.logger.error(lmsg,new Error(lmsg));
+        else this.logger.info(lmsg);
+    }
 }

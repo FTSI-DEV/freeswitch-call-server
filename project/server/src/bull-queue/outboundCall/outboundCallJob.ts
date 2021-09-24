@@ -7,9 +7,12 @@ import { TimeProvider } from "src/utils/timeProvider.utils";
 import { Inject } from "@nestjs/common";
 import { CALL_DETAIL_RECORD_SERVICE, ICallDetailRecordService } from "src/modules/call-detail-record/services/call-detail-record.interface";
 import { CALL_RECORDING_SERVICE, ICallRecordingService } from "src/modules/call-recording/services/call-recording.interface";
+import { CustomAppLogger } from "src/logger/customLogger";
 
 @Processor('default')
 export class OutboundCallJob{
+
+    private readonly _logger = new CustomAppLogger(OutboundCallJob.name);
 
     constructor(
         @Inject(CALL_DETAIL_RECORD_SERVICE)
@@ -24,14 +27,16 @@ export class OutboundCallJob{
         let timeProvider = new TimeProvider();
 
         let context = new OutboundCallJobContext();
-        context.dateTime = timeProvider.getDateTimeNow();
-        context.unixTimeSeconds = timeProvider.getUnixTimeSeconds();
 
-        console.log('Outbound Call');
+        context.dateTime = timeProvider.getDateTimeNow();
+        
+        context.unixTimeSeconds = timeProvider.getUnixTimeSeconds();
 
         try
         {
             context.outboundCallParam = parameter.data;
+
+            this._logger.info(`starting to processed job. CallUid : ${context.outboundCallParam.UUID}`);
 
             context.outboundCallParam.StartedDate = context.dateTime;
 
@@ -44,9 +49,9 @@ export class OutboundCallJob{
             await this.saveCallRecordingStorage(context);
         }
         catch(err){
-            console.log('UNEXECPTED ERROR ', err);
+
+            this._logger.error(`Unexpected error. CallUid -> ${context.outboundCallParam.UUID}` , err);
         }
-        console.log('Transcoding complete OutboundCall');
     }
 
     private async saveCallDetailRecord(context:OutboundCallJobContext):Promise<number>{

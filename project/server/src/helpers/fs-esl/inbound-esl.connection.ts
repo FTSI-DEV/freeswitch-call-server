@@ -12,28 +12,24 @@ import moment from 'moment';
 import { DialplanInstruction } from '../parser/xmlParser';
 import axios from 'axios';
 import { VoiceRequestParam } from './inbound-call/models/voiceRequestParam';
+import { CustomAppLogger, ICustomAppLogger } from 'src/logger/customLogger';
+import { WebhookParam } from './inbound-call/models/webhookParam';
 
-interface ConnResult {
-  connectionObj: any;
-  isSuccess: boolean;
-  errorMessage: string;
-  inboundCallModel?: InboundCall;
-  outboundCallModel?:OutboundCall;
+export interface ConnResult {
+  connectionObj?: any;
+  isSuccess?: boolean;
+  errorMessage?: string;
+  callModel?: CallModel;
 }
 
-interface InboundCall{
-  success:boolean;
-  lastDialplanInstruction:DialplanInstruction;
+interface CallModel{
+  calldDirection?:string;
+  webhookParam: WebhookParam;
   voiceRequestParam: VoiceRequestParam;
+  callRejected:boolean;
 }
 
-interface OutboundCall{
-  success:boolean;
-  lastDialplanInstruction:DialplanInstruction;
-  voiceRequestParam: VoiceRequestParam;
-}
-
-export const FreeswitchConnectionResult: ConnResult = {
+export const InboundEslConnResult: ConnResult = {
   connectionObj: null,
   isSuccess: false,
   errorMessage: null
@@ -41,10 +37,12 @@ export const FreeswitchConnectionResult: ConnResult = {
 
 export class InboundEslConnectionHelper {
 
+  private readonly _logger = new CustomAppLogger(InboundEslConnectionHelper.name);
+
+  constructor(
+  ){}
 
   startConnection(){
-
-    console.log('TRYING TO ESTABLISHED CONNECTION');
 
     let fsConfig = new FreeswitchConfigHelper().getFreeswitchConfig();
 
@@ -55,13 +53,13 @@ export class InboundEslConnectionHelper {
     );
 
     connection.on(FS_ESL.CONNECTION.ERROR, () => {
-      FreeswitchConnectionResult.errorMessage = 'Connection Error';
+      InboundEslConnResult.errorMessage = 'Connection Error';
     });
 
     connection.on(FS_ESL.CONNECTION.READY, () => {
-      console.log('ESL INBOUND CONNECTION READY!');
-      FreeswitchConnectionResult.isSuccess = true;
-      FreeswitchConnectionResult.connectionObj = connection;
+      this._logger.info('Esl Inbound Connection Ready!');
+      InboundEslConnResult.isSuccess = true;
+      InboundEslConnResult.connectionObj = connection;
       connection.subscribe('CHANNEL_HANGUP_COMPLETE');
       connection.subscribe('all');
       connection.subscribe('CHANNEL_CREATE');
@@ -70,7 +68,7 @@ export class InboundEslConnectionHelper {
     this._onListenEvent(connection);
 
     connection.on('esl::end', () => {
-      console.log('ESL END ');
+      this._logger.info('Esl end.');
     })
 
     connection.on(FS_ESL.RECEIVED, (evt) => {
@@ -113,23 +111,25 @@ export class InboundEslConnectionHelper {
 
     connection.on('esl::event::CHANNEL_HANGUP_COMPLETE::*', (fsEvent) => {
 
+      console.log('HAAAANGUPPPPP');
+
       let callId = fsEvent.getHeader(CHANNEL_VARIABLE.UNIQUE_ID);
      
       let channelId = fsEvent.getHeader('Channel-Call-UUID');
       
       let cdrValues = new CDRHelper().getCallRecords(fsEvent);
 
-      console.log('Call direction ', cdrValues.CallDirection);
+      this._logger.info(`Call Direction : ${cdrValues.CallDirection}`);
 
       cdrValues.UUID = callId;
 
       if (callId === channelId){
-        console.log('Call : ' , callId);
+        this._logger.info(`Call  : ${callId}`);
       }
       else{
-        console.log('Call : ' , callId);
+        this._logger.info(`Call  : ${callId}`);
+        this._logger.info(`Parent Call : ${callId}`);
         cdrValues.ParentCallUid = channelId;
-        console.log('Parent Call : ', channelId);
       }
       // if (cdrValues.CallDirection === "outbound"){
       //   http.get(WebhookOutboundCallStatusCallBack(cdrValues));
@@ -137,6 +137,9 @@ export class InboundEslConnectionHelper {
       // else{
       //   http.get(WebhookInboundCallStatusCallBack(cdrValues));
       // }
+
+        this._logger.info('HANDLE CALLS in inbound esl');
+        this.statusCallback(cdrValues);
     });
 
     connection.on('esl::event::BACKGROUND_JOB::*', (evt) =>{
@@ -145,43 +148,29 @@ export class InboundEslConnectionHelper {
   }
 
   private statusCallback(cdrValues:CDRModel){
-      if (FreeswitchConnectionResult.inboundCallModel !== undefined){
 
-        let lastDPInstruction = FreeswitchConnectionResult.inboundCallModel.lastDialplanInstruction;
+      this._logger.info(JSON.stringify(InboundEslConnResult.callModel));
 
-        let params = FreeswitchConnectionResult.inboundCallModel.voiceRequestParam;
+      if (InboundEslConnResult.callModel !== undefined){
 
-        params.CallDirection = cdrValues.CallDirection;
-        params.DialCallStatus = cdrValues.CallStatus;
-        params.CallSid = cdrValues.UUID;
-        params.DialCallDuration = cdrValues.Duration.toString();
+        if (!InboundEslConnResult.callModel.callRejected){
 
-        if (lastDPInstruction.dialAttribute.method === "POST"){
-            axios.post(lastDPInstruction.dialAttribute.action, params);
+          let webhook = InboundEslConnResult.callModel.webhookParam;
+
+          let params = InboundEslConnResult.callModel.voiceRequestParam;
+  
+          params.CallDirection = cdrValues.CallDirection;
+          params.DialCallStatus = cdrValues.CallStatus;
+          params.CallSid = cdrValues.UUID;
+          params.DialCallDuration = cdrValues.Duration.toString();
+  
+          if (webhook.httpMethod === "POST"){
+              axios.post(webhook.actionUrl, params);
+          }
+          else{
+            axios.get(webhook.actionUrl, { params : params });
+          }
         }
-        else{
-          axios.get(lastDPInstruction.dialAttribute.action, { params : params });
-        }
-
-        console.log('SUCCESSFULLY END incoming call');
-    }
-    else if (FreeswitchConnectionResult.outboundCallModel !== undefined){
-
-      let lastDPInstruction = FreeswitchConnectionResult.outboundCallModel.lastDialplanInstruction;
-
-      let params = FreeswitchConnectionResult.outboundCallModel.voiceRequestParam;
-
-      params.CallDirection = cdrValues.CallDirection;
-      params.DialCallStatus = cdrValues.CallStatus;
-      params.CallSid = cdrValues.UUID;
-      params.DialCallDuration = cdrValues.Duration.toString();
-
-        if (lastDPInstruction.dialAttribute.method === "POST"){
-          axios.post(lastDPInstruction.dialAttribute.action, params);
-        }
-        else{
-          axios.get(lastDPInstruction.dialAttribute.action, { params : params });
-        }
-    }
+      }
   }
 }

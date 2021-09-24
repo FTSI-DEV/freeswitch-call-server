@@ -1,18 +1,19 @@
 import { OnQueueActive, Process, Processor } from '@nestjs/bull';
 import { Job } from 'bull';
-import { time } from 'console';
 import { FsCallDetailRecordEntity } from 'src/entity/call-detail-record';
 import { CDRModel } from 'src/modules/call-detail-record/models/cdr.models';
-import { CallDetailRecordService } from 'src/modules/call-detail-record/services/call-detail-record.service';
-import { CallRecordingService } from 'src/modules/call-recording/services/call-recording.service';
 import { TimeProvider } from 'src/utils/timeProvider.utils';
 import path from 'path';
 import { Inject } from '@nestjs/common';
 import { CALL_DETAIL_RECORD_SERVICE, ICallDetailRecordService } from 'src/modules/call-detail-record/services/call-detail-record.interface';
 import { CALL_RECORDING_SERVICE, ICallRecordingService } from 'src/modules/call-recording/services/call-recording.interface';
+import { CustomAppLogger } from 'src/logger/customLogger';
 
 @Processor('default')
 export class IncomingCallJob {
+
+  private readonly _logger = new CustomAppLogger(IncomingCallJob.name);
+
   constructor(
     @Inject(CALL_DETAIL_RECORD_SERVICE)
     private readonly _callDetailRecordService: ICallDetailRecordService,
@@ -26,10 +27,10 @@ export class IncomingCallJob {
     let timeProvider = new TimeProvider();
 
     let context = new InboundCallJobContext();
-    context.dateTime = timeProvider.getDateTimeNow();
-    context.unixTimeSeconds = timeProvider.getUnixTimeSeconds();
 
-    console.log('inbound call');
+    context.dateTime = timeProvider.getDateTimeNow();
+
+    context.unixTimeSeconds = timeProvider.getUnixTimeSeconds();
 
     try
     {
@@ -37,6 +38,8 @@ export class IncomingCallJob {
       context.inboundCallParam = parameter.data;
 
       context.inboundCallParam.StartedDate = context.dateTime;
+
+      this._logger.info(`starting to processed job. CallUid : ${context.inboundCallParam.UUID}`);
       
       context.cdrRecord = await this._callDetailRecordService.getByCallUid(parameter.data.UUID);
 
@@ -45,11 +48,9 @@ export class IncomingCallJob {
       context.inboundCallParam.Id = result;
 
       await this.saveCallRecordingStorage(context);
-
-      console.log('Transcoding complete InboundCall'); 
     }
     catch(err){
-      console.log('Inbound Call Job ERROR -> ' ,err);
+      this._logger.error(`Unexpected error. CallUid -> ${context.inboundCallParam.UUID}` , err)
     }
   }
 
@@ -71,20 +72,20 @@ export class IncomingCallJob {
   }
   else{
 
-      return await this._callDetailRecordService.updateCDR({
-          UUID: context.inboundCallParam.UUID,
-          PhoneNumberFrom: context.inboundCallParam.PhoneNumberFrom,
-          PhoneNumberTo: context.inboundCallParam.PhoneNumberTo,
-          CallDirection: context.inboundCallParam.CallDirection,
-          StartedDate: context.inboundCallParam.StartedDate,
-          CallStatus: context.inboundCallParam.CallStatus,
-          Duration: context.inboundCallParam.Duration,
-          RecordingUUID: context.inboundCallParam.RecordingUUID,
-          ParentCallUid: context.inboundCallParam.ParentCallUid,
-          Id: context.inboundCallParam.Id
+      let result =  await this._callDetailRecordService.updateCDR({
+        UUID: context.inboundCallParam.UUID,
+        PhoneNumberFrom: context.inboundCallParam.PhoneNumberFrom,
+        PhoneNumberTo: context.inboundCallParam.PhoneNumberTo,
+        CallDirection: context.inboundCallParam.CallDirection,
+        StartedDate: context.inboundCallParam.StartedDate,
+        CallStatus: context.inboundCallParam.CallStatus,
+        Duration: context.inboundCallParam.Duration,
+        RecordingUUID: context.inboundCallParam.RecordingUUID,
+        ParentCallUid: context.inboundCallParam.ParentCallUid,
+        Id: context.inboundCallParam.Id
       });
   }
-  }
+}
 
   
   private async saveCallRecordingStorage(context: InboundCallJobContext){
@@ -107,10 +108,6 @@ export class IncomingCallJob {
             DateCreated : context.inboundCallParam.StartedDate
         });
     }
-    else{
-        console.log('CALL RECORDING EXISTS');
-    }
-
 }
 
   @OnQueueActive()

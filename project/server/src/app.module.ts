@@ -24,6 +24,7 @@ import { OUTBOUND_CALL_SERVICE } from './modules/outbound-call/services/outbound
 import { IIncomingCallService, INCOMING_CALL_SERVICE } from './modules/incomingCall/services/incomingCall.interface';
 import { CALL_DETAIL_RECORD_SERVICE, ICallDetailRecordService } from './modules/call-detail-record/services/call-detail-record.interface';
 import { CustomLoggerModule } from './logger/logger.module';
+import { CUSTOM_LOGGER, ICustomAppLogger } from './logger/customLogger';
 
 @Module({
   imports: [

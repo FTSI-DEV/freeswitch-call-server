@@ -3,51 +3,17 @@ import { createLogger, format, Logger, transports } from "winston";
 
 export const CUSTOM_LOGGER = 'CUSTOM_LOGGER';
 
-interface ICustomAppLogger<T>{
-    getLogger(label:string):Logger;
-    info(message:string,ex:Error);
-    warn(message:string,ex:Error);
-    error(message:string,ex:Error);
+export interface ICustomAppLogger{
+    info(message:string,ex?:Error);
+    warn(message:string,ex?:Error);
+    error(message:string,ex?:Error);
 }
 
-export class CustomAppLogger<T> implements ICustomAppLogger<T>{
+export class CustomAppLogger implements ICustomAppLogger{
 
     constructor(
        private readonly _loggerName:string
     ){}
-
-    getLogger(): Logger{
-
-        console.log('name -> ', this._loggerName);
-
-        let logger = createLogger({
-            level: 'info',
-            format: format.combine(
-                format.timestamp({
-                    format: 'YYYY-MM-DD HH:mm:ss'
-                }),
-                format.errors({ stack : true }),
-                this.customFormat()
-            ),
-            defaultMeta: { service : this._loggerName },
-            transports: [
-                new transports.File({
-                    filename: 'fs.log', dirname: process.env.LOGGER_DIR
-                })
-            ]
-        });
-
-        if (process.env.NODE_ENV != 'production' ){
-            logger.add(new transports.Console({
-                format: format.combine(
-                    format.colorize(),
-                    format.simple()
-                )
-            }));
-        }
-
-        return logger;
-    }
 
     info(message:string, ex:Error = null){
 
@@ -69,6 +35,39 @@ export class CustomAppLogger<T> implements ICustomAppLogger<T>{
 
         if (ex === null ) logger.error(message);
         else logger.error(message, ex);
+    }
+
+    private getLogger(): Logger{
+
+        console.log('name -> ', this._loggerName);
+
+        let logger = createLogger({
+            level: 'info',
+            format: format.combine(
+                format.timestamp({
+                    format: 'YYYY-MM-DD HH:mm:ss'
+                }),
+                format.errors({ stack : true }),
+                this.customFormat()
+            ),
+            defaultMeta: { service : this._loggerName },
+            transports: [
+                new transports.File({
+                    filename: 'freeswitchapp.log', dirname: process.env.LOGGER_DIR
+                })
+            ]
+        });
+
+        if (process.env.NODE_ENV != 'production' ){
+            logger.add(new transports.Console({
+                format: format.combine(
+                    format.colorize(),
+                    format.simple()
+                )
+            }));
+        }
+
+        return logger;
     }
     
     private customFormat():Format{
@@ -93,24 +92,5 @@ export class CustomAppLogger<T> implements ICustomAppLogger<T>{
         });
 
         return customFormat;
-    }
-}
-
-export class CLogger<T>{
-
-    private readonly _customLogger: ICustomAppLogger<T> = null;
-
-    constructor(
-    ){}
-
-    name(label:string){
-        return label;
-    }
-
-    info(message:string, ex: Error = null){
-        if (ex === null){
-
-            let log = this._customLogger.getLogger("test");
-        }
     }
 }

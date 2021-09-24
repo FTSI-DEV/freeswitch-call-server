@@ -3,6 +3,7 @@ import { TimeConversion } from "src/utils/timeConversion.utils";
 import { CommandConstants } from "../../constants/freeswitch-command.constants";
 import { FreeswitchDpConstants } from "../../constants/freeswitchdp.constants";
 import { TwiMLXMLParser } from "../../parser/xmlParser";
+import { InboundEslConnResult } from "../inbound-esl.connection";
 import { InboundCallContext } from "./models/inboundCallContext";
 import { PlayAndGetDigitsParam } from "./models/plagdParam";
 import { VoiceRequestParam } from "./models/voiceRequestParam";
@@ -12,8 +13,9 @@ export class InboundCallDialplan{
     executeNextInstruction(context:InboundCallContext,callback){
 
         this.executeFirstInstruction(context,(result) => {
+            
             if (result.legStop){
-                console.log('Leg has stop. Cannot continue to process further instructions.');
+                context.Log(`Leg has stop. Cannot continue to process further instructions.`, true);
                 callback();
                 return;
             }
@@ -26,47 +28,43 @@ export class InboundCallDialplan{
 
             this.getInstruction(context, () => {
 
-                if (context.hasError){
-                    console.log('Error. Cannot continue to process the further instructions.');
-                    console.log('error message -> ', context.errorMessage);
+                if (context.callRejected){
+                    context.Log(context.errorMessage, true);
                     return;
                 }
 
-                console.log('TwiML Response 2 -> ', context.twiMLResponse);
+                context.logger.info(`TwiML Response 2 => ${context.twiMLResponse}`);
 
                 this.setSecondInstruction(context.twiMLResponse, context);
 
                 if (context.instructionValidated){
 
                     this.executeSecondInstruction(context, () =>{
+
+                        if (context.callRejected){
+                            this.callRejectedHandler(context, () => {
+                                context.Log(`Call has rejected -> ${context.errorMessage}`, true);
+                                return;
+                            });
+                        }
+
                         if (context.legStop){
-                            console.log('Leg has stop. Cannot continue to process further instructions.');
+                            context.Log('Leg has stop.',true);
                             callback();
                             return;
                         }
 
-                        if (context.callRejected){
-                            this.callRejectedHandler(context, () => {
-                                console.log('Call has rejected or hangup');
-                            });
-                        }
-
                         //continue to third instructions
 
-                        context.webhookParam = {
-                            actionUrl: context.dialplanInstruction.value,
-                            httpMethod : null
-                        };
-
                         this.getInstruction(context, () =>{
-                            if (context.hasError){
-                                console.log('Error. Canot continue to process the further instructions.');
-                                console.log('error message -> ', context.errorMessage);
+
+                            if (context.callRejected){
+                                context.Log(`Error. Cannot process further instructions. ${context.errorMessage}`);
                                 callback();
                                 return;
                             }
 
-                            console.log('TwiML Response 3 -> ', context.twiMLResponse);
+                            context.logger.info(`TwiML Response 3 -> ${context.twiMLResponse}`);
 
                             this.setThirdInstruction(context.twiMLResponse, context);
 
@@ -74,7 +72,15 @@ export class InboundCallDialplan{
                                 if (context.isLastDialplan)
                                 {
                                     this.executeLastDialplanInstruction(context, () => {
-                                        console.log('All instructions are executed!');
+
+                                        if (context.callRejected){
+                                            this.callRejectedHandler(context, () => {
+                                                context.Log('Call has rejected');
+                                                callback(context);
+                                            });
+                                        }
+                                        context.logger.info('All instructions are executed');
+                                        callback(context);
                                     });
                                 }
                                 else
@@ -100,14 +106,10 @@ export class InboundCallDialplan{
         })
         .catch((err) => {
             let errMessage = 'Error in requesting webhook url -> ' + err;
-
-            console.log(errMessage);
+            // context.logger.info(errMessage);
             this.callRejectedHandler(context, () => {
-                console.log('Error handled!');
-                
-                context.hasError = true;
+                context.callRejected = true;
                 context.errorMessage = errMessage;
-
                 callback(context);
             });
         });
@@ -163,6 +165,15 @@ export class InboundCallDialplan{
                         context.dialplanInstructions.push(instruction);
                     }
                 }
+
+                if (!hasDialInstruction &&
+                    !hasGatherInstruction){
+
+                    if (instruction.name === FreeswitchDpConstants.speak){
+                        context.dialplanInstructions.push(instruction);
+                        context.isLastDialplan = true;
+                    }
+                }
               
             }
         }
@@ -176,16 +187,38 @@ export class InboundCallDialplan{
 
         let size = context.dialplanInstructions.length;
 
+        context.logger.info(`executeLastDialplanInstruction 3 -> ${JSON.stringify(context.webhookParam)}`);
+
+        context.Log(`size -> ${size}`);
+
         if (size === 2){
 
             let instruction = context.dialplanInstructions[0];
+            
 
             if (instruction.order === 1){
+                context.logger.info(`validate playback`);
                 if (instruction.name === FreeswitchDpConstants.playback){
                     connection.execute(instruction.name, instruction.value, () => {
-                        console.log('playback executed');
+                        context.Log('Playback executed');
 
                         instruction = context.dialplanInstructions[1];
+
+                        context.webhookParam = {
+                            actionUrl: instruction.dialAttribute.action,
+                            httpMethod : instruction.dialAttribute.method
+                        }
+
+                        context.inboundESLConnResult = {
+                            callModel : {
+                                webhookParam: context.webhookParam,
+                                calldDirection: "inbound",
+                                voiceRequestParam: context.voiceRequestParam,
+                                callRejected:false
+                            }
+                        }
+
+                        context.logger.info(`CB -> ${JSON.stringify(context.inboundESLConnResult)}`);
 
                         connection.execute('set', 'hangup_after_bridge=true', () => {
 
@@ -198,18 +231,31 @@ export class InboundCallDialplan{
                                     let callForwardingNumber = instruction.value;
 
                                     connection.execute(instruction.name, `sofia/gateway/fs-test3/1000`, () =>{
-                                        console.log('bridge executed');
-                                        context.dialplanInstruction = instruction;
+
+                                        context.Log('Bridge executed');
+
                                         callback(context);
+
                                         return;
                                     });
                                 }
                             });
                             
                         });
+
+                        callback(context);
                     });
                 }
             }
+        }
+        else
+        {
+            connection.execute('speak', `flite|kal|${context.dialplanInstructions[0].value}`, () =>{
+                context.logger.info('speak executed');
+                context.callRejected = true;
+                context.errorMessage = context.dialplanInstructions[0].value;
+                callback(context);
+            });
         }
     }
 
@@ -236,7 +282,7 @@ export class InboundCallDialplan{
             else
             {
                 this.callRejectedHandler(context, () => {
-                    console.log('Call rejected');
+                    context.Log('Call rejected', true);
                     callback(context);
                 })
             }
@@ -310,21 +356,23 @@ export class InboundCallDialplan{
         
         let instructionSize = context.dialplanInstructions.length;
 
-        console.log('size ', instructionSize);
-
         if (instructionSize >= 1) {
 
             let instruction = context.dialplanInstructions[0];
 
             connection.execute('speak', `flite|kal|${instruction.value}`, () => {
 
-                console.log('speak executed');
+                context.logger.info('speak executed');
 
                 instruction = context.dialplanInstructions[1];
 
-                console.log('instruction ', instruction);
-
                 if (instruction.command === CommandConstants.axios){
+
+                    context.webhookParam = {
+                        actionUrl: instruction.value,
+                        httpMethod : null
+                    };
+
                     context.dialplanInstruction = instruction;
 
                     callback(context);
@@ -409,11 +457,9 @@ export class InboundCallDialplan{
         let connection = context.conn;
 
         connection.execute('playback', 'ivr/ivr-call_cannot_be_completed_as_dialed.wav', () => {
-            console.log('Playback executed!');
 
             connection.execute('hangup', 'CALL_REJECTED', () => {
-                console.log('hangup complete!');
-                context.legStop = true;
+                context.callRejected = true;
                 callback();
             });
         });
