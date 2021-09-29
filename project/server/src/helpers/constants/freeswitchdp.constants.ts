@@ -4,5 +4,6 @@ export const FreeswitchDpConstants = {
     playback : 'playback',
     bridge : 'bridge',
     speak: 'speak',
-    hangup: 'hangup'
+    hangup: 'hangup',
+    sleep: 'sleep'
 }

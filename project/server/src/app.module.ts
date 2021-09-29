@@ -15,7 +15,6 @@ import { TestModule } from './modules/test/test.module';
 import { InboundEslConnectionHelper } from './helpers/fs-esl/inbound-esl.connection';
 import { CallRecordingModule } from './modules/call-recording/call-recording.module';
 import { OutboundCallModule } from './modules/outbound-call/outbound-call.module';
-import { ClickToCallServerHelper } from './helpers/fs-esl/click-to-call.server';
 import { OutboundCallService } from './modules/outbound-call/services/outbound-call.service';
 import { GreetingModule } from './modules/greeting/greeting.module';
 import { InboundCallConfigModule } from './modules/inbound-call-config/inbound-call-config.module';
@@ -25,6 +24,8 @@ import { IIncomingCallService, INCOMING_CALL_SERVICE } from './modules/incomingC
 import { CALL_DETAIL_RECORD_SERVICE, ICallDetailRecordService } from './modules/call-detail-record/services/call-detail-record.interface';
 import { CustomLoggerModule } from './logger/logger.module';
 import { CUSTOM_LOGGER, ICustomAppLogger } from './logger/customLogger';
+import { OutboundCallServerHelper } from './helpers/fs-esl/outbound-call/outbound-call.server';
+import redis from 'redis';
 
 @Module({
   imports: [
@@ -63,8 +64,14 @@ export class AppModule {
 
     new InboundEslConnectionHelper().startConnection();
 
-    new EslServerHelper(_inboundCallConfigService,_incomingCallService).startEslServer();
+    let client = redis.createClient(6379);
 
-    new ClickToCallServerHelper(_outboundCallService,_callDetailRecordService).startClickToCallServer();
+    client.on('connect', () => {
+        console.log('Connected Redis Server!');
+    });
+
+    new EslServerHelper(_inboundCallConfigService,_incomingCallService, client).startEslServer();
+
+    new OutboundCallServerHelper(_callDetailRecordService, client).startOutboundCallServer();
   }
 }
