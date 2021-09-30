@@ -38,9 +38,9 @@
           <a-tag :color="'green'"> {{ text }} </a-tag>
         </span>
       </template>
-      <template #action="{  }">
-       <router-link to="/call-logs/details">
-            <MenuFoldOutlined @click="viewDetails" style="font-size: 1.5em; color: #3d56b2; cursor: pointer" />
+      <template #action="{}">
+        <router-link to="/call-logs/details">
+          <MenuFoldOutlined @click="viewDetails" class="view_icon" title="View Details" />
         </router-link>
       </template>
     </a-table>
@@ -49,18 +49,18 @@
 <script lang="ts">
 // import { EditOutlined } from "@ant-design/icons-vue";
 import { defineComponent, computed } from "vue";
-import { useStore } from 'vuex';
+import { useStore } from "vuex";
 import { CDRColumns } from "./helper/helper";
 import methodsObj from "./helper/methods";
 import { MenuFoldOutlined } from "@ant-design/icons-vue";
 export default defineComponent({
   components: {
-    MenuFoldOutlined
+    MenuFoldOutlined,
   },
   setup() {
     const store = useStore();
     const { getCallDetailRecords } = methodsObj();
-    const cdrData = computed(() => store.getters["getCallDetailRecords"])
+    const cdrData = computed(() => store.getters["getCallDetailRecords"]);
     getCallDetailRecords();
     const editConfig = (data: any) => {
       console.log(data);
@@ -68,7 +68,7 @@ export default defineComponent({
     return {
       CDRColumns,
       editConfig,
-      cdrData
+      cdrData,
     };
   },
 });
@@ -80,5 +80,13 @@ export default defineComponent({
   font-size: 1.5em;
   border-bottom: 1px solid #eaeaea;
   margin-bottom: 20px;
+}
+.view_icon {
+  font-size: 1.4em;
+  color: #3d56b2;
+  cursor: pointer;
+}
+.view_icon:hover {
+  transform: scale(1.5);
 }
 </style>

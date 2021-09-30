@@ -11,7 +11,7 @@
               <div class="item-container">
                 <div>
                   <div class="d-flex">
-                       <span style="margin-right: 15px">Date Created</span>
+                    <span style="margin-right: 15px">Date Created</span>
                     <h5 style="font-size: 1em">{{ item.DateCreated }}</h5>
                   </div>
                   <div class="d-flex">
@@ -24,7 +24,11 @@
                   </div>
                 </div>
                 <div style="text-align: right; margin-top: 20px">
-                  <MenuFoldOutlined @click="viewDetails" style="font-size: 1.5em; color: #3d56b2; cursor: pointer" />
+                  <MenuFoldOutlined
+                    @click="viewDetails"
+                    class="view_icon"
+                    title="View Details"
+                  />
                 </div>
               </div>
             </template>
@@ -32,7 +36,7 @@
               <a href="https://www.antdv.com/">{{ item.DateCreated }}</a>
             </template> -->
             <template #avatar>
-              <PhoneFilled style="font-size: 2em; line-height: 3; color: #3d56b2"/>
+              <PhoneFilled style="font-size: 2em; line-height: 3; color: #3d56b2" />
             </template>
           </a-list-item-meta>
         </a-list-item>
@@ -62,11 +66,11 @@ export default defineComponent({
     getRecordings();
     const viewDetails = (): void => {
       router.push({ path: "/call-recording/details" });
-    }
+    };
     return {
       recordingsData,
       getRecordings,
-      viewDetails
+      viewDetails,
     };
   },
 });
@@ -85,5 +89,14 @@ export default defineComponent({
 .item-container {
   display: grid;
   grid-auto-flow: column;
+}
+.view_icon {
+  font-size: 1.4em;
+  line-height: 3;
+  color: #3d56b2;
+  margin-right: 30px;
+}
+.view_icon:hover {
+  transform: scale(1.5);
 }
 </style>
