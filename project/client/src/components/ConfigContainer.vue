@@ -1,9 +1,7 @@
 <template>
-  <a-layout style="padding: 10px;   background: #fff">
+  <a-layout style="padding: 10px; background: #fff">
     <div class="call-config">
-      <div style="text-align: left; flex: 1">
-        Call Configuration
-      </div>
+      <div style="text-align: left; flex: 1">Call Configuration</div>
     </div>
 
     <div
@@ -14,25 +12,28 @@
       }"
     >
       <a-tabs tabPosition="left">
-     
         <a-tab-pane key="1" tab="Phone Number">
           <PhoneNumberConfig />
         </a-tab-pane>
-           <a-tab-pane key="2" tab="Inbound">
+        <a-tab-pane key="2" tab="Inbound">
           <InboundCallConfig />
+        </a-tab-pane>
+        <a-tab-pane key="3" tab="IVR">
+          <IVRConfig />
         </a-tab-pane>
       </a-tabs>
     </div>
   </a-layout>
 </template>
 <script>
-import PhoneNumberConfig from './phoneNumberConfig/PhoneNumberConfig';
-import InboundCallConfig from './inboundCallConfig/InboundCallConfig';
-// import { PhoneOutlined } from "@ant-design/icons-vue";
+import PhoneNumberConfig from "./phoneNumberConfig/PhoneNumberConfig";
+import InboundCallConfig from "./inboundCallConfig/InboundCallConfig";
+import IVRConfig from "./ivr/IVRConfig.vue";
 export default {
   components: {
     PhoneNumberConfig,
-    InboundCallConfig
+    InboundCallConfig,
+    IVRConfig
     // PhoneOutlined
   },
   computed: {

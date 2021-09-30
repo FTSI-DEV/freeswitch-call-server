@@ -32,7 +32,7 @@
     "src/**/*.vue",
     "tests/**/*.ts",
     "tests/**/*.tsx"
-, "src/components/PhoneNumberConfig.vue", "src/components/MainContainer.vue", "src/components/callDetailRecords/CallDetailRecords.vue", "src/components/inboundCallConfig/InboundCall.vue", "src/components/ConfigContainer.vue"  ],
+, "src/components/PhoneNumberConfig.vue", "src/components/MainContainer.vue", "src/components/callDetailRecords/CallDetailRecords.vue", "src/components/inboundCallConfig/InboundCall.vue", "src/components/ConfigContainer.vue", "src/components/ivr/IVRConfig.vue"  ],
   "exclude": [
     "node_modules"
   ]

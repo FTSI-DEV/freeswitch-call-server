@@ -21,7 +21,7 @@ import {
     Modal,
     Tabs,
     List,
-    Avatar
+    Avatar,
 } from 'ant-design-vue';
 
 export default function AntdvUi(app: any) {

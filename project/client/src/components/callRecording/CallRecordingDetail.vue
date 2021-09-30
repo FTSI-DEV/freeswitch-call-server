@@ -5,8 +5,23 @@
                 <ArrowLeftOutlined /> Back
             </router-link>
          </div>
-        <div>
-            Call Recording Detail
+        <div style="text-align: left">
+            <div class="font-size: 1em;">Call Details</div>
+            <div>
+                <h5>Date Created: </h5>
+            </div>
+             <div>
+                <h5>Recording Id: </h5>
+            </div>
+             <div>
+                <h5>Recording UUID: </h5>
+            </div>
+             <div>
+                <h5>Call UUIDI: </h5>
+            </div>
+             <div>
+                <h5>File Path: </h5>
+            </div>
         </div>
     </div>
 </template>
