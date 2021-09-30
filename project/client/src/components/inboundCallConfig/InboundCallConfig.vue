@@ -58,7 +58,7 @@
                     </a-form-item>
                 </a-col>
 
-                <a-col style="margin-right: 15px">
+                <a-col style="margin-right: 15px" :span="8">
                   <a-form-item
                     label="Webhook Url"
                     style="display: block; text-align: left"
