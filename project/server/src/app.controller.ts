@@ -8,7 +8,6 @@ import { ApiCredential } from './models/apiCredential.model';
 
 @Controller()
 export class AppController {
-  /*
   constructor(
     private readonly appService: AppService,
     private authService: AuthService) {}
@@ -16,35 +15,27 @@ export class AppController {
   @UseGuards(LocalAuthGuard)
   @Post('auth/login')
   async login(@Request() req) {
-    let result = this.authService.login(req.user);
-    console.log('test auth');
-    console.log('creds -', result);
-    return result;
+    console.log('UAHT- > ', req.user);
+    let res = this.authService.login(req.user);
+    return res;
+    // let result = this.authService.login(req.user);
+    // return result;
   }
 
   @UseGuards(JwtAuthGuard)
   @Get('profile')
   getProfile(@Request() req){
-    return req.user;
+    console.log('test -> ' , req);
+    return 'Ok!';
   }
 
   @Get('fs')
   getHello(): string {
-    // return this.appService.getHello();
+    return this.appService.getHello();
     return 'Hello World';
   }
-
-  // @Get('fs')
-  // async getfs(): Promise<fscreds>{
-  //   // await this.fsService.addVehicle();
-
-  //   // return this.fsService.getOne('freeswitch', 'machaik-fs2021');
-  //   return this.authService.getOneById(1);
-  // }
-
-  // @Get('validateApi')
-  // async validateApi(apiKey: string, apiPassword: string){
-  //   return this.authService.validateApiCredential(apiKey, apiPassword);
-  // }
-  */
+  @Get('validateApi')
+  async validateApi(apiKey: string, apiPassword: string){
+    return this.authService.validateApiCredential(apiKey, apiPassword);
+  }
 }

@@ -11,7 +11,7 @@ import { CDRModel } from 'src/modules/call-detail-record/models/cdr.models';
 import moment from 'moment';
 import { DialplanInstruction } from '../parser/xmlParser';
 import axios from 'axios';
-import { VoiceRequestParam } from './inbound-call/models/voiceRequestParam';
+import { VoiceRequestParam } from './models/voiceRequestParam';
 import { CustomAppLogger, ICustomAppLogger } from 'src/logger/customLogger';
 import { WebhookParam } from './inbound-call/models/webhookParam';
 
@@ -48,7 +48,7 @@ export class InboundEslConnectionHelper {
     let fsConfig = new FreeswitchConfigHelper().getFreeswitchConfig();
 
     let connection = new esl.Connection(
-      fsConfig.ip,
+      '192.168.18.80',
       fsConfig.port,
       fsConfig.password,
     );
@@ -140,7 +140,7 @@ export class InboundEslConnectionHelper {
       // }
 
         this._logger.info('HANDLE CALLS in inbound esl');
-        this.statusCallback(cdrValues);
+        // this.statusCallback(cdrValues);
     });
 
     connection.on('esl::event::BACKGROUND_JOB::*', (evt) =>{

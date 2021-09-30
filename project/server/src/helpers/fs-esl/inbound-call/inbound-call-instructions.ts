@@ -6,7 +6,7 @@ import { TwiMLXMLParser } from "../../parser/xmlParser";
 import { InboundEslConnResult } from "../inbound-esl.connection";
 import { InboundCallContext } from "./models/inboundCallContext";
 import { PlayAndGetDigitsParam } from "./models/plagdParam";
-import { VoiceRequestParam } from "./models/voiceRequestParam";
+import { VoiceRequestParam } from "../models/voiceRequestParam";
 
 export class InboundCallDialplan{
 
@@ -117,7 +117,7 @@ export class InboundCallDialplan{
 
     setInstruction(twiMLResponse:string, context: InboundCallContext){
 
-        let parseResult = new TwiMLXMLParser().tryParse(twiMLResponse);
+        let parseResult = new TwiMLXMLParser(null).tryParse(twiMLResponse);
 
         let gatherInstructionExists: boolean = false;
 
@@ -313,7 +313,7 @@ export class InboundCallDialplan{
 
     private setSecondInstruction(twiMLResponse:string, context:InboundCallContext){
 
-        let parseResult = new TwiMLXMLParser().tryParse(twiMLResponse);
+        let parseResult = new TwiMLXMLParser(null).tryParse(twiMLResponse);
 
         if (parseResult.length <= 0 ){
             context.instructionValidated = false;
@@ -403,7 +403,7 @@ export class InboundCallDialplan{
 
         context.dialplanInstructions = [];
 
-        let parseResult = new TwiMLXMLParser().tryParse(twiMLResponse);
+        let parseResult = new TwiMLXMLParser(null).tryParse(twiMLResponse);
 
         if (parseResult.length <= 0){
             context.instructionValidated = false;

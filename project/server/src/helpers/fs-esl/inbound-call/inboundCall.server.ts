@@ -9,7 +9,8 @@ export class EslServerHelper {
 
   constructor(
     private readonly _inboundCallConfigService: IInboundCallConfigService,
-    private readonly _inboundCallService: IIncomingCallService
+    private readonly _inboundCallService: IIncomingCallService,
+    private readonly _client:any
   ) {}
 
   //for InboundCall

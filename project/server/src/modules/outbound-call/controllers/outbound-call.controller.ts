@@ -1,8 +1,11 @@
 import { InjectQueue } from '@nestjs/bull';
-import { Controller, Get, Inject, Param, Post, Query } from '@nestjs/common';
+import { Body, Controller, Get, Inject, Param, Post, Query, UseGuards } from '@nestjs/common';
 import { Queue } from 'bull';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import { LocalAuthGuard } from 'src/auth/guards/local-auth.guard';
 import { CDRModel } from 'src/modules/call-detail-record/models/cdr.models';
 import { JsonDataListReturnModel } from 'src/utils/jsonDataListReturnModel';
+import { OutboundCallParam } from '../models/outbound-call.model';
 import { IOutboundCallService, OUTBOUND_CALL_SERVICE } from '../services/outbound-call.interface';
 
 @Controller('/api/outbound-call')
@@ -14,19 +17,19 @@ export class OutboundCallController {
         private readonly outboundCallJobQueue : Queue
     ) {}
 
-    @Post('clickToCall/:phoneNumberFrom/:phoneNumberTo/:callerId')
+    
+    // @UseGuards(LocalAuthGuard)
+    @Post('clickToCall')
     async clickToCall(
-        @Param('phoneNumberFrom') phoneNumberFrom: string,
-        @Param('phoneNumberTo') phoneNumberTo: string,
-        @Param('callerId') callerId: string,
+        @Body() param: OutboundCallParam
       ): Promise<JsonDataListReturnModel> {
     
         try{
 
           let result = await this._outboundCallService.clickToCall(
-            phoneNumberTo,
-            phoneNumberFrom,
-            callerId,
+            param.phoneNumberTo,
+            param.phoneNumberFrom,
+            param.displayCallerId,
           );
 
           return JsonDataListReturnModel.Ok(result);
@@ -35,6 +38,12 @@ export class OutboundCallController {
           console.log('ERR -> ', JsonDataListReturnModel.Error(err));
           return JsonDataListReturnModel.Error(err);
         }
+    }
+
+    @Get('testClickToCall')
+    clickToCallTest(){
+      console.log('Test achieve!');
+      return "Test achieve!";
     }
 
     @Get('outboundCallStatusCallBack')

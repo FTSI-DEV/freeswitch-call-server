@@ -1,12 +1,21 @@
+import e from "express";
 import { CommandConstants } from "../constants/freeswitch-command.constants";
 import { FreeswitchDpConstants } from "../constants/freeswitchdp.constants";
 import { TwiMLContants } from "../constants/twiml.constants";
+import redis from 'redis';
 
 const xml = require('xmldoc');
 
+
 export class TwiMLXMLParser{
 
+    constructor(
+        private readonly redisClient:any
+    ){}
+
     tryParse(value:string):DialplanInstruction[]{
+
+        // console.log('redisclient ', this.redisClient);
 
         let dpInstructions : DialplanInstruction[] = [];
 
@@ -20,6 +29,8 @@ export class TwiMLXMLParser{
 
                let element = xmlChildren[i];
 
+            //    console.log('element -> ' ,JSON.stringify(element));
+
                if (element.name === TwiMLContants.Say){
                    dpInstructions.push({
                        name: FreeswitchDpConstants.speak,
@@ -27,18 +38,58 @@ export class TwiMLXMLParser{
                        value: element.val
                    });
                }
+               else if (element.name === TwiMLContants.Pause){
+
+                    let instruction: DialplanInstruction = {
+                        name : FreeswitchDpConstants.sleep,
+                        command: CommandConstants.exec,
+                        value: element.val,
+                        pauseAttribute: {
+                            length: element.attr.length
+                        }
+                    };
+
+                    console.log('iii -> ', instruction);
+                    
+                   dpInstructions.push(instruction);
+               }
                else if (element.name === TwiMLContants.Gather){
-                   dpInstructions.push({
-                       name: FreeswitchDpConstants.play_and_get_digits,
-                       command: CommandConstants.exec,
-                       value: element.val,
-                       gatherAttribute : {
-                           numDigits: element.attr.numDigits,
-                           action: element.attr.action,
-                           method: element.attr.method,
-                           timeout: element.attr.timeout
-                       }
-                   });
+
+                    let dpInstruction: DialplanInstruction = {
+                        name: FreeswitchDpConstants.play_and_get_digits,
+                        command: CommandConstants.exec,
+                        value: element.val,
+                        gatherAttribute: {
+                            numDigits: element.attr.numDigits,
+                            action: element.attr.action,
+                            method: element.attr.method,
+                            timeout: element.attr.timeout
+                        }
+                    };
+
+                    let child = element.descendantWithPath(TwiMLContants.Say);
+
+                    if (child){
+                        dpInstruction.children = {
+                            command: "",
+                            value: child.val,
+                            name: FreeswitchDpConstants.speak
+                        };
+                    }
+
+                    dpInstructions.push(dpInstruction);
+
+                //    dpInstructions.push({
+                //        name: FreeswitchDpConstants.play_and_get_digits,
+                //        command: CommandConstants.exec,
+                //        value: element.val,
+                //        gatherAttribute : {
+                //            numDigits: element.attr.numDigits,
+                //            action: element.attr.action,
+                //            method: element.attr.method,
+                //            timeout: element.attr.timeout
+                //        }
+                //    });
                }
                else if (element.name === TwiMLContants.Redirect){
                    dpInstructions.push({
@@ -100,6 +151,17 @@ export class TwiMLXMLParser{
             console.log('ERROR PARSING TWIML -> ',err);
         }
 
+        // let arrToString = JSON.stringify(dpInstructions);
+
+        // this.redisClient.set('outbound_dpInstructions', arrToString, (err,reply) => {
+        //     console.log(reply);
+        // });
+
+        // this.redisClient.get('outbound_dpInstructions', (err,reply) => {
+        //     console.log('Retrieve instructions from REDIS');
+        //     // console.log(JSON.parse(reply));
+        // });
+
         return dpInstructions;
     }
 }
@@ -112,6 +174,7 @@ export interface DialplanInstruction {
     value: string;
     children?: DialplanInstruction;
     order?:number;
+    pauseAttribute?:PauseAttribute;
   }
   
   export interface GatherAttribute {
@@ -126,4 +189,8 @@ export interface DialplanInstruction {
     method: string; //http method
     callerId: string;
     recordCondition: string;
+  }
+
+  export interface PauseAttribute{
+      length:string;
   }

@@ -1,7 +1,7 @@
 import { DialplanInstruction } from "src/helpers/parser/xmlParser";
 import { CustomAppLogger } from "src/logger/customLogger";
 import { ConnResult } from "../../inbound-esl.connection";
-import { VoiceRequestParam } from "./voiceRequestParam";
+import { VoiceRequestParam } from "../../models/voiceRequestParam";
 import { WebhookParam } from "./webhookParam";
 
 export class InboundCallContext{
