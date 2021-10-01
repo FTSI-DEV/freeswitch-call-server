@@ -1,12 +1,13 @@
 import { Injectable } from "@nestjs/common";
 import { TypeOrmModuleOptions } from "@nestjs/typeorm";
-import { CallRecordingStorageEntity } from "src/entity/callRecordingStorage.entity";
+import { CallRecordingStorageEntity, FsCallDetailRecordEntity } from "src/entity/callRecordingStorage.entity";
 import { FreeswitchCallConfigEntity } from "src/entity/freeswitchCallConfig.entity";
 import { InboundCallConfigEntity } from "src/entity/inboundCallConfig.entity";
 import { PhoneNumberConfigEntity } from "src/entity/phoneNumberConfig.entity";
 import { ApiCredential } from "src/models/apiCredential.model";
 import { IConfigService } from "./iconfig.interface";
 import { AccountConfigEntity } from "src/entity/account-config";
+import { AccountConfigModel } from "src/modules/account-config/models/accountConfig.model";
 require('dotenv').config();
 
 @Injectable()
@@ -45,15 +46,16 @@ export class ConfigService implements IConfigService{
             username: this.getValue('POSTGRES_USER'),
             password: this.getValue('POSTGRES_PASSWORD'),
             database: this.getValue('POSTGRES_DATABASE'),
-            // entities: [FreeswitchCallConfigEntity,
-            //             CallRecordingStorageEntity,
-            //            FsCallDetailRecordEntity,
-            //            InboundCallConfigEntity,
-            //            PhoneNumberConfigEntity],
-            entities : ["dist/entity/**/*.js"],
+            entities: [FreeswitchCallConfigEntity,
+                        FsCallDetailRecordEntity,
+                        CallRecordingStorageEntity,
+                       InboundCallConfigEntity,
+                       PhoneNumberConfigEntity,
+                        AccountConfigEntity],
+            // entities : ["dist/entity/**/*.js"],
             migrationsTableName : "MigrationTable",
             migrations: ['dist/migration/**/*.js'],
-            migrationsRun: true,
+            // migrationsRun: true,
             cli: {
                 migrationsDir: 'src/migration',
                 entitiesDir: 'src/entity'
