@@ -15,15 +15,15 @@ export interface JsonDataListModel<T>{
     Message?:string;
 }
 
-export class JsonDataListReturnModel extends JsonDataListModel<object>{
+export class JsonDataListReturnModel extends JsonDataListModel<any>{
 
-    static Ok(message:string):JsonDataListModel<object>;
+    static Ok(message:string):JsonDataListModel<any>;
 
-    static Ok(message?:string,data?:object):JsonDataListModel<object>;
+    static Ok(message?:string,data?:any):JsonDataListModel<any>;
 
-    static Ok(message:string='Ok',data?:object):JsonDataListModel<object>{
+    static Ok(message:string='Ok',data?:any):JsonDataListModel<any>{
         
-        let value = new JsonDataListModel<object>();
+        let value = new JsonDataListModel<any>();
 
         value.Data = data;
         value.Message = message;
@@ -32,22 +32,22 @@ export class JsonDataListReturnModel extends JsonDataListModel<object>{
         return value;
     }
 
-    static Error(message:string='Error' ,data?:object):JsonDataListModel<object>{
+    static Error(message:string='Error' ,data?:any):JsonDataListModel<any>{
         return this.CreateGenericErrorResponse(message,data);
     }
 
-    static NotFound(message:string='Not found'):JsonDataListModel<object>{
+    static NotFound(message:string='Not found'):JsonDataListModel<any>{
 
-        let value = new JsonDataListModel<object>();
+        let value = new JsonDataListModel<any>();
 
         value.Message = message;
 
         return value;
     }
 
-    static UnAuthorize(message:string='Unathorized'):JsonDataListModel<object>{
+    static UnAuthorize(message:string='Unathorized'):JsonDataListModel<any>{
         
-        let value = new JsonDataListModel<object>();
+        let value = new JsonDataListModel<any>();
 
         value.Message = message;
         value.Status = JsonResultStatus.UNAUTHORIZED;
@@ -55,9 +55,9 @@ export class JsonDataListReturnModel extends JsonDataListModel<object>{
         return value;
     }
 
-    static Forbidden(message:string='Forbidden'):JsonDataListModel<object>{
+    static Forbidden(message:string='Forbidden'):JsonDataListModel<any>{
 
-        let value = new JsonDataListModel<object>();
+        let value = new JsonDataListModel<any>();
 
         value.Message = message;
 
@@ -66,9 +66,9 @@ export class JsonDataListReturnModel extends JsonDataListModel<object>{
         return value;
     }
 
-    static CreateGenericOKResponse(message:string='OK', data?:object):JsonDataListModel<object>{
+    static CreateGenericOKResponse(message:string='OK', data?:any):JsonDataListModel<any>{
 
-        let value = new JsonDataListModel<object>();
+        let value = new JsonDataListModel<any>();
 
         value.Message = message;
 
@@ -79,9 +79,9 @@ export class JsonDataListReturnModel extends JsonDataListModel<object>{
         return value;
     }
 
-    static CreateGenericErrorResponse(message:string='Not found', data?:object):JsonDataListModel<object>{
+    static CreateGenericErrorResponse(message:string='Not found', data?:any):JsonDataListModel<any>{
         
-        let value = new JsonDataListModel<object>();
+        let value = new JsonDataListModel<any>();
 
         value.Status = JsonResultStatus.ERROR;
 

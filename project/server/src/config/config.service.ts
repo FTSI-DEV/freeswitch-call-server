@@ -2,11 +2,11 @@ import { Injectable } from "@nestjs/common";
 import { TypeOrmModuleOptions } from "@nestjs/typeorm";
 import { CallRecordingStorageEntity } from "src/entity/callRecordingStorage.entity";
 import { FreeswitchCallConfigEntity } from "src/entity/freeswitchCallConfig.entity";
-import { FsCallDetailRecordEntity } from "src/entity/call-detail-record";
 import { InboundCallConfigEntity } from "src/entity/inboundCallConfig.entity";
 import { PhoneNumberConfigEntity } from "src/entity/phoneNumberConfig.entity";
 import { ApiCredential } from "src/models/apiCredential.model";
 import { IConfigService } from "./iconfig.interface";
+import { AccountConfigEntity } from "src/entity/account-config";
 require('dotenv').config();
 
 @Injectable()
@@ -45,15 +45,18 @@ export class ConfigService implements IConfigService{
             username: this.getValue('POSTGRES_USER'),
             password: this.getValue('POSTGRES_PASSWORD'),
             database: this.getValue('POSTGRES_DATABASE'),
-            entities: [FreeswitchCallConfigEntity,
-                       FsCallDetailRecordEntity,
-                       InboundCallConfigEntity,
-                       PhoneNumberConfigEntity,
-                       CallRecordingStorageEntity],
+            // entities: [FreeswitchCallConfigEntity,
+            //             CallRecordingStorageEntity,
+            //            FsCallDetailRecordEntity,
+            //            InboundCallConfigEntity,
+            //            PhoneNumberConfigEntity],
+            entities : ["dist/entity/**/*.js"],
+            migrationsTableName : "MigrationTable",
             migrations: ['dist/migration/**/*.js'],
             migrationsRun: true,
             cli: {
                 migrationsDir: 'src/migration',
+                entitiesDir: 'src/entity'
             },
             ssl: this.isProduction(),
             synchronize: false

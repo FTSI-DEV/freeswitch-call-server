@@ -25,6 +25,7 @@ import { CALL_DETAIL_RECORD_SERVICE, ICallDetailRecordService } from './modules/
 import { CustomLoggerModule } from './logger/logger.module';
 import { CUSTOM_LOGGER, ICustomAppLogger } from './logger/customLogger';
 import { OutboundCallServerHelper } from './helpers/fs-esl/outbound-call/outbound-call.server';
+import { AccountConfigModule } from './modules/account-config/account-config.module';
 import redis from 'redis';
 
 @Module({
@@ -47,7 +48,8 @@ import redis from 'redis';
     CallRecordingModule,
     OutboundCallModule,
     GreetingModule,
-    CustomLoggerModule
+    CustomLoggerModule,
+    AccountConfigModule
  ],
   controllers: [AppController],
   providers: [AppService],

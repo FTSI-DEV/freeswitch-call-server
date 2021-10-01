@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { FsCallDetailRecordEntity, FsCallDetailRecordRepository } from 'src/entity/call-detail-record';
+import { FsCallDetailRecordEntity, FsCallDetailRecordRepository } from 'src/entity/callRecordingStorage.entity';
+// import { FsCallDetailRecordEntity, FsCallDetailRecordRepository } from 'src/entity/call-detail-record';
 import { CallDetailRecordController } from './controllers/call-detail-record.controller';
 import { CALL_DETAIL_RECORD_SERVICE } from './services/call-detail-record.interface';
 import { CallDetailRecordService } from './services/call-detail-record.service';

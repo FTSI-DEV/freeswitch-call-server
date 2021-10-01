@@ -24,7 +24,7 @@ export class CallDetailRecordController {
     @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number = 10,
   ): Promise<JsonDataListReturnModel> {
 
-    limit = limit > 100 ? 100 : limit;
+    limit = limit > 10 ? 10 : limit;
 
     let callLogs = await this._callDetailRecordService.getCallLogs({
       page,

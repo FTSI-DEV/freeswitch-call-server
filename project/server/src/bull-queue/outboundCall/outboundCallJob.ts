@@ -1,6 +1,6 @@
 import { OnQueueActive, Process, Processor } from "@nestjs/bull";
 import { Job } from "bull";
-import { FsCallDetailRecordEntity } from "src/entity/call-detail-record";
+// import { FsCallDetailRecordEntity } from "src/entity/call-detail-record";
 import path from 'path';
 import { CDRModel } from "src/modules/call-detail-record/models/cdr.models";
 import { TimeProvider } from "src/utils/timeProvider.utils";
@@ -8,6 +8,7 @@ import { Inject } from "@nestjs/common";
 import { CALL_DETAIL_RECORD_SERVICE, ICallDetailRecordService } from "src/modules/call-detail-record/services/call-detail-record.interface";
 import { CALL_RECORDING_SERVICE, ICallRecordingService } from "src/modules/call-recording/services/call-recording.interface";
 import { CustomAppLogger } from "src/logger/customLogger";
+import { FsCallDetailRecordEntity } from "src/entity/callRecordingStorage.entity";
 
 @Processor('default')
 export class OutboundCallJob{

@@ -1,9 +1,10 @@
 import { IPaginationOptions, Pagination } from "nestjs-typeorm-paginate";
-import { FsCallDetailRecordEntity } from "src/entity/call-detail-record";
+import { FsCallDetailRecordEntity } from "src/entity/callRecordingStorage.entity";
+// import { FsCallDetailRecordEntity } from "src/entity/call-detail-record";
 import { CallDetailRecordDTO, CDRModel } from "src/modules/call-detail-record/models/cdr.models";
 
 
-export const CALL_DETAIL_RECORD_SERVICE = 'CALL DETAIL RECORD SERVICE';
+export const CALL_DETAIL_RECORD_SERVICE = 'CALL_DETAIL_RECORD_SERVICE';
 
 export interface ICallDetailRecordService{
     saveCDR(cdrParam:CDRModel):Promise<number>;

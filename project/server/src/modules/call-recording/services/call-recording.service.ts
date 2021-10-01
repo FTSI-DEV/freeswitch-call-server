@@ -1,7 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { IPaginationMeta, IPaginationOptions, paginate, Pagination } from 'nestjs-typeorm-paginate';
-import { FsCallDetailRecordEntity } from 'src/entity/call-detail-record';
 import { CallRecordingStorageEntity, CallRecordingStorageRepository } from 'src/entity/callRecordingStorage.entity';
 import { CALL_DETAIL_RECORD_SERVICE, ICallDetailRecordService } from 'src/modules/call-detail-record/services/call-detail-record.interface';
 import { CallDetailRecordService } from 'src/modules/call-detail-record/services/call-detail-record.service';
@@ -30,9 +29,9 @@ export class CallRecordingService implements ICallRecordingService{
 
         let cdr = await this._callRecordDetailService.getById(param.CallId);
 
-        if (cdr != null){
-            callRecording.callDetailRecord = cdr;
-        }
+        // if (cdr != null){
+        //     callRecording.cdr = cdr;
+        // }
 
         await this._recordingStorageRepo.save(callRecording);
     }   

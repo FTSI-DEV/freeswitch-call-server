@@ -5,6 +5,7 @@ import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { LocalAuthGuard } from 'src/auth/guards/local-auth.guard';
 import { CDRModel } from 'src/modules/call-detail-record/models/cdr.models';
 import { JsonDataListReturnModel } from 'src/utils/jsonDataListReturnModel';
+import { OutboundCallResultModel } from '../models/outbound-call-result.model';
 import { OutboundCallParam } from '../models/outbound-call.model';
 import { IOutboundCallService, OUTBOUND_CALL_SERVICE } from '../services/outbound-call.interface';
 
@@ -32,7 +33,11 @@ export class OutboundCallController {
             param.displayCallerId,
           );
 
-          return JsonDataListReturnModel.Ok(result);
+          var callUid: OutboundCallResultModel = {
+              CallUid : result
+          };
+
+          return JsonDataListReturnModel.Ok(null, callUid);
         }
         catch(err){
           console.log('ERR -> ', JsonDataListReturnModel.Error(err));
