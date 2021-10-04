@@ -10,4 +10,5 @@ export interface IAccountConfigService{
     update(param:AccountConfigModel):Promise<number>;
     getById(id:number):Promise<AccountConfigEntity>;
     getConfigs(options: IPaginationOptions) : Promise<Pagination<AccountConfigDTO>>;
+    getByAccountSID(accountSID:string):Promise<AccountConfigDTO>;
 } 

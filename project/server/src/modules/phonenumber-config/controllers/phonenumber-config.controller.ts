@@ -5,7 +5,7 @@ import { JsonDataListReturnModel } from 'src/utils/jsonDataListReturnModel';
 import { IPhoneNumberConfigService, PHONENUMBER_CONFIG_SERVICE } from '../services/iphonenumber-config.interface';
 import { PhoneNumberConfigService } from '../services/phonenumber-config.service';
 
-@Controller('/api/freeswitch-phonenumber-config')
+@Controller('freeswitch-phonenumber-config')
 export class FreeswitchPhoneNumberConfigController {
     constructor(
         @Inject(PHONENUMBER_CONFIG_SERVICE)

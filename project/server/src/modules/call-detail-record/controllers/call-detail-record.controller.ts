@@ -11,7 +11,7 @@ import { CallDetailRecordDTO } from 'src/modules/call-detail-record/models/cdr.m
 import { JsonDataListReturnModel } from 'src/utils/jsonDataListReturnModel';
 import { CALL_DETAIL_RECORD_SERVICE, ICallDetailRecordService } from '../services/call-detail-record.interface';
 
-@Controller('/call-detail-record')
+@Controller('call-detail-record')
 export class CallDetailRecordController {
   constructor(
     @Inject(CALL_DETAIL_RECORD_SERVICE)

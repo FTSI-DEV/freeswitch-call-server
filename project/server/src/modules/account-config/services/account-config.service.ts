@@ -19,7 +19,7 @@ export class AccountConfigService implements IAccountConfigService{
 
         let accountConfig = new AccountConfigEntity();
 
-        accountConfig.AuthToken = uuidv4();
+        accountConfig.AuthKey = uuidv4();
 
         accountConfig.AccountSID = uuidv4();
 
@@ -38,7 +38,7 @@ export class AccountConfigService implements IAccountConfigService{
 
         let config = await this.getById(param.id);
 
-        config.AuthToken = param.accountName;
+        config.AuthKey = param.accountName;
 
         config.IsActive = param.isActive;
 
@@ -56,6 +56,24 @@ export class AccountConfigService implements IAccountConfigService{
        return config;
     }
 
+    async getByAccountSID(accountSID:string):Promise<AccountConfigDTO>{
+
+        let account = await this._accountConfigRepo.createQueryBuilder("AccountConfig")
+            .where("AccountConfig.AccountSID = :accountSID", { accountSID : accountSID })
+            .getOne();
+
+        if (account) return null;
+
+        return {
+            id: account.Id,
+            accountName: account.AccountName,
+            accountSID : account.AccountSID,
+            isActive: account.IsActive,
+            authKey: account.AuthKey,
+            dateCreated: account.DateCreated
+        };
+    }
+
     async getConfigs(options: IPaginationOptions) : Promise<Pagination<AccountConfigDTO>>{
 
         let pageRecords = await paginate<AccountConfigEntity>(this._accountConfigRepo, options);
@@ -71,7 +89,7 @@ export class AccountConfigService implements IAccountConfigService{
             let model : AccountConfigDTO = {
                 id: item.Id,
                 accountSID: item.AccountSID,
-                authToken : item.AuthToken,
+                authKey : item.AuthKey,
                 accountName  : item.AccountName,
                 isActive: item.IsActive,
                 dateCreated: item.DateCreated

@@ -6,14 +6,16 @@ import { jwtConstants } from './constants';
 import { JwtStrategy } from './strategies/jwt-strategy';
 import { LocalStrategy } from './strategies/local.strategy';
 import { AuthenticationController } from './auth.controller';
+import { AccountConfigModule } from 'src/modules/account-config/account-config.module';
 
 @Module({
   imports: [
     PassportModule,
     JwtModule.register({
       secret: jwtConstants.secret,
-      signOptions: { expiresIn: '100s'}
-    })
+      signOptions: { expiresIn: '1d'}
+    }),
+    AccountConfigModule
   ],
   providers: [AuthService, LocalStrategy, JwtStrategy],
   exports: [AuthService],

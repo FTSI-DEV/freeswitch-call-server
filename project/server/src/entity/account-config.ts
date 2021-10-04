@@ -13,7 +13,7 @@ export class AccountConfigEntity{
     AccountName: string;
 
     @Column({ type: "varchar" , length: "500"})
-    AuthToken : string;
+    AuthKey : string;
 
     @Column({ default: false, type: "boolean" })
     IsActive:boolean;

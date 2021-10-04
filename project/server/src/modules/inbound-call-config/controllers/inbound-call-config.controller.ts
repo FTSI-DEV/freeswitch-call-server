@@ -6,7 +6,7 @@ import { IInboundCallConfigService, INBOUND_CALL_CONFIG_SERVICE } from '../servi
 import { InboundCallConfigService } from '../services/inbound-call-config.service';
 
 
-@Controller('/api/inbound-call-config')
+@Controller('inbound-call-config')
 export class InboundCallConfigController {
 
   constructor(

@@ -1,7 +1,10 @@
-import { Controller, Post, UseGuards, Request, Get, UnauthorizedException } from "@nestjs/common";
+import { Controller, Post, UseGuards, Request, Get, UnauthorizedException, HttpCode, HttpStatus, UseInterceptors } from "@nestjs/common";
+import { AuthAccount } from "src/modules/account-config/account-config.decorator";
+import { AccountConfigDTO, AccountCredentialModel } from "src/modules/account-config/models/accountConfigDto.model";
 import { AuthService } from "./auth.service";
 import { JwtAuthGuard } from "./guards/jwt-auth.guard";
 import { LocalAuthGuard } from "./guards/local-auth.guard";
+import { TokenInterceptor } from "./interceptors/token.interceptor";
 
 @Controller('auth')
 export class AuthenticationController{
@@ -9,47 +12,17 @@ export class AuthenticationController{
         private authService: AuthService
     ) {}
 
-    @UseGuards(LocalAuthGuard)
     @Post('login')
-    async login(@Request() req){
-        let result = this.authService.login(req.user);
-        return result;
-    }
-
-    @UseGuards(JwtAuthGuard)
-    @Get('profile')
-    getProfile(@Request() req){
-        return req.user
-    };
-
     @UseGuards(LocalAuthGuard)
-    @Get('validateApi')
-    validateApiByReqBody(@Request() req){
-        // console.log('paramkey: ', req);
-
-        let requestBody = req.body;
-
-        let result = this.authService.validateApiCredential(requestBody.apiKey, requestBody.apiPassword);
-        
-        console.log('result validate', result);
-        if (result === false){
-            return new UnauthorizedException;
-        }
-
-        return result;
+    @HttpCode(HttpStatus.OK)
+    @UseInterceptors(TokenInterceptor)
+    async login(@AuthAccount() account: AccountCredentialModel): Promise<AccountCredentialModel>{
+        return account;
     }
 
-     @UseGuards(LocalAuthGuard)
-     @Get('validateApi')
-     validateApi(apiKey: string, apiPassword:string){
-         console.log('paramkey: ', apiKey);
-         let result = this.authService.validateApiCredential(apiKey, apiPassword);
-         
-         console.log('result validate', result);
-         if (result === false){
-             return new UnauthorizedException;
-         }
- 
-         return result;
-     }
+    @Post('/account')
+    @UseGuards(JwtAuthGuard)
+    account(@AuthAccount() account: AccountCredentialModel):AccountCredentialModel{
+        return account;
+    }
 }

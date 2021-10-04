@@ -4,7 +4,7 @@ import { AccountConfigModel } from '../models/accountConfig.model';
 import { AccountConfigDTO } from '../models/accountConfigDto.model';
 import { ACCOUNT_CONFIG_SERVICE, IAccountConfigService } from '../services/account-config.interface';
 
-@Controller('api/account-config')
+@Controller('account-config')
 export class AccountConfigController {
 
     constructor(
@@ -24,7 +24,7 @@ export class AccountConfigController {
             let accountConfigDTO : AccountConfigDTO = {
                 id: config.Id,
                 accountName: config.AccountName,
-                authToken: config.AuthToken,
+                authKey: config.AuthKey,
                 isActive: config.IsActive,
                 dateCreated: config.DateCreated,
                 accountSID: config.AccountSID
