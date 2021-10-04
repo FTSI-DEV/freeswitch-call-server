@@ -180,3 +180,56 @@ export const callRecording = {
         }
     }
 }
+export const accountConfig = {
+  Data: {
+      items: [
+        {
+          id: Math.floor(Math.random() * 100),
+          accountName: "Houston Ford",
+          authToken: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJtZXNzYWdlIjoiSldUIFJ1bGVzISIsImlhdCI6MTQ1OTQ0ODExOSwiZXhwIjoxNDU5NDU0NTE5fQ.-yIVBD5b73C75osbmwwshQNRC7frWUYrqaTjTpza2y4",
+          isActive: true,
+          dateCreated: "2021-09-19",
+          accountSID: "Re2fsdfaedas4523asdsdgf"
+        },
+        {
+          id: Math.floor(Math.random() * 100),
+          accountName: "Houston Ford",
+          authToken: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJtZXNzYWdlIjoiSldUIFJ1bGVzISIsImlhdCI6MTQ1OTQ0ODExOSwiZXhwIjoxNDU5NDU0NTE5fQ.-yIVBD5b73C75osbmwwshQNRC7frWUYrqaTjTpza2y4",
+          isActive: true,
+          dateCreated: "2021-09-19",
+          accountSID: "Re2fsdfaedas4523asdsdgf"
+        },
+        {
+          id: Math.floor(Math.random() * 100),
+          accountName: "Houston Ford",
+          authToken: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJtZXNzYWdlIjoiSldUIFJ1bGVzISIsImlhdCI6MTQ1OTQ0ODExOSwiZXhwIjoxNDU5NDU0NTE5fQ.-yIVBD5b73C75osbmwwshQNRC7frWUYrqaTjTpza2y4",
+          isActive: true,
+          dateCreated: "2021-09-19",
+          accountSID: "Re2fsdfaedas4523asdsdgf"
+        },
+        {
+          id: Math.floor(Math.random() * 100),
+          accountName: "Houston Ford",
+          authToken: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJtZXNzYWdlIjoiSldUIFJ1bGVzISIsImlhdCI6MTQ1OTQ0ODExOSwiZXhwIjoxNDU5NDU0NTE5fQ.-yIVBD5b73C75osbmwwshQNRC7frWUYrqaTjTpza2y4",
+          isActive: true,
+          dateCreated: "2021-09-19",
+          accountSID: "Re2fsdfaedas4523asdsdgf"
+        },  
+        {
+          id: Math.floor(Math.random() * 100),
+          accountName: "Houston Ford",
+          authToken: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJtZXNzYWdlIjoiSldUIFJ1bGVzISIsImlhdCI6MTQ1OTQ0ODExOSwiZXhwIjoxNDU5NDU0NTE5fQ.-yIVBD5b73C75osbmwwshQNRC7frWUYrqaTjTpza2y4",
+          isActive: true,
+          dateCreated: "2021-09-19",
+          accountSID: "Re2fsdfaedas4523asdsdgf"
+        }
+      ],
+      meta: {
+        totalItems: 0,
+        itemCount: 0,
+        itemsPerPage: 1,
+        totalPages: 0,
+        currentPage: 1
+    }
+  }
+}

@@ -12,13 +12,16 @@
       }"
     >
       <a-tabs tabPosition="left">
-        <a-tab-pane key="1" tab="Phone Number">
+        <!-- <a-tab-pane key="1" tab="Account Config">
+          <AccountConfig />
+        </a-tab-pane> -->
+        <a-tab-pane key="2" tab="Phone Number">
           <PhoneNumberConfig />
         </a-tab-pane>
-        <a-tab-pane key="2" tab="Inbound">
+        <a-tab-pane key="3" tab="Inbound">
           <InboundCallConfig />
         </a-tab-pane>
-        <a-tab-pane key="3" tab="IVR">
+        <a-tab-pane key="4" tab="IVR">
           <IVRConfig />
         </a-tab-pane>
       </a-tabs>
@@ -33,8 +36,7 @@ export default {
   components: {
     PhoneNumberConfig,
     InboundCallConfig,
-    IVRConfig
-    // PhoneOutlined
+    IVRConfig,
   },
   computed: {
     gridSize() {

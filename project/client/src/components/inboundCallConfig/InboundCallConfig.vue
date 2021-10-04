@@ -1,17 +1,6 @@
 <template>
   <a-layout>
-    <!-- <a-layout style="padding: 24px 24px 24px">
-      <a-layout-content
-        :style="{
-          background: '#fff',
-          padding: '24px',
-          margin: 0,
-          minHeight: '280px',
-        }"
-      > -->
-     
             <div style="background: white; padding: 20px;  padding-top: 0">
-              <!-- <div class="call-config">Inbound Call Config</div> -->
               <a-alert
                 v-if="isSaved && !hasError"
                 message="Successfully saved"
@@ -136,8 +125,6 @@
             <input :class="['ant-input']" v-model="selectedConfig.webhookUrl" />
           </a-form-item>
         </a-modal>
-      <!-- </a-layout-content>
-    </a-layout> -->
   </a-layout>
 </template>
 <script lang="ts">

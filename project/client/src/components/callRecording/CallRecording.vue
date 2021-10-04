@@ -29,6 +29,12 @@
                     class="view_icon"
                     title="View Details"
                   />
+                  <DeleteFilled
+                    @click="deleteRecording(item)"
+                    class="view_icon"
+                    style="color: #f86c6b"
+                    title="Delete Recording"
+                  />
                 </div>
               </div>
             </template>
@@ -50,10 +56,10 @@ import { useStore } from "vuex";
 import { computed } from "vue";
 import { useRouter } from "vue-router";
 import { CallRecordingItem } from "../../types/callRecording";
-import { MenuFoldOutlined, PhoneFilled } from "@ant-design/icons-vue";
+import { MenuFoldOutlined, PhoneFilled, DeleteFilled } from "@ant-design/icons-vue";
 
 export default defineComponent({
-  components: { MenuFoldOutlined, PhoneFilled },
+  components: { MenuFoldOutlined, PhoneFilled, DeleteFilled },
   setup() {
     const store = useStore();
     const router = useRouter();
@@ -67,10 +73,17 @@ export default defineComponent({
     const viewDetails = (): void => {
       router.push({ path: "/call-recording/details" });
     };
+    const deleteRecording = (item: CallRecordingItem): void => {
+      if (confirm("Do you want to delete this recording?")) {
+        console.log(item);
+        //store.dispatch("deleteCallRecording", { recordingId: item.RecordingId });
+      }
+    };
     return {
       recordingsData,
       getRecordings,
       viewDetails,
+      deleteRecording,
     };
   },
 });

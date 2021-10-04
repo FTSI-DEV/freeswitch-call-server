@@ -5,6 +5,7 @@ import ClickToCall from './clickToCall/clickToCall';
 import CallRecording from './callRecording/callRecording';
 import CallDetailRecords from './callDetailRecords/callDetailRecords';
 import IVRConfig from './ivr/ivrConfig';
+import AccountConfig from './accountConfig/accountConfig';
 export default createStore({
     modules: {
         InboundCallConfig, 
@@ -12,6 +13,7 @@ export default createStore({
         ClickToCall,
         CallRecording,
         CallDetailRecords,
-        IVRConfig
+        IVRConfig,
+        AccountConfig
     }
 });

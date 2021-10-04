@@ -23,7 +23,7 @@
         </a-list-item>
       </template>
     </a-list> -->
-    <a-table :columns="CDRColumns" :data-source="cdrData">
+    <a-table :dataSource="cdrData" :columns="CDRColumns">
       <template #name="{ text }">
         <a>{{ text }}</a>
       </template>

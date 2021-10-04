@@ -19,17 +19,21 @@
             <home-filled />
             <span>Home</span>
           </a-menu-item>
-          <a-menu-item key="2" @click="navigateRoute('/call-logs')">
+          <a-menu-item key="2" @click="navigateRoute('/account-config')">
+            <user-outlined />
+            <span>Account</span>
+          </a-menu-item>
+          <a-menu-item key="3" @click="navigateRoute('/call-logs')">
             <read-filled />
             <span>Call Logs</span>
           </a-menu-item>
-          <a-menu-item key="3" @click="navigateRoute('/call-recording')">
+          <a-menu-item key="4" @click="navigateRoute('/call-recording')">
             <play-circle-filled />
             <span>Call Recording</span>
           </a-menu-item>
-          <a-menu-item key="4" @click="navigateRoute('/call-config')">
+          <a-menu-item key="5" @click="navigateRoute('/call-config')">
             <setting-filled />
-            <span>Config</span>
+            <span>Call Config</span>
           </a-menu-item>
         </a-menu>
       </a-layout-sider>
@@ -53,7 +57,8 @@ import {
   PlayCircleFilled,
   HomeFilled,
   ClusterOutlined,
-  ReadFilled
+  ReadFilled,
+  UserOutlined,
 } from "@ant-design/icons-vue";
 import { defineComponent, ref } from "vue";
 import { useRouter } from "vue-router";
@@ -63,8 +68,8 @@ export default defineComponent({
     PlayCircleFilled,
     HomeFilled,
     ClusterOutlined,
-    ReadFilled
-    // NotificationOutlined,
+    ReadFilled,
+    UserOutlined,
   },
   setup() {
     const router = useRouter();
