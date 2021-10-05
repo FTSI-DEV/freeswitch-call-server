@@ -1,4 +1,4 @@
-import { Column, CreateDateColumn, Entity, EntityRepository, PrimaryGeneratedColumn, Repository } from "typeorm";
+import { Column, CreateDateColumn, Entity, EntityRepository, PrimaryGeneratedColumn, Repository, UpdateDateColumn } from "typeorm";
 
 @Entity('AccountConfig')
 export class AccountConfigEntity{
@@ -20,6 +20,9 @@ export class AccountConfigEntity{
 
     @CreateDateColumn()
     DateCreated: Date;
+
+    @UpdateDateColumn()
+    DateUpdated: Date;
 }
 
 @EntityRepository(AccountConfigEntity)
