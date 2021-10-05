@@ -10,7 +10,7 @@ import { AccountConfigModule } from 'src/modules/account-config/account-config.m
 
 @Module({
   imports: [
-    PassportModule,
+    PassportModule.register({ defaultStrategy: 'jwt' }),
     JwtModule.register({
       secret: jwtConstants.secret,
       signOptions: { expiresIn: '1d'}

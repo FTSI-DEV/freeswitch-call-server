@@ -1,10 +1,12 @@
-import { Body, Controller, DefaultValuePipe, Get, Inject, Param, ParseIntPipe, Post, Query } from '@nestjs/common';
+import { Body, Controller, DefaultValuePipe, Get, Inject, Param, ParseIntPipe, Post, Query, UseGuards } from '@nestjs/common';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { JsonDataListReturnModel } from 'src/utils/jsonDataListReturnModel';
 import { AccountConfigModel } from '../models/accountConfig.model';
 import { AccountConfigDTO } from '../models/accountConfigDto.model';
 import { ACCOUNT_CONFIG_SERVICE, IAccountConfigService } from '../services/account-config.interface';
 
 @Controller('account-config')
+@UseGuards(JwtAuthGuard)
 export class AccountConfigController {
 
     constructor(
@@ -52,17 +54,12 @@ export class AccountConfigController {
         return JsonDataListReturnModel.Ok(null, configs);
       }
 
-    @Post('add')
+    @Post('add/:accountName')
     async add(
-        @Body() params: AccountConfigModel
+        @Param("accountName") accountName: string
     ): Promise<JsonDataListReturnModel>{
 
-        let config = await this._accountConfigService.add({
-            accountName: params.accountName,
-            accountSID: params.accountSID,
-            authToken: params.accountSID,
-            isActive: params.isActive
-        });
+        let config = await this._accountConfigService.add(accountName);
 
         return JsonDataListReturnModel.Ok("Successfully added config", config);
     }
@@ -73,7 +70,6 @@ export class AccountConfigController {
     ): Promise<JsonDataListReturnModel>
     {
         let success = await this._accountConfigService.update({
-            isActive: params.isActive,
             accountName: params.accountName
         });
 
@@ -81,5 +77,18 @@ export class AccountConfigController {
             return JsonDataListReturnModel.Ok("Successfully updated config");
         else
             return JsonDataListReturnModel.Error("Unable to update config");
+    }
+
+    @Post('delete')
+    async delete(
+        @Body() params:AccountConfigModel
+    ): Promise<JsonDataListReturnModel>{
+     
+        let success = await this._accountConfigService.delete(params);
+
+        if (success)
+            return JsonDataListReturnModel.Ok("Successfully deleted config");
+        else
+            return JsonDataListReturnModel.Error("Unable to delete config");
     }
 }

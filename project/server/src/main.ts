@@ -18,6 +18,7 @@ async function bootstrap() {
     .setTitle('Freeswitch Call')
     .setVersion('1.0')
     .setBasePath('api')
+    .addBearerAuth()
     .build();
 
   const document = SwaggerModule.createDocument(app, options);

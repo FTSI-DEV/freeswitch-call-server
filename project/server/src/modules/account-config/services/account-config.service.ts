@@ -15,7 +15,7 @@ export class AccountConfigService implements IAccountConfigService{
         private _accountConfigRepo: AccountConfigEntityRepository
     ){}
 
-    async add(param:AccountConfigModel):Promise<number>{
+    async add(accountName:string):Promise<number>{
 
         let accountConfig = new AccountConfigEntity();
 
@@ -23,7 +23,7 @@ export class AccountConfigService implements IAccountConfigService{
 
         accountConfig.AccountSID = uuidv4();
 
-        accountConfig.AccountName = param.accountName;
+        accountConfig.AccountName = accountName;
 
         accountConfig.DateCreated = new Date();
 
@@ -40,11 +40,27 @@ export class AccountConfigService implements IAccountConfigService{
 
         config.AuthKey = param.accountName;
 
-        config.IsActive = param.isActive;
+        config.DateUpdated = new Date();
 
         config = await this._accountConfigRepo.saveConfig(config);
 
         return config.Id;
+    }
+
+    async delete(param:AccountConfigModel):Promise<boolean>{
+
+        let config = await this.getById(param.id);
+
+        if (config){
+
+            config.IsActive = param.isActive;
+
+            config.DateUpdated = new Date();
+
+            return true;
+        }
+
+        return false;
     }
 
     async getById(id:number):Promise<AccountConfigEntity>{
