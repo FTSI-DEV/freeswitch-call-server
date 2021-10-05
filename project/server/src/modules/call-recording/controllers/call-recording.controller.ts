@@ -7,7 +7,7 @@ import { CALL_RECORDING_SERVICE, ICallRecordingService } from '../services/call-
 import { CallRecordingService } from '../services/call-recording.service';
 import path from 'path';
 
-@Controller('/api/call-recording')
+@Controller('call-recording')
 export class CallRecordingController {
 
     constructor(

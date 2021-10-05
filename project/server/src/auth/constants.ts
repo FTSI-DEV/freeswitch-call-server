@@ -4,5 +4,5 @@
 // using appropriate measures such as a secrets vault,
 // environment variable, or configuration service.
 export const jwtConstants = {
-    secret: 'secretKey'
+    secret: 'm@(h@ikfr33$witch'
 };

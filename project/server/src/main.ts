@@ -11,13 +11,18 @@ async function bootstrap() {
   // Allow crossorigin
   app.enableCors();
 
+  app.setGlobalPrefix('api');
+  
   // Swagger
-  const config = new DocumentBuilder()
-    .setTitle('Freeswitch Call Server')
+  const options = new DocumentBuilder()
+    .setTitle('Freeswitch Call')
     .setVersion('1.0')
+    .setBasePath('api')
     .build();
-  const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api', app, document);
+
+  const document = SwaggerModule.createDocument(app, options);
+  
+  SwaggerModule.setup('/docs', app, document);
 
   // BullQueue Arena initialization
   Arena(ArenaConfig);

@@ -9,7 +9,7 @@ import { OutboundCallResultModel } from '../models/outbound-call-result.model';
 import { OutboundCallParam } from '../models/outbound-call.model';
 import { IOutboundCallService, OUTBOUND_CALL_SERVICE } from '../services/outbound-call.interface';
 
-@Controller('/api/outbound-call')
+@Controller('outbound-call')
 export class OutboundCallController {
     constructor(
         @Inject(OUTBOUND_CALL_SERVICE)
