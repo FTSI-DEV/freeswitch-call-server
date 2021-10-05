@@ -16,7 +16,7 @@ export class AppController {
   @Post('auth/login')
   async login(@Request() req) {
     console.log('UAHT- > ', req.user);
-    let res = this.authService.login(req.user);
+    let res = this.authService.signToken(req.user);
     return res;
     // let result = this.authService.login(req.user);
     // return result;
@@ -33,9 +33,5 @@ export class AppController {
   getHello(): string {
     return this.appService.getHello();
     return 'Hello World';
-  }
-  @Get('validateApi')
-  async validateApi(apiKey: string, apiPassword: string){
-    return this.authService.validateApiCredential(apiKey, apiPassword);
   }
 }

@@ -4,7 +4,6 @@ import { AccountConfigEntity, AccountConfigEntityRepository } from 'src/entity/a
 import { AccountConfigController } from './controllers/account-config.controller';
 import { ACCOUNT_CONFIG_SERVICE } from './services/account-config.interface';
 import { AccountConfigService } from './services/account-config.service';
-import { AccountConfigController } from "./controllers/account-config.controller";
 
 @Module({
     controllers: [AccountConfigController],
@@ -16,6 +15,5 @@ import { AccountConfigController } from "./controllers/account-config.controller
     ],
     imports: [TypeOrmModule.forFeature([AccountConfigEntity, AccountConfigEntityRepository])],
     exports: [ACCOUNT_CONFIG_SERVICE],
-    controllers: [AccountConfigController]
 })
 export class AccountConfigModule {}
