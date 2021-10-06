@@ -21,7 +21,7 @@ export class AuthenticationController{
 
     @Post('register')
     @HttpCode(HttpStatus.CREATED)
-    @UseInterceptors(AccountTokenInterceptor)
+    @UseInterceptors(UserTokenInterceptor)
     register(@Body() signUp: SignUp): Promise<UserEntity>{
         return this.authService.register(signUp);
     }
