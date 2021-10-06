@@ -12,15 +12,15 @@ export class AppController {
     private readonly appService: AppService,
     private authService: AuthService) {}
 
-  @UseGuards(LocalAuthGuard)
-  @Post('auth/login')
-  async login(@Request() req) {
-    console.log('UAHT- > ', req.user);
-    let res = this.authService.signAccountCredsToken(req.user);
-    return res;
-    // let result = this.authService.login(req.user);
-    // return result;
-  }
+  // @UseGuards(LocalAuthGuard)
+  // @Post('auth/login')
+  // async login(@Request() req) {
+  //   console.log('UAHT- > ', req.user);
+  //   let res = this.authService.signAccountCredsToken(req.user);
+  //   return res;
+  //   // let result = this.authService.login(req.user);
+  //   // return result;
+  // }
 
   @UseGuards(JwtAuthGuard)
   @Get('profile')

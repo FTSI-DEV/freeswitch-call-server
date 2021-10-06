@@ -1,23 +1,27 @@
-import { IsDefined, IsNotEmpty, MinLength, Validate } from "class-validator";
-import { IsUserAlreadyExist } from "src/modules/users/user.validator";
+import {
+  IsDefined,
+  IsNotEmpty,
+  IsEmail,
+  MinLength,
+  Validate,
+} from 'class-validator';
+import { IsUserAlreadyExist } from 'src/modules/users/user.validator';
 
-export class SignUp{
+export class SignUp {
+  @IsDefined()
+  @IsNotEmpty()
+  readonly FirstName: string;
 
-    @IsDefined()
-    @IsNotEmpty()
-    readonly FirstName:string;
+  @IsDefined()
+  @IsNotEmpty()
+  readonly LastName: string;
 
-    @IsDefined()
-    @IsNotEmpty()
-    readonly LastName:string;
+  @IsDefined()
+  @Validate(IsUserAlreadyExist)
+  readonly Username: string;
 
-    @IsDefined()
-    @IsNotEmpty()
-    @Validate(IsUserAlreadyExist)
-    readonly Username:string;
-
-    @IsDefined()
-    @IsNotEmpty()
-    @MinLength(7)
-    readonly Password: string;
+  @IsDefined()
+  @IsNotEmpty()
+  @MinLength(8)
+  readonly Password: string;
 }

@@ -8,8 +8,7 @@ import type { Response } from 'express';
 export class AccountTokenInterceptor implements NestInterceptor{
     constructor(
         private readonly authService: AuthService
-    ) {
-    }
+    ) { }
 
     intercept(
         context: ExecutionContext, 
