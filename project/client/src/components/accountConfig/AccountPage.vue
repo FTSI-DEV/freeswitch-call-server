@@ -2,8 +2,9 @@
   <div>
     <a-row>
       <a-col :span="18" style="background: #001529; height: 100vh">
-        <div class="icon-container">
-          <cluster-outlined style="margin-right: 20px" />Freeswitch
+        <div>
+          <LoginCoverImage />
+          <!-- <cluster-outlined style="margin-right: 20px" />Freeswitch -->
         </div>
       </a-col>
       <a-col :span="6">
@@ -16,9 +17,10 @@
 </template>
 
 <script>
-import { ClusterOutlined } from "@ant-design/icons-vue";
+// import { ClusterOutlined } from "@ant-design/icons-vue";
+import LoginCoverImage from "./LoginCoverImage.vue";
 export default {
-  components: { ClusterOutlined },
+  components: { LoginCoverImage },
 };
 </script>
 
