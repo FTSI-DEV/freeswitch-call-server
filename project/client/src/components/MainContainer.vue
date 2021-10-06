@@ -1,8 +1,30 @@
 <template>
   <a-layout>
-    <a-layout-header class="header" style="padding-left: 30px; font-size: 2em">
-      <div class="logo" style="color: #ffb344; text-align: left">
+    <a-layout-header
+      class="header"
+      style="padding-left: 30px; font-size: 2em; display: flex"
+    >
+      <div class="logo" style="color: #ffb344; text-align: left; flex: 1">
         <cluster-outlined style="margin-right: 15px" />Freeswitch
+      </div>
+      <div class="user-icon" style="flex: 1; font-size: 0.6em; text-align: right">
+        <UserOutlined style="color: #fff; margin-right: 5px" />
+
+        <a-dropdown>
+          <a
+            class="ant-dropdown-link"
+            @click.prevent
+            style="color: #fff; font-weight: 600"
+          >
+            json
+            <DownOutlined />
+          </a>
+          <template #overlay>
+            <a-menu>
+              <a-menu-item @click="signOut"> Sign out </a-menu-item>
+            </a-menu>
+          </template>
+        </a-dropdown>
       </div>
     </a-layout-header>
     <a-layout>
@@ -59,6 +81,7 @@ import {
   ClusterOutlined,
   ReadFilled,
   UserOutlined,
+  DownOutlined,
 } from "@ant-design/icons-vue";
 import { defineComponent, ref } from "vue";
 import { useRouter } from "vue-router";
@@ -70,6 +93,7 @@ export default defineComponent({
     ClusterOutlined,
     ReadFilled,
     UserOutlined,
+    DownOutlined,
   },
   setup() {
     const router = useRouter();
@@ -77,12 +101,16 @@ export default defineComponent({
       router.push({ path });
     };
     navigateRoute("/dashboard");
+    const signOut = (): void => {
+      navigateRoute("/account/login");
+    };
     return {
       navigateRoute,
       selectedKeys1: ref<string[]>(["2"]),
       selectedKeys2: ref<string[]>(["1"]),
       collapsed: ref<boolean>(false),
       openKeys: ref<string[]>(["sub1"]),
+      signOut,
     };
   },
 });
