@@ -6,6 +6,8 @@ import CallRecording from './callRecording/callRecording';
 import CallDetailRecords from './callDetailRecords/callDetailRecords';
 import IVRConfig from './ivr/ivrConfig';
 import AccountConfig from './accountConfig/accountConfig';
+import Auth from './auth/auth';
+
 export default createStore({
     modules: {
         InboundCallConfig, 
@@ -14,6 +16,7 @@ export default createStore({
         CallRecording,
         CallDetailRecords,
         IVRConfig,
-        AccountConfig
+        AccountConfig,
+        Auth
     }
 });

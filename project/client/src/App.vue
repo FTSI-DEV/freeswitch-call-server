@@ -1,15 +1,20 @@
 <template>
-  <MainContainer />
+  <router-view></router-view>
 </template>
 
 <script lang="ts">
 import { defineComponent } from "vue";
-import MainContainer from "./components/MainContainer.vue";
+// import MainContainer from "./components/MainContainer.vue";
+import { useRouter } from "vue-router";
 
 export default defineComponent({
   name: "App",
   components: {
-    MainContainer,
+    // MainContainer,
+  },
+  setup() {
+    const router = useRouter();
+    router.push({ path: "/account/login" });
   },
 });
 </script>

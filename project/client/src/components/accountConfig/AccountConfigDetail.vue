@@ -8,11 +8,14 @@
       <div style="margin-top: 20px">
         <a-row>
           <a-col :span="12">
+            <a-form-item label="Account Name" style="display: block; text-align: left">
+              <input :class="['ant-input']" v-model="accountName" />
+            </a-form-item>
             <a-form-item label="Account SID" style="display: block; text-align: left">
-              <input :class="['ant-input']" v-model="accountSID" />
+              <!-- <input :class="['ant-input']" v-model="accountSID" /> -->
             </a-form-item>
             <a-form-item label="Auth Token" style="display: block; text-align: left">
-              <input :class="['ant-input']" v-model="authToken" />
+              <!-- <input :class="['ant-input']" v-model="authToken" /> -->
             </a-form-item>
             <div style="display: flex">
               <span>Active</span>
@@ -43,13 +46,14 @@ export default defineComponent({
       accountSID: "",
       authToken: "",
       isActive: true,
+      accountName: "",
     });
     const updateAccountConfig = () => {
-        console.log('updateAccountConfig')
-    }
+      console.log("updateAccountConfig");
+    };
     return {
       ...toRefs(state),
-      updateAccountConfig
+      updateAccountConfig,
     };
   },
 });

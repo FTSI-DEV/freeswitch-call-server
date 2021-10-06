@@ -8,36 +8,9 @@
         title="Add Account Config"
       />
     </div>
-    <!-- <a-row>
-      <a-col style="margin-right: 15px">
-        <a-form-item label="Account Name" style="display: block; text-align: left">
-          <input :class="['ant-input', isInvalid(acountName)]" v-model="acountName" />
-        </a-form-item>
-      </a-col>
-      <a-col style="margin-right: 15px">
-        <a-form-item label="Account SID" style="display: block; text-align: left">
-          <input :class="['ant-input', isInvalid(accountSID)]" v-model="accountSID" />
-        </a-form-item>
-      </a-col>
-      <a-col style="margin-right: 35px">
-        <a-form-item style="display: block; text-align: left">
-          <a-form-item label="Active" style="display: block; text-align: left">
-            <a-checkbox v-model:checked="isActive" />
-          </a-form-item>
-        </a-form-item>
-      </a-col>
-      <a-col>
-        <a-form-item style="text-align: left">
-          <a-button type="primary" @click="saveAccountConfig" style="margin-top: 32px">
-            Save
-          </a-button>
-        </a-form-item>
-      </a-col>
-    </a-row> -->
     <a-table :columns="columns" :dataSource="accountConfigs">
       <template #accountName="{ record }">
         {{ record.accountName }}
-
         <router-link to="/account-config/details" style="position: absolute; right: 15px">
           <MenuFoldOutlined
             class="view_icon"

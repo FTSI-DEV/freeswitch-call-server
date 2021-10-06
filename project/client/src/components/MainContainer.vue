@@ -15,7 +15,7 @@
           v-model:openKeys="openKeys"
           :style="{ height: '93.5vh !important', borderRight: 0 }"
         >
-          <a-menu-item key="1" @click="navigateRoute('/')">
+          <a-menu-item key="1" @click="navigateRoute('/dashboard')">
             <home-filled />
             <span>Home</span>
           </a-menu-item>
@@ -76,7 +76,7 @@ export default defineComponent({
     const navigateRoute = (path: string) => {
       router.push({ path });
     };
-    navigateRoute("/");
+    navigateRoute("/dashboard");
     return {
       navigateRoute,
       selectedKeys1: ref<string[]>(["2"]),

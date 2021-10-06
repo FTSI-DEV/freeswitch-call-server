@@ -11,7 +11,7 @@
             <a-form-item label="Account Name" style="display: block; text-align: left">
               <input :class="['ant-input']" v-model="accountName" />
             </a-form-item>
-            <a-form-item label="Account SID" style="display: block; text-align: left">
+            <!-- <a-form-item label="Account SID" style="display: block; text-align: left">
               <input :class="['ant-input']" v-model="accountSID" />
             </a-form-item>
             <a-form-item label="Auth Token" style="display: block; text-align: left">
@@ -23,7 +23,7 @@
                 v-model:checked="isActive"
                 style="margin-left: 10px !important"
               />
-            </div>
+            </div> -->
             <div style="display: flex; margin-top: 50px">
               <a-button type="primary" @click="saveAccountConfig">Save</a-button>
             </div>
@@ -50,12 +50,12 @@ export default defineComponent({
     });
 
     const saveAccountConfig = () => {
-        console.log('saveAccountConfig')
-    }
+      console.log("saveAccountConfig");
+    };
 
     return {
       ...toRefs(state),
-      saveAccountConfig
+      saveAccountConfig,
     };
   },
 });
