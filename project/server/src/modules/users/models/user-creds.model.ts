@@ -1,4 +1,4 @@
 export class UserCredentialModel{
-    username:string;
-    password:string;
+    Username:string;
+    Password:string;
 }
