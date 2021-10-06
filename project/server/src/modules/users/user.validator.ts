@@ -1,30 +1,28 @@
-import { Injectable } from "@nestjs/common";
-import { InjectRepository } from "@nestjs/typeorm";
-import { ValidatorConstraint, ValidatorConstraintInterface } from "class-validator";
-import { UserEntity, UserEntityRepository } from "src/entity/user.entity";
+import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import {
+  ValidatorConstraint,
+  ValidatorConstraintInterface,
+} from 'class-validator';
+import { UserEntity } from 'src/entity/user.entity';
+import { Repository } from 'typeorm';
+import { isNullOrUndefined } from 'util';
 
-@ValidatorConstraint({ name : 'isUserAlreadyExist' , async: true })
+@ValidatorConstraint({ name: 'isUserAlreadyExist', async: true })
 @Injectable()
-export class IsUserAlreadyExist implements ValidatorConstraintInterface{
+export class IsUserAlreadyExist implements ValidatorConstraintInterface {
+  constructor(
+    @InjectRepository(UserEntity)
+    private readonly userRepository: Repository<UserEntity>,
+  ) {}
 
-    constructor(
-        @InjectRepository(UserEntity)
-        private readonly userRepo: UserEntityRepository
-    ) {}
+  async validate(Username: string): Promise<boolean> {
+    const user = await this.userRepository.findOne({ Username });
 
-    async validate(Username:string):Promise<boolean>{
+    return isNullOrUndefined(user);
+  }
 
-        let user = await this.userRepo.findOne({ Username });
-
-        if (user === null || user === undefined){
-            return false;
-        }
-
-        return true;
-    }
-
-    defaultMessage():string{
-        return 'The username «$value» is already register.';
-    }
-
+  defaultMessage(): string {
+    return 'The username «$value» is already register.';
+  }
 }

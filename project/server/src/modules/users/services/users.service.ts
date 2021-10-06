@@ -16,6 +16,8 @@ export class UsersService implements IUserService{
 
     async create(data: Partial<UserEntity>):Promise<UserEntity>{
 
+       data.CreatedDate = new Date()
+
        return this.userRepo.saveRecord(new UserEntity(data));
     }
 

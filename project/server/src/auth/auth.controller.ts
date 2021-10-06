@@ -11,7 +11,7 @@ import { LocalAuthGuard } from "./guards/local-auth.guard";
 import { AccountTokenInterceptor } from "./interceptors/account-token.interceptor";
 import { UserTokenInterceptor } from "./interceptors/user-token.interceptor";
 import { LocalAccountStrategy } from "./strategies/local-account.strategy";
-import { LocalUserStrategy } from "./strategies/local-user.strategy";
+import { LocalStrategy } from "./strategies/local-user.strategy";
 
 @Controller('auth')
 export class AuthenticationController{
@@ -41,7 +41,7 @@ export class AuthenticationController{
     }
 
     @Post('loginUser')
-    @UseGuards(LocalUserStrategy)
+    @UseGuards(LocalStrategy)
     @UseInterceptors(UserTokenInterceptor)
     async loginUser(@AuthUser() user: UserCredentialModel):Promise<UserCredentialModel>{
         return user;

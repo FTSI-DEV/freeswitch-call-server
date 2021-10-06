@@ -27,15 +27,20 @@ export class LocalAccountStrategy extends PassportStrategy(Strategy, "local") {
 
   async validate(accountSID:string, authKey:string):Promise<any>{
 
-    let account = this.authService.signAccountCredsToken({
-      accountSID: accountSID,
-      authKey: authKey
-    });
-
-    if (!account){
-      throw new UnauthorizedException();
+    try {
+      let account = this.authService.signAccountCredsToken({
+        accountSID: accountSID,
+        authKey: authKey
+      });
+  
+      if (!account){
+        throw new UnauthorizedException();
+      }
+  
+      return account;
+    } catch (error) {
+      console.log('LocalAccountStrategy -> ', error);
     }
-
-    return account;
+    
   }
 }

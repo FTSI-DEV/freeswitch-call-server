@@ -55,23 +55,22 @@ export class AuthService {
       };
     }
 
-    signUserToken(user: UserCredentialModel){
-      let payload = {
-        username: user.username,
-        sub: user.password
-      };
+    signUserToken(user: UserEntity){
 
+      let payload = {
+        username: user.Username
+      };
+      
       return{
         access_token: this.jwtService.sign(payload)
       };
-      // return this.jwtService.sign(payload);
     }
 
     async register(signUp:SignUp):Promise<UserEntity>{
 
       let user = await this.userService.create(signUp);
 
-      delete user.Pasword;
+      delete user.Password;
 
       return user;
     }
@@ -95,7 +94,7 @@ export class AuthService {
         );
       }
 
-      delete user.Pasword;
+      delete user.Password;
 
       return user;
 
@@ -114,7 +113,7 @@ export class AuthService {
         );
       }
 
-      delete user.Pasword;
+      delete user.Password;
 
       return user;
     }

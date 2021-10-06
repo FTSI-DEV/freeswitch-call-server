@@ -1,40 +1,43 @@
-import { CallHandler, ExecutionContext, Injectable, NestInterceptor } from "@nestjs/common";
-import { map, Observable } from "rxjs";
-import { AccountCredentialModel } from "src/modules/account-config/models/accountConfigDto.model";
-import { AuthService } from "../auth.service";
-import type { Response } from 'express';
-import { UserCredentialModel } from "src/modules/users/models/user-creds.model";
-
-@Injectable()
-export class UserTokenInterceptor implements NestInterceptor{
+import {
+    CallHandler,
+    ExecutionContext,
+    Injectable,
+    NestInterceptor,
+  } from '@nestjs/common';
+  import type { Response } from 'express';
+  import { Observable } from 'rxjs';
+  import { map } from 'rxjs/operators';
+import { UserEntity } from 'src/entity/user.entity';
+  import { AuthService } from '../auth.service';
+  
+  @Injectable()
+  export class UserTokenInterceptor implements NestInterceptor {
     constructor(
-        private readonly authService: AuthService
-    ) {
-    }
-
+      private readonly authService: AuthService,
+    ) {}
+  
     intercept(
-        context: ExecutionContext, 
-        next: CallHandler<UserCredentialModel>): Observable<UserCredentialModel> | Promise<Observable<UserCredentialModel>> {
+      context: ExecutionContext,
+      next: CallHandler<UserEntity>,
+    ): Observable<UserEntity> {
+      return next.handle().pipe(
+        map((user) => {
+          const response = context.switchToHttp().getResponse<Response>();
 
-        return next.handle().pipe(
-            map((user) => {
-                
-                const response = context.switchToHttp().getResponse<Response>();
-
-                let token = this.authService.signUserToken(user);
-
-                response.setHeader('Authorization', `Bearer ${token}`);
-
-                response.cookie('token', token, {
-                    httpOnly: true,
-                    signed: true,
-                    sameSite: 'strict',
-                    secure: process.env.NODE_ENV === 'production'
-                });
-
-                return user;
-            }),
-        );
-        
+          const token = this.authService.signUserToken(user);
+  
+          response.setHeader('Authorization', `Bearer ${token}`);
+          
+          response.cookie('token', token, {
+            httpOnly: true,
+            signed: true,
+            sameSite: 'strict',
+            secure: process.env.NODE_ENV === 'production',
+          });
+  
+          return user;
+        }),
+      );
     }
-}
+  }
+  

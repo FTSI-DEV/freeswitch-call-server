@@ -39,6 +39,7 @@
     "bull-arena": "^3.29.2",
     "class-transformer": "^0.4.0",
     "class-validator": "^0.13.1",
+    "cookie-parser": "^1.4.5",
     "dotenv": "^10.0.0",
     "modesl": "^1.2.1",
     "moment": "^2.29.1",

@@ -18,7 +18,7 @@ export class UserEntity{
 
     @Column()
     @Exclude()
-    Pasword: string;
+    Password: string;
 
     @CreateDateColumn()
     CreatedDate: Date;
@@ -34,13 +34,16 @@ export class UserEntity{
     @BeforeUpdate()
     async hashPassword(): Promise<void> {
         const salt = await bcrypt.genSalt();
-        if (!/^\$2a\$\d+\$/.test(this.Pasword)) {
-        this.Pasword = await bcrypt.hash(this.Pasword, salt);
+
+        if (!/^\$2a\$\d+\$/.test(this.Password)) {
+
+            this.Password = await bcrypt.hash(this.Password, salt);
+        
         }
     }
 
     async checkPassword(plainPassword: string): Promise<boolean> {
-        return await bcrypt.compare(plainPassword, this.Pasword);
+        return await bcrypt.compare(plainPassword, this.Password);
     }
 }
 

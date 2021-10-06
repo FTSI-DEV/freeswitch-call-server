@@ -7,20 +7,20 @@ import { JwtStrategy } from './strategies/jwt-strategy';
 import { LocalAccountStrategy } from './strategies/local-account.strategy';
 import { AuthenticationController } from './auth.controller';
 import { AccountConfigModule } from 'src/modules/account-config/account-config.module';
-import { LocalUserStrategy } from './strategies/local-user.strategy';
+import { LocalStrategy } from './strategies/local-user.strategy';
 import { UsersModule } from 'src/modules/users/users.module';
 
 @Module({
   imports: [
     PassportModule.register({ defaultStrategy: 'jwt' }),
     JwtModule.register({
-      secret: jwtConstants.secret,
+      secret: 'm@(h@ikfr33$witch',
       signOptions: { expiresIn: '1d'}
     }),
     AccountConfigModule,
     UsersModule
   ],
-  providers: [AuthService, LocalAccountStrategy, JwtStrategy, LocalUserStrategy],
+  providers: [AuthService, JwtStrategy, LocalStrategy],
   exports: [AuthService],
   controllers: [AuthenticationController]
 })
