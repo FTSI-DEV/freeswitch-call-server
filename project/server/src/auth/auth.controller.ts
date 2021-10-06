@@ -1,10 +1,17 @@
-import { Controller, Post, UseGuards, Request, Get, UnauthorizedException, HttpCode, HttpStatus, UseInterceptors } from "@nestjs/common";
+import { Controller, Post, UseGuards, Request, Get, UnauthorizedException, HttpCode, HttpStatus, UseInterceptors, Body } from "@nestjs/common";
+import { UserEntity } from "src/entity/user.entity";
 import { AuthAccount } from "src/modules/account-config/account-config.decorator";
 import { AccountConfigDTO, AccountCredentialModel } from "src/modules/account-config/models/accountConfigDto.model";
+import { UserCredentialModel } from "src/modules/users/models/user-creds.model";
+import { AuthUser } from "src/modules/users/user.decorator";
 import { AuthService } from "./auth.service";
+import { SignUp } from "./dto/sign-up.dto";
 import { JwtAuthGuard } from "./guards/jwt-auth.guard";
 import { LocalAuthGuard } from "./guards/local-auth.guard";
-import { TokenInterceptor } from "./interceptors/token.interceptor";
+import { AccountTokenInterceptor } from "./interceptors/account-token.interceptor";
+import { UserTokenInterceptor } from "./interceptors/user-token.interceptor";
+import { LocalAccountStrategy } from "./strategies/local-account.strategy";
+import { LocalUserStrategy } from "./strategies/local-user.strategy";
 
 @Controller('auth')
 export class AuthenticationController{
@@ -12,11 +19,18 @@ export class AuthenticationController{
         private authService: AuthService
     ) {}
 
-    @Post('login')
-    @UseGuards(LocalAuthGuard)
+    @Post('register')
+    @HttpCode(HttpStatus.CREATED)
+    @UseInterceptors(AccountTokenInterceptor)
+    register(@Body() signUp: SignUp): Promise<UserEntity>{
+        return this.authService.register(signUp);
+    }
+
+    @Post('loginAccount')
+    @UseGuards(LocalAccountStrategy)
     @HttpCode(HttpStatus.OK)
-    @UseInterceptors(TokenInterceptor)
-    async login(@AuthAccount() account: AccountCredentialModel): Promise<AccountCredentialModel>{
+    @UseInterceptors(AccountTokenInterceptor)
+    async loginAccount(@AuthAccount() account: AccountCredentialModel): Promise<AccountCredentialModel>{
         return account;
     }
 
@@ -24,5 +38,18 @@ export class AuthenticationController{
     @UseGuards(JwtAuthGuard)
     account(@AuthAccount() account: AccountCredentialModel):AccountCredentialModel{
         return account;
+    }
+
+    @Post('loginUser')
+    @UseGuards(LocalUserStrategy)
+    @UseInterceptors(UserTokenInterceptor)
+    async loginUser(@AuthUser() user: UserCredentialModel):Promise<UserCredentialModel>{
+        return user;
+    }
+
+    @Post('/user')
+    @UseGuards(JwtAuthGuard)
+    user(@AuthUser() user: UserCredentialModel):UserCredentialModel{
+        return user;
     }
 }

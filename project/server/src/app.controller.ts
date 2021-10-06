@@ -16,7 +16,7 @@ export class AppController {
   @Post('auth/login')
   async login(@Request() req) {
     console.log('UAHT- > ', req.user);
-    let res = this.authService.signToken(req.user);
+    let res = this.authService.signAccountCredsToken(req.user);
     return res;
     // let result = this.authService.login(req.user);
     // return result;

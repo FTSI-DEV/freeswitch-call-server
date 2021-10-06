@@ -3,9 +3,10 @@ import { map, Observable } from "rxjs";
 import { AccountCredentialModel } from "src/modules/account-config/models/accountConfigDto.model";
 import { AuthService } from "../auth.service";
 import type { Response } from 'express';
+import { UserCredentialModel } from "src/modules/users/models/user-creds.model";
 
 @Injectable()
-export class TokenInterceptor implements NestInterceptor{
+export class UserTokenInterceptor implements NestInterceptor{
     constructor(
         private readonly authService: AuthService
     ) {
@@ -13,14 +14,14 @@ export class TokenInterceptor implements NestInterceptor{
 
     intercept(
         context: ExecutionContext, 
-        next: CallHandler<AccountCredentialModel>): Observable<AccountCredentialModel> | Promise<Observable<AccountCredentialModel>> {
+        next: CallHandler<UserCredentialModel>): Observable<UserCredentialModel> | Promise<Observable<UserCredentialModel>> {
 
         return next.handle().pipe(
-            map((account) => {
+            map((user) => {
                 
                 const response = context.switchToHttp().getResponse<Response>();
 
-                let token = this.authService.signToken(account);
+                let token = this.authService.signUserToken(user);
 
                 response.setHeader('Authorization', `Bearer ${token}`);
 
@@ -31,7 +32,7 @@ export class TokenInterceptor implements NestInterceptor{
                     secure: process.env.NODE_ENV === 'production'
                 });
 
-                return account;
+                return user;
             }),
         );
         

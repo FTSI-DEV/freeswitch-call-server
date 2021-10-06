@@ -33,6 +33,7 @@
     "@nestjs/typeorm": "^8.0.1",
     "async": "^3.2.1",
     "axios": "^0.21.1",
+    "bcryptjs": "^2.4.3",
     "bee-queue": "^1.4.0",
     "bull": "^3.29.1",
     "bull-arena": "^3.29.2",

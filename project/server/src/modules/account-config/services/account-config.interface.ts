@@ -1,5 +1,5 @@
 import { IPaginationOptions, Pagination } from "nestjs-typeorm-paginate";
-import { AccountConfigEntity } from "src/entity/account-config";
+import { AccountConfigEntity } from "src/entity/account-config.entity";
 import { AccountConfigModel } from "../models/accountConfig.model";
 import { AccountConfigDTO } from "../models/accountConfigDto.model";
 

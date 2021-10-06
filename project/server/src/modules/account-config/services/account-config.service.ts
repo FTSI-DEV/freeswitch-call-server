@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { AccountConfigEntity, AccountConfigEntityRepository } from 'src/entity/account-config';
+import { AccountConfigEntity, AccountConfigEntityRepository } from 'src/entity/account-config.entity';
 import { AccountConfigModel } from '../models/accountConfig.model';
 import { v4 as uuidv4 } from 'uuid';
 import { AccountConfigDTO } from '../models/accountConfigDto.model';

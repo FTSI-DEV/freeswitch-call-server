@@ -7,7 +7,7 @@
     "database": "postgres",
     "synchronize": false,
     "logging": false,
-    "migrationsRun": true,
+    "migrationsTableName" : "MigrationTable",
     "entities": [
         "dist/**/*.entity.js"
     ],

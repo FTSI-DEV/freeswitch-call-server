@@ -28,7 +28,7 @@ export class AccountConfigEntity{
 @EntityRepository(AccountConfigEntity)
 export class AccountConfigEntityRepository extends Repository<AccountConfigEntity>{
 
-    async saveConfig(config:AccountConfigEntity){
-        return await this.save(config);
+    async saveConfig(entity:AccountConfigEntity){
+        return await this.save(entity);
     }
 }

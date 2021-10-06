@@ -26,6 +26,7 @@ import { CustomLoggerModule } from './logger/logger.module';
 import { CUSTOM_LOGGER, ICustomAppLogger } from './logger/customLogger';
 import { OutboundCallServerHelper } from './helpers/fs-esl/outbound-call/outbound-call.server';
 import { AccountConfigModule } from './modules/account-config/account-config.module';
+import { UsersModule } from './modules/users/users.module';
 import redis from 'redis';
 
 @Module({
@@ -49,7 +50,8 @@ import redis from 'redis';
     OutboundCallModule,
     GreetingModule,
     CustomLoggerModule,
-    AccountConfigModule
+    AccountConfigModule,
+    UsersModule
  ],
   controllers: [AppController],
   providers: [AppService],

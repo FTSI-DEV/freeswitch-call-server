@@ -6,8 +6,9 @@ import { InboundCallConfigEntity } from "src/entity/inboundCallConfig.entity";
 import { PhoneNumberConfigEntity } from "src/entity/phoneNumberConfig.entity";
 import { ApiCredential } from "src/models/apiCredential.model";
 import { IConfigService } from "./iconfig.interface";
-import { AccountConfigEntity } from "src/entity/account-config";
+import { AccountConfigEntity } from "src/entity/account-config.entity";
 import { AccountConfigModel } from "src/modules/account-config/models/accountConfig.model";
+import { UserEntity } from "src/entity/user.entity";
 require('dotenv').config();
 
 @Injectable()
@@ -46,16 +47,18 @@ export class ConfigService implements IConfigService{
             username: this.getValue('POSTGRES_USER'),
             password: this.getValue('POSTGRES_PASSWORD'),
             database: this.getValue('POSTGRES_DATABASE'),
-            entities: [FreeswitchCallConfigEntity,
-                        FsCallDetailRecordEntity,
-                        CallRecordingStorageEntity,
-                       InboundCallConfigEntity,
-                       PhoneNumberConfigEntity,
-                        AccountConfigEntity],
+            entities: [
+                FreeswitchCallConfigEntity,
+                FsCallDetailRecordEntity,
+                CallRecordingStorageEntity,
+                InboundCallConfigEntity,
+                PhoneNumberConfigEntity,
+                AccountConfigEntity,
+                UserEntity],
             // entities : ["dist/entity/**/*.js"],
             migrationsTableName : "MigrationTable",
             migrations: ['dist/migration/**/*.js'],
-            // migrationsRun: true,
+            migrationsRun: true,
             cli: {
                 migrationsDir: 'src/migration',
                 entitiesDir: 'src/entity'
