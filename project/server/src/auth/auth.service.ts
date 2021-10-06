@@ -75,22 +75,22 @@ export class AuthService {
       return user;
     }
 
-    async login(username:string, password:string): Promise<UserEntity>{
+    async login(Username:string, password:string): Promise<UserEntity>{
 
       let user: UserEntity;
 
       try{
-        user = await this.userService.findOne({ where: username });
+        user = await this.userService.findOne({ where: Username });
       }
       catch(err){
         throw new UnauthorizedException(
-          `There isn't any user with username: ${username}`
+          `There isn't any user with username: ${Username}`
         );
       }
 
       if (!(await user.checkPassword(password))){
         throw new UnauthorizedException(
-          `Wrong password for user with username: ${username}`
+          `Wrong password for user with username: ${Username}`
         );
       }
 
