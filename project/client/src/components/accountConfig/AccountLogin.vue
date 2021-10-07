@@ -52,6 +52,9 @@ export default defineComponent({
       console.log("params: ", params);
       store.dispatch("loginUser", params).then((res) => {
         if (res.data.Id) {
+          console.log("res.data: ", res.data);
+          localStorage.setItem("fs_user_key", `${res.data.Id}${new Date().getTime()}`);
+          localStorage.setItem("fs_username", res.data.Username);
           router.push({ path: "/" });
         }
       });

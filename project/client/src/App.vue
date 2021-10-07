@@ -14,7 +14,13 @@ export default defineComponent({
   },
   setup() {
     const router = useRouter();
-    router.push({ path: "/account/login" });
+    const fsUserKey = localStorage.getItem("fs_user_key");
+    if (fsUserKey) {
+      // Redirect to dashboard if user alredy logged in
+      router.push({ path: "/" });
+    } else {
+      router.push({ path: "/account/login" });
+    }
   },
 });
 </script>

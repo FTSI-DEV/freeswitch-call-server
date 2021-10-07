@@ -16,7 +16,7 @@
             @click.prevent
             style="color: #fff; font-weight: 600"
           >
-            json
+            {{ username }}
             <DownOutlined />
           </a>
           <template #overlay>
@@ -96,12 +96,18 @@ export default defineComponent({
     DownOutlined,
   },
   setup() {
+    const username = ref<string>("");
     const router = useRouter();
     const navigateRoute = (path: string) => {
       router.push({ path });
     };
     navigateRoute("/dashboard");
+    if (localStorage.getItem("fs_username")) {
+      username.value = localStorage.getItem("fs_username") || "";
+    }
     const signOut = (): void => {
+      localStorage.removeItem("fs_user_key");
+      localStorage.removeItem("fs_username");
       navigateRoute("/account/login");
     };
     return {
@@ -110,6 +116,7 @@ export default defineComponent({
       selectedKeys2: ref<string[]>(["1"]),
       collapsed: ref<boolean>(false),
       openKeys: ref<string[]>(["sub1"]),
+      username,
       signOut,
     };
   },

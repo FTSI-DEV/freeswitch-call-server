@@ -56,7 +56,7 @@ export default {
             });
         },
         addAccountConfig({ dispatch }: { dispatch: Dispatch }, params: any) {
-            return HTTP.get(`api/account-config/add/${params}`).then(res => {
+            return HTTP.post(`api/account-config/add/${params}`).then(res => {
                 if (res.data.Status === Status.OK) {
                     dispatch('getAccountConfigs');
                 }
