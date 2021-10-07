@@ -17,9 +17,8 @@ export class PhoneNumberConfigParam{
     @IsNotEmpty()
     readonly webhookUrl: string;
   
-    @IsDefined()
-    @IsNotEmpty()
-    readonly isDeleted: boolean
+    @IsEmpty()
+    readonly isDeleted?: boolean
 
     @IsEmpty()
     readonly id? : number;
