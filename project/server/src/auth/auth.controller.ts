@@ -6,10 +6,11 @@ import {
   HttpStatus,
   Post,
   Res,
+  Request,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
-import { Response } from 'express';
+import { response, Response } from 'express';
 import { UserEntity } from 'src/entity/user.entity';
 import { AuthAccount } from 'src/modules/account-config/account-config.decorator';
 import { AccountCredentialModel } from 'src/modules/account-config/models/accountConfigDto.model';
@@ -22,9 +23,13 @@ import { LocalAuthGuard } from './guards/local-auth.guard';
 import { SessionAuthGuard } from './guards/session-auth.guard';
 import { AccountTokenInterceptor } from './interceptors/account-token.interceptor';
 import { UserTokenInterceptor } from './interceptors/user-token.interceptor';
+import { UserBlacklistedTokenValidator } from './validator/user-blacklisted-token.validator';
 
 @Controller('auth')
 export class AuthController {
+
+  private readonly userBlacklistToken = new UserBlacklistedTokenValidator();
+
   constructor(private readonly authService: AuthService) {}
 
   @Post('register')
@@ -48,6 +53,26 @@ export class AuthController {
   @UseGuards(SessionAuthGuard, JwtAuthGuard)
   me(@AuthUser() user: UserEntity): UserEntity {
     return user;
+  }
+
+  @Post('logoutUser')
+  async logoutUser(@Request() req){
+
+    console.log('Request:Token -> ', req.signedCookies.token);
+
+    console.log('Request:Secret -> ', req.secret);
+
+    var token = req.signedCookies.token;
+
+    var secret = req.secret;
+
+    this.userBlacklistToken.addToBlacklist({
+        token: token
+    });
+
+    return{
+      message: 'logged out'
+    }
   }
 
   @Post('loginAccount')
