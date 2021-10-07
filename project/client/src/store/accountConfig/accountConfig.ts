@@ -20,7 +20,7 @@ export default {
                 accountSID: "",
                 authKey: "",
                 authToken: "",
-                dateCreted: "",
+                dateCreated: "",
                 isActive: false,
                 id: 1
             }
@@ -40,18 +40,18 @@ export default {
                     accountSID: prop.accountSID,
                     accountName: prop.accountName,
                     authToken: prop.authToken,
-                    dateCreted: prop.dateCreted,
+                    dateCreated: prop.dateCreated,
                     isActive: prop.isActive,
                 });
             });
             console.log('set account config: ', payload);
         },
         setAccountConfigById(state: AccountConfig, payload: AccountConfigItem) {
-            const { accountName, accountSID, authKey, dateCreted, isActive, id } = payload;
+            const { accountName, accountSID, authKey, dateCreated, isActive, id } = payload;
             state.Data.configItem.accountName = accountName;
             state.Data.configItem.accountSID = accountSID;
             state.Data.configItem.authKey = authKey;
-            state.Data.configItem.dateCreted = dateCreted;
+            state.Data.configItem.dateCreated = dateCreated;
             state.Data.configItem.isActive = isActive;
             state.Data.configItem.id = id;
         }

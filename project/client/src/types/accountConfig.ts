@@ -3,7 +3,7 @@ export interface AccountConfigItem {
     accountSID: string;
     accountName: string;
     authToken: string;
-    dateCreted: string;
+    dateCreated: string;
     isActive: boolean;
     authKey?: string;
 }

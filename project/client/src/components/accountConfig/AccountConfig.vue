@@ -10,7 +10,19 @@
     </div>
     <a-table :columns="columns" :dataSource="accountConfigs">
       <template #accountName="{ record }">
-        {{ record.accountName }}
+        <span>
+          <CheckCircleOutlined
+            v-if="record.isActive"
+            style="color: rgb(87, 204, 153); margin-right: 5px"
+            title="Active"
+          />
+          <CloseOutlined
+            v-else
+            style="color: #ff6358; margin-right: 5px"
+            title="Inactive"
+          />
+          {{ record.accountName }}
+        </span>
         <MenuFoldOutlined
           class="view_icon"
           title="View Details"
@@ -27,10 +39,15 @@ import { defineComponent, toRefs, reactive, computed } from "vue";
 import { useStore } from "vuex";
 import { AccountConfigItem } from "../../types/accountConfig";
 import AccountConfigColumn from "./helper/helper";
-import { MenuFoldOutlined, PlusSquareFilled } from "@ant-design/icons-vue";
+import {
+  MenuFoldOutlined,
+  PlusSquareFilled,
+  CloseOutlined,
+  CheckCircleOutlined,
+} from "@ant-design/icons-vue";
 import { useRouter } from "vue-router";
 export default defineComponent({
-  components: { MenuFoldOutlined, PlusSquareFilled },
+  components: { MenuFoldOutlined, PlusSquareFilled, CloseOutlined, CheckCircleOutlined },
   setup() {
     const router = useRouter();
     const store = useStore();

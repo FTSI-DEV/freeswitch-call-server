@@ -5,13 +5,24 @@
     </div>
     <div class="detail-container">
       <div class="detail_header">
-        {{ configItem.accountName }}
-        <CheckCircleOutlined
-          v-if="configItem.isActive"
-          style="color: rgb(87, 204, 153); margin-left: 5px"
-          title="Active"
-        />
-        <CloseOutlined v-else style="color: #ff6358; margin-left: 5px" title="Inactive" />
+        <div style="flex: 1">
+          {{ configItem.accountName }}
+          <CheckCircleOutlined
+            v-if="configItem.isActive"
+            style="color: rgb(87, 204, 153); margin-left: 5px"
+            title="Active"
+          />
+          <CloseOutlined
+            v-else
+            style="color: #ff6358; margin-left: 5px"
+            title="Inactive"
+          />
+        </div>
+        <div style="flex: 1; text-align: right; line-height: 2; font-size: 0.8em">
+          <CalendarOutlined style="margin-right: 5px" title="Date Created" />{{
+            configItem.dateCreated
+          }}
+        </div>
       </div>
       <div style="margin-top: 20px">
         <a-row>
@@ -46,6 +57,7 @@ import {
   ArrowLeftOutlined,
   CheckCircleOutlined,
   CloseOutlined,
+  CalendarOutlined,
 } from "@ant-design/icons-vue";
 import { defineComponent, toRefs, reactive, computed, onMounted } from "vue";
 import { useStore } from "vuex";
@@ -54,6 +66,7 @@ export default defineComponent({
     ArrowLeftOutlined,
     CheckCircleOutlined,
     CloseOutlined,
+    CalendarOutlined,
   },
   setup() {
     const store = useStore();
@@ -84,7 +97,8 @@ export default defineComponent({
 
 <style scoped>
 .detail_header {
-  padding: 10px;
+  display: flex;
+  padding: 10 10px 5px 10px;
   text-align: left;
   font-size: 1.5em;
   border-bottom: 1px solid #c8c8c8;
