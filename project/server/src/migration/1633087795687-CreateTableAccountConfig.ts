@@ -22,6 +22,7 @@ export class CreateTableAccountConfig1633087795687 implements MigrationInterface
             "AuthToken" varchar(500) NOT NULL, 
             "DateCreated" timestamp without time zone NOT NULL, 
             "DateUpdated" timestamp without time zone,
+            "IsActive" boolean NOT NULL DEFAULT false,
             CONSTRAINT "PK_AccountConfig_Id" PRIMARY KEY ("Id")
          )`);
 

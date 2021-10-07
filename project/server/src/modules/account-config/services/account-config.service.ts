@@ -19,7 +19,7 @@ export class AccountConfigService implements IAccountConfigService{
 
         let accountConfig = new AccountConfigEntity();
 
-        accountConfig.AuthKey = uuidv4();
+        accountConfig.AuthToken = uuidv4();
 
         accountConfig.AccountSID = uuidv4();
 
@@ -38,7 +38,7 @@ export class AccountConfigService implements IAccountConfigService{
 
         let config = await this.getById(param.id);
 
-        config.AuthKey = param.accountName;
+        config.AuthToken = param.accountName;
 
         config.DateUpdated = new Date();
 
@@ -85,7 +85,7 @@ export class AccountConfigService implements IAccountConfigService{
             accountName: account.AccountName,
             accountSID : account.AccountSID,
             isActive: account.IsActive,
-            authKey: account.AuthKey,
+            authKey: account.AuthToken,
             dateCreated: account.DateCreated
         };
     }
@@ -105,7 +105,7 @@ export class AccountConfigService implements IAccountConfigService{
             let model : AccountConfigDTO = {
                 id: item.Id,
                 accountSID: item.AccountSID,
-                authKey : item.AuthKey,
+                authKey : item.AuthToken,
                 accountName  : item.AccountName,
                 isActive: item.IsActive,
                 dateCreated: item.DateCreated
