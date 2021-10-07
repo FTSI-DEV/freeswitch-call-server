@@ -11,13 +11,12 @@
     <a-table :columns="columns" :dataSource="accountConfigs">
       <template #accountName="{ record }">
         {{ record.accountName }}
-        <router-link to="/account-config/details" style="position: absolute; right: 15px">
-          <MenuFoldOutlined
-            class="view_icon"
-            title="View Details"
-            @click="viewDetails(record)"
-          />
-        </router-link>
+        <MenuFoldOutlined
+          class="view_icon"
+          title="View Details"
+          style="position: absolute; right: 15px"
+          @click="viewDetails(record)"
+        />
       </template>
     </a-table>
   </div>
@@ -38,15 +37,18 @@ export default defineComponent({
     const state = reactive({
       acountName: "",
       accountSID: "",
+      authKey: "",
+      dateCreated: "",
       isActive: false,
       hasError: false,
       columns: AccountConfigColumn,
     });
+
+    const authToken = localStorage.getItem("fs_auth_token");
     const accountConfigs = computed(
       (): AccountConfigItem[] => store.getters["getAccountConfigs"]
     );
     const getAccountConfigs = () => {
-      const authToken = localStorage.getItem("fs_auth_token");
       store.dispatch("getAccountConfigs", { params: { page: 1, limit: 1 }, authToken });
     };
     const saveAccountConfig = () => {
@@ -54,6 +56,17 @@ export default defineComponent({
     };
     const viewDetails = (item: any) => {
       console.log(item);
+      store
+        .dispatch("getAccountConfigById", {
+          id: item.id,
+          authToken: authToken,
+        })
+        .then((res) => {
+          if (res.data.Status === 1) {
+            store.dispatch("setAccountConfigData", res.data.Data);
+            router.push({ path: "/account-config/details" });
+          }
+        });
     };
     const addAccountConfig = () => {
       router.push({ path: "/account-config/add" });

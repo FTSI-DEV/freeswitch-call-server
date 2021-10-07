@@ -38,12 +38,14 @@
 import { ArrowLeftOutlined } from "@ant-design/icons-vue";
 import { defineComponent, toRefs, reactive } from "vue";
 import { useStore } from "vuex";
+import { useRouter } from "vue-router";
 export default defineComponent({
   components: {
     ArrowLeftOutlined,
   },
   setup() {
     const store = useStore();
+    const router = useRouter();
     const state = reactive({
       accountName: "",
       accountSID: "",
@@ -52,11 +54,18 @@ export default defineComponent({
     });
 
     const saveAccountConfig = () => {
+      if (!state.accountName) return;
       const authToken = localStorage.getItem("fs_auth_token");
-      store.dispatch("addAccountConfig", {
-        accountName: state.accountName,
-        authToken
-      });
+      store
+        .dispatch("addAccountConfig", {
+          accountName: state.accountName,
+          authToken,
+        })
+        .then((res) => {
+          if (res.data.Status === 1) {
+            router.push({ path: "/account-config" });
+          }
+        });
       console.log("saveAccountConfig");
     };
 

@@ -5,6 +5,7 @@ export interface AccountConfigItem {
     authToken: string;
     dateCreted: string;
     isActive: boolean;
+    authKey?: string;
 }
 
 export interface AccountConfigPager {
@@ -18,6 +19,7 @@ export interface AccountConfigPager {
 export interface AccountConfig {
     Data: {
         items: AccountConfigItem[],
-        meta: InboundConfigPager
+        meta: AccountConfigPager,
+        configItem: AccountConfigItem
     }
 }
