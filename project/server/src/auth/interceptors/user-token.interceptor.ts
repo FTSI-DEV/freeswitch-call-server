@@ -10,9 +10,13 @@ import { map } from 'rxjs/operators';
 import { UserEntity } from 'src/entity/user.entity';
 
 import { AuthService } from '../auth.service';
+import { UserBlacklistedTokenValidator } from '../validator/user-blacklisted-token.validator';
 
 @Injectable()
 export class UserTokenInterceptor implements NestInterceptor {
+
+  private readonly userTokenValidator = new UserBlacklistedTokenValidator();
+
   constructor(
     private readonly authService: AuthService,
   ) {}
@@ -28,6 +32,10 @@ export class UserTokenInterceptor implements NestInterceptor {
         console.log('TokenInterceptor:user -> ', user);
 
         const token = this.authService.signUserToken(user);
+
+        this.userTokenValidator.validate({
+          token : token
+        });
 
         console.log('TokenInterceptor:Token -> ', token);
 
