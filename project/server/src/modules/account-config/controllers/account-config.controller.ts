@@ -69,6 +69,8 @@ export class AccountConfigController {
         @Body() params:AccountConfigModel
     ): Promise<JsonDataListReturnModel>
     {
+        console.log('params -> ' , params.accountName);
+        
         let success = await this._accountConfigService.update({
             accountName: params.accountName
         });

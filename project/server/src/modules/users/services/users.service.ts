@@ -23,6 +23,8 @@ export class UsersService implements IUserService{
 
     async findOne(where: FindOneOptions<UserEntity>):Promise<UserEntity | undefined>{
 
+        console.log('where -> ', where);
+        
         let user = await this.userRepo.findOne(where);
 
         return user;

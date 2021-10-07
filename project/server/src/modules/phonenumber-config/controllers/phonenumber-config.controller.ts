@@ -1,5 +1,6 @@
-import { Body, Controller, Get, Post, Param, Query, ParseIntPipe, DefaultValuePipe, Inject } from '@nestjs/common';
+import { Body, Controller, Get, Post, Param, Query, ParseIntPipe, DefaultValuePipe, Inject, HttpCode, UseInterceptors, HttpStatus } from '@nestjs/common';
 import { Pagination } from 'nestjs-typeorm-paginate';
+import { UserTokenInterceptor } from 'src/auth/interceptors/user-token.interceptor';
 import { PhoneNumberConfigParam } from 'src/modules/phonenumber-config/models/phoneNumberConfig.model';
 import { JsonDataListReturnModel } from 'src/utils/jsonDataListReturnModel';
 import { IPhoneNumberConfigService, PHONENUMBER_CONFIG_SERVICE } from '../services/iphonenumber-config.interface';
@@ -22,7 +23,6 @@ export class FreeswitchPhoneNumberConfigController {
 
     @Post('add')
     add(@Body() callConfigParam: PhoneNumberConfigParam):JsonDataListReturnModel{
-        console.log('entered', callConfigParam);
 
         this._phoneNumberConfigService.add(callConfigParam);
 

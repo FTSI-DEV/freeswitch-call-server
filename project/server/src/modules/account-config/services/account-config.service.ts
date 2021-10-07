@@ -34,9 +34,11 @@ export class AccountConfigService implements IAccountConfigService{
         return accountConfig.Id;
     }
 
-    async update(param:AccountConfigModel):Promise<number>{
+    async update(param:AccountConfigModel):Promise<boolean>{
 
         let config = await this.getById(param.id);
+
+        if (!config) return false;
 
         config.AccountName = param.accountName;
 
@@ -44,7 +46,7 @@ export class AccountConfigService implements IAccountConfigService{
 
         config = await this._accountConfigRepo.saveConfig(config);
 
-        return config.Id;
+        return true;
     }
 
     async delete(param:AccountConfigModel):Promise<boolean>{
