@@ -24,6 +24,7 @@ import { SessionAuthGuard } from './guards/session-auth.guard';
 import { AccountTokenInterceptor } from './interceptors/account-token.interceptor';
 import { UserTokenInterceptor } from './interceptors/user-token.interceptor';
 import { UserBlacklistedTokenValidator } from './validator/user-blacklisted-token.validator';
+import * as jwt from 'jsonwebtoken';
 
 @Controller('auth')
 export class AuthController {
@@ -62,13 +63,24 @@ export class AuthController {
 
     console.log('Request:Secret -> ', req.secret);
 
-    var token = req.signedCookies.token;
+    // var token = req.signedCookies.token;
 
     var secret = req.secret;
 
-    this.userBlacklistToken.addToBlacklist({
-        token: token
-    });
+    var authHeaders = req.headers.authorization;
+
+    if (authHeaders && (authHeaders as string).split(' ')[1]){
+      let token = (authHeaders as string).split(' ')[1];
+      let decoded:any = jwt.verify(token, secret);
+
+      console.log('token -> ' , token);
+      console.log('decoded -> ', decoded);
+
+        this.userBlacklistToken.addToBlacklist({
+          token: token,
+          exp: decoded.exp
+        });
+    }
 
     return{
       message: 'logged out'

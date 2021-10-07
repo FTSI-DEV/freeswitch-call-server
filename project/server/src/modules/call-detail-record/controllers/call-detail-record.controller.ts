@@ -6,11 +6,14 @@ import {
   Param,
   ParseIntPipe,
   Query,
+  UseGuards,
 } from '@nestjs/common';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { CallDetailRecordDTO } from 'src/modules/call-detail-record/models/cdr.models';
 import { JsonDataListReturnModel } from 'src/utils/jsonDataListReturnModel';
 import { CALL_DETAIL_RECORD_SERVICE, ICallDetailRecordService } from '../services/call-detail-record.interface';
 
+@UseGuards(JwtAuthGuard)
 @Controller('call-detail-record')
 export class CallDetailRecordController {
   constructor(

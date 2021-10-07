@@ -1,14 +1,14 @@
 import { UnauthorizedException } from '@nestjs/common';
 import redis from 'redis';
 
-export class UserBlacklistedTokenValidator{
+export class ProjectAccountBlacklistedTokenValidator{
 
     constructor(
 
         
     ){}
 
-    validate(blacklistModel:UserBlackListTokenModel){
+    validate(blacklistModel:ProjectAccountBlacklistTokenModel){
 
         let redisClient = redis.createClient(6379);
 
@@ -16,11 +16,11 @@ export class UserBlacklistedTokenValidator{
             console.log('Connected Redis Server!');
         });
 
-        redisClient.get(USER_BLACKLIST_TOKENS, (err, reply) => {
+        redisClient.get(PROJECTACCOUNT_BLACKLIST_TOKENS, (err, reply) => {
 
             if (reply){
 
-                let blackListedTokens:UserBlackListTokenModel[] = JSON.parse(reply);
+                let blackListedTokens:ProjectAccountBlacklistTokenModel[] = JSON.parse(reply);
                 
                 console.log('User blacklisted tokens -> ', blackListedTokens);
 
@@ -31,7 +31,7 @@ export class UserBlacklistedTokenValidator{
         });
     }
 
-    addToBlacklist(blacklistModel:UserBlackListTokenModel){
+    addToBlacklist(blacklistModel:ProjectAccountBlacklistTokenModel){
 
         let client = redis.createClient(6379);
 
@@ -39,7 +39,7 @@ export class UserBlacklistedTokenValidator{
             console.log('Connected Redis Server!');
         });
 
-        let tokenList:UserBlackListTokenModel[] = []
+        let tokenList:ProjectAccountBlacklistTokenModel[] = []
 
         tokenList.push(blacklistModel);
 
@@ -50,15 +50,15 @@ export class UserBlacklistedTokenValidator{
 
         let serializeToken = JSON.stringify(tokenList);
 
-        client.set(USER_BLACKLIST_TOKENS, serializeToken, (err,reply) => {
+        client.set(PROJECTACCOUNT_BLACKLIST_TOKENS, serializeToken, (err,reply) => {
             console.log('User blacklisted token saved in redis: -> ', reply);
         });
     }
 }
 
-export class UserBlackListTokenModel{
+export class ProjectAccountBlacklistTokenModel{
     token:string;
     exp?: number;
 }
 
-export const USER_BLACKLIST_TOKENS = 'USER_BLACKLIST_TOKENS';
+export const PROJECTACCOUNT_BLACKLIST_TOKENS = 'PROJECTACCOUNT_BLACKLIST_TOKENS';

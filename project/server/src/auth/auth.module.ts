@@ -1,6 +1,9 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { AccountConfigEntity, AccountConfigEntityRepository } from 'src/entity/account-config.entity';
+import { UserAuthMiddleware } from 'src/auth/middlewares/user-auth.middleware';
 import { AccountConfigModule } from 'src/modules/account-config/account-config.module';
 // import { UserModule } from 'src/modules/user/user.module';
 import { UsersModule } from 'src/modules/users/users.module';
@@ -16,7 +19,6 @@ const APP_SECRET = '0dd8d1d7c673300e0e800e10e13eb6ee1414c140e046ebf7e2229010ab7a
 @Module({
   imports: [
     UsersModule,
-    // UserModule,
     PassportModule.register({ defaultStrategy: 'jwt' }),
     JwtModule.register({
       secret: APP_SECRET,
@@ -28,10 +30,14 @@ const APP_SECRET = '0dd8d1d7c673300e0e800e10e13eb6ee1414c140e046ebf7e2229010ab7a
         algorithms: ['HS384'],
       },
     }),
-    AccountConfigModule
+    // TypeOrmModule.forFeature([AccountConfigEntity, AccountConfigEntityRepository]),
   ],
   controllers: [AuthController],
   providers: [AuthService, LocalStrategy, JwtStrategy, SessionSerializer],
   exports: [AuthService]
 })
-export class AuthModule {}
+export class AuthModule implements NestModule {
+  public configure(consumer: MiddlewareConsumer) {
+    consumer.apply(UserAuthMiddleware)
+  }
+}

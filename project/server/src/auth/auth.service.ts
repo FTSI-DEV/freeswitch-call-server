@@ -1,6 +1,7 @@
 import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { AccountConfigEntity } from 'src/entity/account-config.entity';
+import { InjectRepository } from '@nestjs/typeorm';
+import { AccountConfigEntity, AccountConfigEntityRepository } from 'src/entity/account-config.entity';
 import { UserEntity } from 'src/entity/user.entity';
 import { AccountCredentialModel } from 'src/modules/account-config/models/accountConfigDto.model';
 import { ACCOUNT_CONFIG_SERVICE, IAccountConfigService } from 'src/modules/account-config/services/account-config.interface';
@@ -16,10 +17,11 @@ export class AuthService {
   constructor(
     @Inject(USER_SERVICE)
     private readonly usersService: IUserService,
+
     private readonly jwtService: JwtService,
-    @Inject(ACCOUNT_CONFIG_SERVICE)
-      private accountConfigService : IAccountConfigService,
-    // private readonly userService: UserService
+    
+    // @InjectRepository(AccountConfigEntityRepository)
+    // private _accountConfigRepo: AccountConfigEntityRepository
   ) {}
 
   async register(signUp: SignUp): Promise<UserEntity> {
@@ -62,7 +64,7 @@ export class AuthService {
       user = await this.usersService.findOne({ where: { Username: payload.sub } });
     } catch (error) {
       throw new UnauthorizedException(
-        `There isn't any user with email: ${payload.sub}`,
+        `There isn't any user with username: ${payload.sub}`,
       );
     }
     delete user.Password;
@@ -77,7 +79,11 @@ export class AuthService {
 
     console.log('AuthService:signToken -> ', this.signUserToken);
 
-    return this.jwtService.sign(payload);
+    let sign =  this.jwtService.sign(payload);
+
+    console.log('AuthService:sign -> ', sign)
+
+    return sign;
   }
 
   async signAccountCredsToken(account:AccountCredentialModel){
@@ -94,14 +100,18 @@ export class AuthService {
 
   async validateAccount(accountSID:string, authKey:string):Promise<AccountCredentialModel>{
 
-    let account = await this.accountConfigService.getByAccountSID(accountSID);
+    // let account = await this._accountConfigRepo.createQueryBuilder("AccountConfig")
+    //     .where("AccountConfig.AccountSID = :accountSID", { accountSID : accountSID })
+    //     .getOne();
+
+    let account:any;
 
     if (account &&
-        account.authKey === authKey){
+        account.AuthToken === authKey){
 
       let accountCreds : AccountCredentialModel = {
-        accountSID: account.accountSID,
-        authKey: account.authKey
+        accountSID: account.AccountSID,
+        authKey: account.AuthToken
       };
 
       let { authKey, ...result } = accountCreds;

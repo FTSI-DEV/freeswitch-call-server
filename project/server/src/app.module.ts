@@ -28,6 +28,7 @@ import { OutboundCallServerHelper } from './helpers/fs-esl/outbound-call/outboun
 import { AccountConfigModule } from './modules/account-config/account-config.module';
 import { UsersModule } from './modules/users/users.module';
 import redis from 'redis';
+import { MiddleWaresModule } from './middlewares/middleware.module';
 
 @Module({
   imports: [
@@ -51,7 +52,7 @@ import redis from 'redis';
     GreetingModule,
     CustomLoggerModule,
     AccountConfigModule,
-    UsersModule
+    UsersModule,
  ],
   controllers: [AppController],
   providers: [AppService],
