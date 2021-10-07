@@ -36,7 +36,11 @@ export class AccountConfigService implements IAccountConfigService{
 
     async update(param:AccountConfigModel):Promise<boolean>{
 
+        console.log('id -> ', param.id);
+
         let config = await this.getById(param.id);
+
+        console.log('config -> ', config);
 
         if (!config) return false;
 

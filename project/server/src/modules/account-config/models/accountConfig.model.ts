@@ -1,23 +1,25 @@
-import { IsDefined, IsEmpty, IsNotEmpty } from "class-validator";
+import { Allow, IsBoolean, IsDate, IsDefined, IsEmpty, IsInt, IsNotEmpty, IsNotEmptyObject, IsOptional, IsString } from "class-validator";
+
 
 export class AccountConfigModel
 {
-    @IsEmpty()
-    id?:number;
+    @IsOptional()
+    id?:number; 
 
-    @IsEmpty()
+    @IsOptional()
+    @IsString()
     accountSID?: string;
 
-    @IsDefined()
-    @IsNotEmpty()
-    accountName:string;
+    @IsOptional()
+    accountName?:string;
 
-    @IsEmpty()
+    @IsOptional()
+    @IsString()
     authToken?:string;
 
-    @IsEmpty()
+    @IsOptional()
     dateCreated?:Date;
 
-    @IsEmpty()
+    @IsOptional()
     isActive?:boolean;
 }
