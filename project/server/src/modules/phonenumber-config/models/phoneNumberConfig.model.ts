@@ -1,11 +1,29 @@
+import { IsDefined, IsEmpty, IsNotEmpty } from "class-validator";
+
 export class PhoneNumberConfigParam{
-    friendlyName: string;
-    phoneNumber: string;
-    httpMethod: string;
-    webhookUrl: string;
-    id?: number;
-    isDeleted:boolean;
-}
+    @IsDefined()
+    @IsNotEmpty()
+    readonly friendlyName:string;
+  
+    @IsDefined()
+    @IsNotEmpty()
+    readonly phoneNumber: string;
+  
+    @IsDefined()
+    @IsNotEmpty()
+    readonly httpMethod: string;
+  
+    @IsDefined()
+    @IsNotEmpty()
+    readonly webhookUrl: string;
+  
+    @IsDefined()
+    @IsNotEmpty()
+    readonly isDeleted: boolean
+
+    @IsEmpty()
+    readonly id? : number;
+  }
 
 export class PhoneNumberConfigModel{
     friendlyName: string;

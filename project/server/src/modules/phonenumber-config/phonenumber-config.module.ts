@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { AuthModule } from 'src/auth/auth.module';
 import { PhoneNumberConfigEntity, PhoneNumberConfigRepository } from 'src/entity/phoneNumberConfig.entity';
 import { FreeswitchPhoneNumberConfigController as PhoneNumberConfigController } from './controllers/phonenumber-config.controller';
 import { PHONENUMBER_CONFIG_SERVICE } from './services/iphonenumber-config.interface';

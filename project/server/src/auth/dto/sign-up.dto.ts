@@ -25,3 +25,4 @@ export class SignUp {
   @MinLength(8)
   readonly Password: string;
 }
+

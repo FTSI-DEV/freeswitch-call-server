@@ -7,7 +7,7 @@ export const ACCOUNT_CONFIG_SERVICE = 'ACCOUNT_CONFIG_SERVICE';
 
 export interface IAccountConfigService{
     add(accountName:string):Promise<number>;
-    update(param:AccountConfigModel):Promise<number>;
+    update(param:AccountConfigModel):Promise<boolean>;
     getById(id:number):Promise<AccountConfigEntity>;
     getConfigs(options: IPaginationOptions) : Promise<Pagination<AccountConfigDTO>>;
     getByAccountSID(accountSID:string):Promise<AccountConfigDTO>;
