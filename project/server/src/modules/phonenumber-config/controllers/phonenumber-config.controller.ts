@@ -52,6 +52,8 @@ export class FreeswitchPhoneNumberConfigController {
             limit
         });
 
+        console.log('retval -> ', retVal);
+
         return JsonDataListReturnModel.Ok(null, retVal);
     }
 
