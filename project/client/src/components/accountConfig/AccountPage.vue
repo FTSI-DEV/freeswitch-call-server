@@ -8,7 +8,7 @@
         </div>
       </a-col>
       <a-col :span="6">
-        <div style="padding: 50px 15px 15px 15px">
+        <div style="padding: 20px 15px 15px 15px">
           <router-view></router-view>
         </div>
       </a-col>
