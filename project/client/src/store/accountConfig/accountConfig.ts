@@ -3,6 +3,7 @@ import { Commit, Dispatch } from 'vuex';
 import { Status } from '../status';
 import { AccountConfig, AccountConfigItem } from "../../types/accountConfig";
 import { accountConfig } from '../mock/mockData';
+
 export default {
     state: {
         Data: {
@@ -13,11 +14,21 @@ export default {
                 itemsPerPage: 1,
                 totalPages: 0,
                 currentPage: 1
+            },
+            configItem: {
+                accountName: "",
+                accountSID: "",
+                authKey: "",
+                authToken: "",
+                dateCreated: "",
+                isActive: false,
+                id: 1
             }
         }
     } as AccountConfig,
     getters: {
-        getAccountConfigs: (state: AccountConfig): AccountConfigItem[] => state.Data.items
+        getAccountConfigs: (state: AccountConfig): AccountConfigItem[] => state.Data.items,
+        getAccountConfigItem: (state: AccountConfig): AccountConfigItem => state.Data.configItem
     },
     mutations: {
         setAccountConfig(state: AccountConfig, payload: AccountConfig) {
@@ -29,14 +40,20 @@ export default {
                     accountSID: prop.accountSID,
                     accountName: prop.accountName,
                     authToken: prop.authToken,
-                    dateCreted: prop.dateCreted,
+                    dateCreated: prop.dateCreated,
                     isActive: prop.isActive,
                 });
             });
             console.log('set account config: ', payload);
         },
         setAccountConfigById(state: AccountConfig, payload: AccountConfigItem) {
-            console.log('Account Config Item: ', payload);
+            const { accountName, accountSID, authKey, dateCreated, isActive, id } = payload;
+            state.Data.configItem.accountName = accountName;
+            state.Data.configItem.accountSID = accountSID;
+            state.Data.configItem.authKey = authKey;
+            state.Data.configItem.dateCreated = dateCreated;
+            state.Data.configItem.isActive = isActive;
+            state.Data.configItem.id = id;
         }
     },
     actions: {
@@ -49,21 +66,16 @@ export default {
             });
         },
         getAccountConfigById({ commit }: { commit: Commit }, params: any) {
-            return HTTP().get('api/account-config/getAccountConfigById', params).then(res => {
-                if (res.data.Status === Status.OK) {
-                    commit('setAccountConfigById', res.data);
-                }
-            });
+            return HTTP(params.authToken).get(`api/account-config/getAccountConfigById/${params.id}`);
+        },
+        setAccountConfigData({ commit }: { commit: Commit }, payload: any) {
+            commit('setAccountConfigById', payload);
         },
         addAccountConfig({ dispatch }: { dispatch: Dispatch }, params: any) {
-            return HTTP(params.authToken).post(`api/account-config/add/${params.accountName}`).then(res => {
-                if (res.data.Status === Status.OK) {
-                    dispatch('getAccountConfigs');
-                }
-            });
+            return HTTP(params.authToken).post(`api/account-config/add/${params.accountName}`);
         },
         updateAccountConfig({ dispatch }: { dispatch: Dispatch }, params: any) {
-            return HTTP().get('api/account-config/update', params).then(res => {
+            return HTTP(params.authToken).post('api/account-config/update', params.params).then(res => {
                 if (res.data.Status === Status.OK) {
                     dispatch('getAccountConfigs');
                 }

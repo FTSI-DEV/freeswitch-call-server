@@ -4,28 +4,46 @@
       <router-link to="/account-config"> <ArrowLeftOutlined /> Back </router-link>
     </div>
     <div class="detail-container">
-      <div class="detail_header">Account Config Detail</div>
+      <div class="detail_header">
+        <div style="flex: 1">
+          {{ configItem.accountName }}
+          <CheckCircleOutlined
+            v-if="configItem.isActive"
+            style="color: rgb(87, 204, 153); margin-left: 5px"
+            title="Active"
+          />
+          <CloseOutlined
+            v-else
+            style="color: #ff6358; margin-left: 5px"
+            title="Inactive"
+          />
+        </div>
+        <div style="flex: 1; text-align: right; line-height: 2; font-size: 0.8em">
+          <CalendarOutlined style="margin-right: 5px" title="Date Created" />{{
+            configItem.dateCreated
+          }}
+        </div>
+      </div>
       <div style="margin-top: 20px">
         <a-row>
           <a-col :span="12">
             <a-form-item label="Account Name" style="display: block; text-align: left">
-              <input :class="['ant-input']" v-model="accountName" />
+              <input :class="['ant-input']" v-model="configItem.accountName" />
             </a-form-item>
             <a-form-item label="Account SID" style="display: block; text-align: left">
+              <span style="font-weight: 600">{{ configItem.accountSID }}</span>
               <!-- <input :class="['ant-input']" v-model="accountSID" /> -->
             </a-form-item>
             <a-form-item label="Auth Token" style="display: block; text-align: left">
+              <span style="font-weight: 600"> {{ configItem.authKey }}</span>
               <!-- <input :class="['ant-input']" v-model="authToken" /> -->
             </a-form-item>
-            <div style="display: flex">
-              <span>Active</span>
-              <a-checkbox
-                v-model:checked="isActive"
-                style="margin-left: 10px !important"
-              />
-            </div>
             <div style="display: flex; margin-top: 50px">
-              <a-button type="primary" @click="updateAccountConfig">Update</a-button>
+              <a-button
+                type="primary"
+                @click="updateAccountConfig(configItem.accountName)"
+                >Update</a-button
+              >
             </div>
           </a-col>
         </a-row>
@@ -35,12 +53,20 @@
 </template>
 
 <script lang="ts">
-import { ArrowLeftOutlined } from "@ant-design/icons-vue";
-import { defineComponent, toRefs, reactive } from "vue";
-import { useStore } from 'vuex';
+import {
+  ArrowLeftOutlined,
+  CheckCircleOutlined,
+  CloseOutlined,
+  CalendarOutlined,
+} from "@ant-design/icons-vue";
+import { defineComponent, toRefs, reactive, computed, onMounted } from "vue";
+import { useStore } from "vuex";
 export default defineComponent({
   components: {
     ArrowLeftOutlined,
+    CheckCircleOutlined,
+    CloseOutlined,
+    CalendarOutlined,
   },
   setup() {
     const store = useStore();
@@ -50,12 +76,20 @@ export default defineComponent({
       isActive: true,
       accountName: "",
     });
-    const updateAccountConfig = () => {
-      store.dispatch("updateAccountConfig", state.accountName);
+    const configItem = computed(() => store.getters["getAccountConfigItem"]);
+    const updateAccountConfig = (accountName: string) => {
+      console.log("accountName", accountName);
+      if (!accountName) return;
+      const authToken = localStorage.getItem("fs_auth_token");
+      store.dispatch("updateAccountConfig", {
+        params: { accountName },
+        authToken,
+      });
     };
     return {
       ...toRefs(state),
       updateAccountConfig,
+      configItem,
     };
   },
 });
@@ -63,7 +97,8 @@ export default defineComponent({
 
 <style scoped>
 .detail_header {
-  padding: 10px;
+  display: flex;
+  padding: 10 10px 5px 10px;
   text-align: left;
   font-size: 1.5em;
   border-bottom: 1px solid #c8c8c8;
