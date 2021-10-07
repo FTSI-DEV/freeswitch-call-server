@@ -75,11 +75,7 @@ export default {
             return HTTP(params.authToken).post(`api/account-config/add/${params.accountName}`);
         },
         updateAccountConfig({ dispatch }: { dispatch: Dispatch }, params: any) {
-            return HTTP(params.authToken).post('api/account-config/update', params.params).then(res => {
-                if (res.data.Status === Status.OK) {
-                    dispatch('getAccountConfigs');
-                }
-            });
+            return HTTP(params.authToken).post('api/account-config/update', params.params);
         }
     }
 }  

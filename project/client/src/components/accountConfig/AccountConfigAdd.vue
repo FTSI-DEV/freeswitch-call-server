@@ -4,7 +4,7 @@
       <router-link to="/account-config"> <ArrowLeftOutlined /> Back </router-link>
     </div>
     <div class="detail-container">
-      <div class="detail_header">Account Config Detail</div>
+      <div class="detail_header">Add Account Config</div>
       <div style="margin-top: 20px">
         <a-row>
           <a-col :span="12">
@@ -79,7 +79,7 @@ export default defineComponent({
 
 <style scoped>
 .detail_header {
-  padding: 10px;
+  padding: 10px 10px 5px 0px;
   text-align: left;
   font-size: 1.5em;
   border-bottom: 1px solid #c8c8c8;

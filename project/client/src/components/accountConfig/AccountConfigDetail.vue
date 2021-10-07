@@ -30,18 +30,33 @@
             <a-form-item label="Account Name" style="display: block; text-align: left">
               <input :class="['ant-input']" v-model="configItem.accountName" />
             </a-form-item>
-            <a-form-item label="Account SID" style="display: block; text-align: left">
-              <span style="font-weight: 600">{{ configItem.accountSID }}</span>
+            <a-form-item label="Account SID" class="form-field">
+              <div class="form-value">
+                <div style="flex: 1; text-align: left">
+                  {{ configItem.accountSID }}
+                </div>
+                <div style="width: 20px text-align: right">
+                  <CopyOutlined style="cursor: pointer" />
+                </div>
+              </div>
               <!-- <input :class="['ant-input']" v-model="accountSID" /> -->
             </a-form-item>
-            <a-form-item label="Auth Token" style="display: block; text-align: left">
-              <span style="font-weight: 600"> {{ configItem.authKey }}</span>
+            <a-form-item label="Auth Token" class="form-field">
+              <div class="form-value">
+                <div style="flex: 1; text-align: left">
+                  <span v-if="isShow" @mouseout="isShow = false">{{
+                    configItem.authKey
+                  }}</span>
+                  <span v-else @mouseover="isShow = true">Show</span>
+                </div>
+                <div style="width: 20px text-align: right">
+                  <CopyOutlined style="cursor: pointer" />
+                </div>
+              </div>
               <!-- <input :class="['ant-input']" v-model="authToken" /> -->
             </a-form-item>
             <div style="display: flex; margin-top: 50px">
-              <a-button
-                type="primary"
-                @click="updateAccountConfig(configItem.accountName)"
+              <a-button type="primary" @click="updateAccountConfig(configItem)"
                 >Update</a-button
               >
             </div>
@@ -58,6 +73,7 @@ import {
   CheckCircleOutlined,
   CloseOutlined,
   CalendarOutlined,
+  CopyOutlined,
 } from "@ant-design/icons-vue";
 import { defineComponent, toRefs, reactive, computed, onMounted } from "vue";
 import { useStore } from "vuex";
@@ -67,6 +83,7 @@ export default defineComponent({
     CheckCircleOutlined,
     CloseOutlined,
     CalendarOutlined,
+    CopyOutlined,
   },
   setup() {
     const store = useStore();
@@ -75,14 +92,14 @@ export default defineComponent({
       authToken: "",
       isActive: true,
       accountName: "",
+      isShow: false,
     });
     const configItem = computed(() => store.getters["getAccountConfigItem"]);
-    const updateAccountConfig = (accountName: string) => {
-      console.log("accountName", accountName);
-      if (!accountName) return;
+    const updateAccountConfig = (item: any) => {
+      if (!item.accountName) return;
       const authToken = localStorage.getItem("fs_auth_token");
       store.dispatch("updateAccountConfig", {
-        params: { accountName },
+        params: { accountName: item.accountName, id: item.id },
         authToken,
       });
     };
@@ -98,7 +115,7 @@ export default defineComponent({
 <style scoped>
 .detail_header {
   display: flex;
-  padding: 10 10px 5px 10px;
+  padding: 15px 10px 5px 0px;
   text-align: left;
   font-size: 1.5em;
   border-bottom: 1px solid #c8c8c8;
@@ -116,5 +133,15 @@ export default defineComponent({
   flex: 1;
   text-align: left;
   padding: 10px;
+}
+.form-field {
+  display: block;
+  text-align: left;
+}
+.form-value {
+  padding: 10px;
+  background: #f7f7f7;
+  font-weight: 500;
+  display: flex;
 }
 </style>
