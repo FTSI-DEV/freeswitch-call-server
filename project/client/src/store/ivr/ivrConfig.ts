@@ -36,14 +36,14 @@ export default {
     },
     actions: {
         getIVRConfig({ commit }: { commit: Commit }) {
-            return HTTP.get('/api/freeswitch-phonenumber-config/getIVRConfig').then(res => {
+            return HTTP().get('/api/freeswitch-phonenumber-config/getIVRConfig').then(res => {
                 if (res.data.Status === Status.OK) {
                     commit('setIVRConfig', res.data.Data);
                 }
             })
         },
         saveIVRConfig({ commit }: { commit: Commit }) {
-            return HTTP.get('/api/freeswitch-phonenumber-config/saveIVRConfig');
+            return HTTP().get('/api/freeswitch-phonenumber-config/saveIVRConfig');
         }
     }
 }

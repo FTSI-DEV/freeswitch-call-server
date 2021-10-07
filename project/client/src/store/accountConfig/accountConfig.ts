@@ -42,28 +42,28 @@ export default {
     actions: {
         getAccountConfigs({ commit }: { commit: Commit }, params: any) {
             commit("setAccountConfig", accountConfig);
-            return HTTP.get('api/account-config/getAccountConfigs', params).then(res => {
+            return HTTP(params.authToken).get('api/account-config/getAccountConfigs', params.params).then(res => {
                 if (res.data.Status === Status.OK) {
                     commit('setAccountConfig', res.data);
                 }
             });
         },
         getAccountConfigById({ commit }: { commit: Commit }, params: any) {
-            return HTTP.get('api/account-config/getAccountConfigById', params).then(res => {
+            return HTTP().get('api/account-config/getAccountConfigById', params).then(res => {
                 if (res.data.Status === Status.OK) {
                     commit('setAccountConfigById', res.data);
                 }
             });
         },
         addAccountConfig({ dispatch }: { dispatch: Dispatch }, params: any) {
-            return HTTP.post(`api/account-config/add/${params}`).then(res => {
+            return HTTP(params.authToken).post(`api/account-config/add/${params.accountName}`).then(res => {
                 if (res.data.Status === Status.OK) {
                     dispatch('getAccountConfigs');
                 }
             });
         },
         updateAccountConfig({ dispatch }: { dispatch: Dispatch }, params: any) {
-            return HTTP.get('api/account-config/update', params).then(res => {
+            return HTTP().get('api/account-config/update', params).then(res => {
                 if (res.data.Status === Status.OK) {
                     dispatch('getAccountConfigs');
                 }

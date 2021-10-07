@@ -52,8 +52,11 @@ export default defineComponent({
     });
 
     const saveAccountConfig = () => {
-      console.log("state.accountName: ", state.accountName);
-      store.dispatch("addAccountConfig", state.accountName);
+      const authToken = localStorage.getItem("fs_auth_token");
+      store.dispatch("addAccountConfig", {
+        accountName: state.accountName,
+        authToken
+      });
       console.log("saveAccountConfig");
     };
 

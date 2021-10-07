@@ -1,7 +1,7 @@
 <template>
   <div>
     <div style="padding: 10px">
-      <UserOutlined style="font-size: 30px; font-weight: 600;"/>
+      <UserOutlined style="font-size: 30px; font-weight: 600" />
     </div>
     <a-form :layout="formState.layout" :model="formState" style="margin-top: 15px">
       <a-form-item>
@@ -56,9 +56,11 @@ export default defineComponent({
       console.log("params: ", params);
       store.dispatch("loginUser", params).then((res) => {
         if (res.data.Id) {
+          console.log("res: ", res);
           console.log("res.data: ", res.data);
           localStorage.setItem("fs_user_key", `${res.data.Id}${new Date().getTime()}`);
           localStorage.setItem("fs_username", res.data.Username);
+          localStorage.setItem("fs_auth_token", res.headers.authorization);
           router.push({ path: "/" });
         }
       });

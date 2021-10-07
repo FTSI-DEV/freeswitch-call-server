@@ -49,7 +49,7 @@ export default {
     },
     actions: {
         getCallDetailRecords({ commit }: { commit: Commit }, params: any) {
-            return HTTP.get('/call-detail-record/getCdrLogs', { params: params }).then(res => {
+            return HTTP().get('/call-detail-record/getCdrLogs', { params: params }).then(res => {
                 if (res.data.Status === Status.OK) {
                     //commit('setCallDetailRecords', res.data.Data);
                     commit('setCallDetailRecords', cdrData);
@@ -57,7 +57,7 @@ export default {
             })
         },
         getCallDetailById({ commit }: { commit: Commit }, params: any) {
-            return HTTP.get('/call-detail-record/getCDRById', { params: params });
+            return HTTP().get('/call-detail-record/getCDRById', { params: params });
         }
     }
 }

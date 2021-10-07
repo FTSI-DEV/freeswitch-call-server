@@ -10,7 +10,7 @@ interface ClickToCall {
 export default {
     actions: {
         clickToCall({ commit }: { commit: Commit }, params: ClickToCall) {
-            return HTTP.post('/api/outbound-call/clickToCall', params);
+            return HTTP().post('/api/outbound-call/clickToCall', params);
         }
     }
 }

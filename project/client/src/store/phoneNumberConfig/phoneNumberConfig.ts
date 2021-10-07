@@ -79,31 +79,31 @@ export default {
     },
     actions: {
         getPhoneNumberConfigs({ commit }: { commit: Commit }) {
-            return HTTP.get('/api/freeswitch-phonenumber-config/getPhonenumberConfigs').then(res => {
+            return HTTP().get('/api/freeswitch-phonenumber-config/getPhonenumberConfigs').then(res => {
                 if (res.data.Status === Status.OK){
                     commit('setPhoneNumberConfigs', res.data);
                 }
             });
         },
         getPhoneNumberConfigById({ commit }: { commit: Commit }, params: any) {
-            return HTTP.get(`/api/freeswitch-phonenumber-config/getPhoneNumberConfigById/${params.id}`)
+            return HTTP().get(`/api/freeswitch-phonenumber-config/getPhoneNumberConfigById/${params.id}`)
         },
         addPhoneNumberConfig({ dispatch }: { dispatch: Dispatch }, params: PhoneNumberConfigItem) {
-            return HTTP.post('/api/freeswitch-phonenumber-config/add', params).then(res => {
+            return HTTP().post('/api/freeswitch-phonenumber-config/add', params).then(res => {
                 if (res.status === 201) {
                     dispatch('getPhoneNumberConfigs');
                 }
             });
         },
         updatePhoneNumberConfig({ dispatch }: { dispatch: Dispatch }, params: PhoneNumberConfigItem){
-            return HTTP.post('/api/freeswitch-phonenumber-config/update', params).then(res => {
+            return HTTP().post('/api/freeswitch-phonenumber-config/update', params).then(res => {
                  if (res.status === 201) {
                     dispatch('getPhoneNumberConfigs');
                 }
             });
         },
         deletePhoneNumberConfig({ dispatch }: { dispatch: Dispatch }, params: number) {
-            return HTTP.post(`/api/freeswitch-phonenumber-config/delete/${Number(params)}`).then(res => {
+            return HTTP().post(`/api/freeswitch-phonenumber-config/delete/${Number(params)}`).then(res => {
                 if (res.status === 201) {
                     dispatch('getPhoneNumberConfigs');
                 }

@@ -108,6 +108,7 @@ export default defineComponent({
     const signOut = (): void => {
       localStorage.removeItem("fs_user_key");
       localStorage.removeItem("fs_username");
+      localStorage.removeItem("fs_auth_token");
       navigateRoute("/account/login");
     };
     return {

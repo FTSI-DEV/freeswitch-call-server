@@ -46,7 +46,8 @@ export default defineComponent({
       (): AccountConfigItem[] => store.getters["getAccountConfigs"]
     );
     const getAccountConfigs = () => {
-      store.dispatch("getAccountConfigs");
+      const authToken = localStorage.getItem("fs_auth_token");
+      store.dispatch("getAccountConfigs", { params: { page: 1, limit: 1 }, authToken });
     };
     const saveAccountConfig = () => {
       store.dispatch("addAccountConfig");

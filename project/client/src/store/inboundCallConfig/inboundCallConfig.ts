@@ -61,18 +61,18 @@ export default {
     },
     actions: {
         getInboundCallConfigs({ commit }: { commit: Commit }) {
-          return HTTP.get(`/api/inbound-call-config/getInboundCallConfigs`).then(res => {
+          return HTTP().get(`/api/inbound-call-config/getInboundCallConfigs`).then(res => {
             if (res.data.Status === Status.OK) {
                 commit('setInboundCallConfig', res.data);
             }
           })
         },
         getInboundCallConfigById({commit}: { commit: Commit }, params: number) {
-            return HTTP.get(`/api/inbound-call-config/getInboundCallConfigById/${params}`)
+            return HTTP().get(`/api/inbound-call-config/getInboundCallConfigById/${params}`)
         },
         addInboundCallConfig({ dispatch }: { dispatch: Dispatch }, params: InboundConfigItem) {
             console.log('params: ', params)
-            return HTTP.post('/api/inbound-call-config/add', params)
+            return HTTP().post('/api/inbound-call-config/add', params)
                 .then(res => {
                     if (res.status === 201) {
                         dispatch("getInboundCallConfigs");
@@ -80,7 +80,7 @@ export default {
             })
         },
         deleteInboundCallConfig({ dispatch }: { dispatch: Dispatch }, params: number) {
-            return HTTP.post(`/api/inbound-call-config/delete/${Number(params)}`)
+            return HTTP().post(`/api/inbound-call-config/delete/${Number(params)}`)
                 .then(res => {
                     if (res.status === 201) {
                         dispatch("getInboundCallConfigs");
@@ -88,7 +88,7 @@ export default {
                 });
         },
         updateInboundCallConfig({ dispatch }: { dispatch: Dispatch }, params: InboundConfigItem) {
-            return HTTP.post('/api/inbound-call-config/update', params);
+            return HTTP().post('/api/inbound-call-config/update', params);
         }
     }
 }

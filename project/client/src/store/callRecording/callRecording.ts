@@ -47,7 +47,7 @@ export default {
     },
     actions: {
         getCallRecordings({ commit }: { commit: Commit }, params: any) {
-            return HTTP.get('/api/call-recording/getCallRecordings', { params: params }).then(res => {
+            return HTTP().get('/api/call-recording/getCallRecordings', { params: params }).then(res => {
                 if (res.data.Status === Status.OK) {
                    // commit('setCallRecordings', res.data.Data);
                     commit('setCallRecordings', callRecording);
@@ -55,13 +55,13 @@ export default {
             });
         },
         getCallRecord({ commit }: { commit: Commit }, params: any) {
-            return HTTP.get('/api/call-recording/getCallRecord', { params: params });
+            return HTTP().get('/api/call-recording/getCallRecord', { params: params });
         },
         getRecordFile({ commit }: { commit: Commit }, params: any) {
-            return HTTP.get('/api/call-recording/getRecordFile', { params: params });
+            return HTTP().get('/api/call-recording/getRecordFile', { params: params });
         },
         deleteCallRecording({ dispatch }: { dispatch: Dispatch }, params: any) {
-            return HTTP.get('/api/call-recording/deleteCallRecording', { params: params }).then(res => {
+            return HTTP().get('/api/call-recording/deleteCallRecording', { params: params }).then(res => {
                 if (res.data.Status === Status.OK) {
                     dispatch('getCallRecordings', { page: 1, limit: 1 });
                 }
