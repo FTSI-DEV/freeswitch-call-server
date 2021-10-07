@@ -2,7 +2,7 @@ import { MiddlewareConsumer, Module, NestModule, Req, RequestMethod } from '@nes
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from 'src/auth/auth.module';
 import { AuthService } from 'src/auth/auth.service';
-import { UserAuthMiddleware } from 'src/auth/middlewares/user-auth.middleware';
+// import { UserAuthMiddleware } from 'src/auth/middlewares/user-auth.middleware';
 import { AccountConfigEntity, AccountConfigEntityRepository } from 'src/entity/account-config.entity';
 import { AccountConfigController } from './controllers/account-config.controller';
 import { ACCOUNT_CONFIG_SERVICE } from './services/account-config.interface';

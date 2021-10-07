@@ -16,7 +16,7 @@ export class UserAuthMiddleware implements NestMiddleware{
     ){}
 
     async use(req:Request, res:Response, next:NextFunction){
-
+        console.log('UserAuthMiddleware:validate -> ');
         let authHeaders = req.headers.authorization;
 
         if (authHeaders && (authHeaders as string).split(' ')[1]){

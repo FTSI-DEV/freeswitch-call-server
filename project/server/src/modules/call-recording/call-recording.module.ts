@@ -2,6 +2,7 @@ import { MiddlewareConsumer, Module, NestModule, RequestMethod } from '@nestjs/c
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from 'src/auth/auth.module';
 import { UserAuthMiddleware } from 'src/auth/middlewares/user-auth.middleware';
+// import { UserAuthMiddleware } from 'src/auth/middlewares/user-auth.middleware';
 import { CallRecordingStorageEntity, CallRecordingStorageRepository } from 'src/entity/callRecordingStorage.entity';
 import { CallDetailRecordModule } from '../call-detail-record/call-detail-record.module';
 import { CallRecordingController } from './controllers/call-recording.controller';
@@ -24,7 +25,10 @@ export class CallRecordingModule implements NestModule {
     consumer
         .apply(UserAuthMiddleware)
         .forRoutes(
-          { path: '/**' ,  method: RequestMethod.ALL }
+          { path: 'call-recording/deleteCallRecording/:recordingId' , method: RequestMethod.GET },
+          { path: 'call-recording/getCallRecordings' , method: RequestMethod.GET },
+          { path: 'call-recording/getCallRecord/:recordingId', method: RequestMethod.GET },
+          { path: 'call-recording/getRecordFile/:recordingId', method: RequestMethod.GET }
         )
   }
 }

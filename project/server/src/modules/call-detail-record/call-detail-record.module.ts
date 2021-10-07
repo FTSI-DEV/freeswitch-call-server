@@ -1,7 +1,8 @@
-import { MiddlewareConsumer, Module, NestModule, RequestMethod } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule, Req, RequestMethod } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from 'src/auth/auth.module';
 import { UserAuthMiddleware } from 'src/auth/middlewares/user-auth.middleware';
+// import { UserAuthMiddleware } from 'src/auth/middlewares/user-auth.middleware';
 import { FsCallDetailRecordEntity, FsCallDetailRecordRepository } from 'src/entity/callRecordingStorage.entity';
 import { CallDetailRecordController } from './controllers/call-detail-record.controller';
 import { CALL_DETAIL_RECORD_SERVICE } from './services/call-detail-record.interface';
@@ -26,7 +27,8 @@ export class CallDetailRecordModule implements NestModule {
         consumer
             .apply(UserAuthMiddleware)
             .forRoutes(
-              { path: '/**' ,  method: RequestMethod.ALL }
+              { path: 'call-detail-record/getCdrLogs', method: RequestMethod.GET },
+              { path: 'call-detail-record/getCDRById/:id', method: RequestMethod.GET }
             )
     }
 }

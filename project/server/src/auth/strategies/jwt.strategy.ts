@@ -22,6 +22,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
   }
 
   validate(payload): Promise<UserEntity> {
+    console.log('LocalStrategy:validate -> ');
     return this.authService.verifyUserPayload(payload);
   }
 }
