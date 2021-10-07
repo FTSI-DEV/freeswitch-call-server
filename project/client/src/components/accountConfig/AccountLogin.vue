@@ -46,16 +46,15 @@ export default defineComponent({
     });
     const loginUser = () => {
       const params = {
-        username: formState.username,
-        password: formState.password,
+        Username: formState.username,
+        Password: formState.password,
       };
       console.log("params: ", params);
       store.dispatch("loginUser", params).then((res) => {
-        console.log(res);
-        //   if (res.data.Status === 1) {
-        // }
+        if (res.data.Id) {
+          router.push({ path: "/" });
+        }
       });
-      router.push({ path: "/" });
     };
     return {
       formState,

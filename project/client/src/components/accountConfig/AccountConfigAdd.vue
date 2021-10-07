@@ -37,11 +37,13 @@
 <script lang="ts">
 import { ArrowLeftOutlined } from "@ant-design/icons-vue";
 import { defineComponent, toRefs, reactive } from "vue";
+import { useStore } from "vuex";
 export default defineComponent({
   components: {
     ArrowLeftOutlined,
   },
   setup() {
+    const store = useStore();
     const state = reactive({
       accountName: "",
       accountSID: "",
@@ -50,6 +52,8 @@ export default defineComponent({
     });
 
     const saveAccountConfig = () => {
+      console.log("state.accountName: ", state.accountName);
+      store.dispatch("addAccountConfig", state.accountName);
       console.log("saveAccountConfig");
     };
 
