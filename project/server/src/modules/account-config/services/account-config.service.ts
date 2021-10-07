@@ -38,7 +38,7 @@ export class AccountConfigService implements IAccountConfigService{
 
         let config = await this.getById(param.id);
 
-        config.AuthToken = param.accountName;
+        config.AccountName = param.accountName;
 
         config.DateUpdated = new Date();
 
