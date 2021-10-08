@@ -24,7 +24,11 @@ export default function methodsObj() {
             phoneNumberTo: state.to,
             displayCallerId: state.callerId,
         };
-        store.dispatch("clickToCall", params);
+        const authToken = localStorage.getItem("fs_auth_token");
+        store.dispatch("clickToCall", {
+            authToken,
+            params
+        });
     };
 
     return {
