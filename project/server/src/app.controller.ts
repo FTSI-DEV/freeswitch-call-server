@@ -2,8 +2,8 @@ import { Controller, Get, Post, UseGuards, Request, UnauthorizedException } from
 import { AuthGuard } from '@nestjs/passport';
 import { AppService } from './app.service';
 import { AuthService } from './auth/auth.service';
-import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
-import { LocalAuthGuard } from './auth/guards/local-auth.guard';
+import { UserJwtAuthGuard } from './auth/guards/user-jwt-auth.guard';
+import { UserLocalAuthGuard } from './auth/guards/user-local-auth.guard';
 import { ApiCredential } from './models/apiCredential.model';
 
 @Controller()
@@ -22,7 +22,7 @@ export class AppController {
   //   // return result;
   // }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(UserJwtAuthGuard)
   @Get('profile')
   getProfile(@Request() req){
     console.log('test -> ' , req);

@@ -20,8 +20,8 @@ export class AuthService {
 
     private readonly jwtService: JwtService,
     
-    // @InjectRepository(AccountConfigEntityRepository)
-    // private _accountConfigRepo: AccountConfigEntityRepository
+    @InjectRepository(AccountConfigEntityRepository)
+    private _accountConfigRepo: AccountConfigEntityRepository
   ) {}
 
   async register(signUp: SignUp): Promise<UserEntity> {
@@ -74,6 +74,22 @@ export class AuthService {
     return user;
   }
 
+  async verifyAccountPayload(payload: JwtPayload): Promise<AccountConfigEntity> {
+    let account: AccountConfigEntity;
+
+    console.log('AuthService:verifyAccountPayload -> ', payload);
+
+    try {
+      account = await this._accountConfigRepo.findOne({ where: { AuthToken: payload.sub } });
+    } catch (error) {
+      throw new UnauthorizedException(
+        `There isn't any account with accountSID: ${payload.sub}`,
+      );
+    }
+
+    return account;
+  }
+
   signUserToken(user: UserEntity): string {
     const payload = {
       sub: user.Username,
@@ -88,36 +104,47 @@ export class AuthService {
     return sign;
   }
 
-  async signAccountCredsToken(account:AccountCredentialModel){
+  signAccountCredsToken(account:AccountCredentialModel){
 
     let payload = {
-      accountSID: account.accountSID,
-      sub: account.authKey
+      accountSID: account.AccountSID,
+      sub: account.AuthToken
     };
 
-    return{
-      access_token: this.jwtService.sign(payload)
-    };
+    // return{
+    //   access_token: this.jwtService.sign(payload)
+    // };
+
+    return this.jwtService.sign(payload);
   }
 
-  async validateAccount(accountSID:string, authKey:string):Promise<AccountCredentialModel>{
+  async validateAccount(accountSID:string, authKey:string):Promise<AccountConfigEntity>{
 
-    // let account = await this._accountConfigRepo.createQueryBuilder("AccountConfig")
-    //     .where("AccountConfig.AccountSID = :accountSID", { accountSID : accountSID })
-    //     .getOne();
+    let account = await this._accountConfigRepo.createQueryBuilder("AccountConfig")
+        .where("AccountConfig.AccountSID = :accountSID", { accountSID : accountSID })
+        .getOne();
 
-    let account:any;
+    // let account:any;
 
     if (account &&
         account.AuthToken === authKey){
 
       let accountCreds : AccountCredentialModel = {
-        accountSID: account.AccountSID,
-        authKey: account.AuthToken
+        AccountSID: account.AccountSID,
+        AuthToken: account.AuthToken
       };
 
-      let { authKey, ...result } = accountCreds;
-      return accountCreds;
+      let { AuthToken: authKey, ...result } = accountCreds;
+      
+      return {
+        Id: account.Id,
+        AccountName: account.AccountName,
+        AccountSID: account.AccountSID,
+        AuthToken: account.AuthToken,
+        IsActive: account.IsActive,
+        DateCreated : account.DateCreated,
+        DateUpdated : account.DateCreated
+      };
     }
 
     return null;

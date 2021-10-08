@@ -3,6 +3,7 @@ import { map, Observable } from "rxjs";
 import { AccountCredentialModel } from "src/modules/account-config/models/accountConfigDto.model";
 import { AuthService } from "../auth.service";
 import type { Response } from 'express';
+import { AccountConfigEntity } from "src/entity/account-config.entity";
 
 @Injectable()
 export class AccountTokenInterceptor implements NestInterceptor{
@@ -12,14 +13,23 @@ export class AccountTokenInterceptor implements NestInterceptor{
 
     intercept(
         context: ExecutionContext, 
-        next: CallHandler<AccountCredentialModel>): Observable<AccountCredentialModel> | Promise<Observable<AccountCredentialModel>> {
+        next: CallHandler<AccountConfigEntity>): Observable<AccountConfigEntity> | Promise<Observable<AccountConfigEntity>> {
 
         return next.handle().pipe(
             map((account) => {
+
+                console.log('UserTokenInterceptor:account -> ' , account);
                 
                 const response = context.switchToHttp().getResponse<Response>();
 
-                let token = this.authService.signAccountCredsToken(account);
+                console.log('AccountTokenInterceptor:intercept -> ', account);
+
+                let token = this.authService.signAccountCredsToken({
+                    AuthToken: account.AuthToken,
+                    AccountSID : account.AccountSID
+                });
+
+                console.log('AccountTokenInterceptor:token -> ', token);
 
                 response.setHeader('Authorization', `Bearer ${token}`);
 

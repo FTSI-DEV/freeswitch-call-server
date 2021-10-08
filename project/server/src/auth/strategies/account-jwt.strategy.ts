@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy, ExtractJwt } from 'passport-jwt';
+import { AccountConfigEntity } from 'src/entity/account-config.entity';
 import { UserEntity } from 'src/entity/user.entity';
 
 import { AuthService } from '../auth.service';
@@ -10,7 +11,7 @@ import { UserBlacklistedTokenValidator } from '../validator/user-blacklisted-tok
 const APP_SECRET = '0dd8d1d7c673300e0e800e10e13eb6ee1414c140e046ebf7e2229010ab7ab79a10f06fddeebabfb428b6a380aa12654c';
 
 @Injectable()
-export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
+export class AccountJwtStrategy extends PassportStrategy(Strategy, 'jwtAccount') {
 
   constructor(private readonly authService: AuthService) {
     super({
@@ -21,8 +22,9 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
     });
   }
 
-  validate(payload): Promise<UserEntity> {
-    console.log('LocalStrategy:validate -> ');
-    return this.authService.verifyUserPayload(payload);
+  validate(payload): Promise<AccountConfigEntity> {
+    console.log('AccountJwtStrategy:validate -> ');
+    return null;
+    // return this.authService.verifyUserPayload(payload);
   }
 }

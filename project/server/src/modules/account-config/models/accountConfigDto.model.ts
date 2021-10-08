@@ -8,6 +8,6 @@ export class AccountConfigDTO{
 }
 
 export class AccountCredentialModel{
-    accountSID:string;
-    authKey:string;
+    AccountSID:string;
+    AuthToken:string;
 }

@@ -12,7 +12,15 @@ import { TestService } from "./test.service";
     providers: [TestService],
     controllers: [TestController2]
 })
-export class TestModule{}
+export class TestModule implements NestModule{
+    public configure(consumer:MiddlewareConsumer){
+        consumer
+            .apply(AccountAuthMiddleware)
+            .forRoutes(
+                { path: "test/testSofiaStatus", method: RequestMethod.GET }
+            )
+    }
+}
 // export class TestModule implements NestModule{
 //     public configure(consumer:MiddlewareConsumer){
 //         consumer

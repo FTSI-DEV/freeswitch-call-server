@@ -27,10 +27,10 @@ export class UserTokenInterceptor implements NestInterceptor {
   ): Observable<UserEntity> {
     return next.handle().pipe(
       map((user) => {
-        console.log('UserTokenInterceptor:validate -> ');
-        const response = context.switchToHttp().getResponse<Response>();
 
-        console.log('TokenInterceptor:user -> ', user);
+        console.log('UserTokenInterceptor:user -> ' , user);
+
+        const response = context.switchToHttp().getResponse<Response>();
 
         const token = this.authService.signUserToken(user);
 
