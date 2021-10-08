@@ -76,6 +76,9 @@ export default {
         },
         updateAccountConfig({ dispatch }: { dispatch: Dispatch }, params: any) {
             return HTTP(params.authToken).post('api/account-config/update', params.params);
+        },
+        deleteAccountConfig({ dispatch }: { dispatch: Dispatch }, params: any) {
+            return HTTP(params.authToken).post('api/account-config/delete', params.params);
         }
     }
 }  
