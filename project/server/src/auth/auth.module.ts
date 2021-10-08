@@ -1,4 +1,4 @@
-import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule, RequestMethod } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -9,10 +9,13 @@ import { AccountConfigModule } from 'src/modules/account-config/account-config.m
 import { UsersModule } from 'src/modules/users/users.module';
 
 import { AuthController } from './auth.controller';
-import { AuthService } from './auth.service';
+import { AuthService, AUTH_SERVICE } from './auth.service';
 import { SessionSerializer } from './session.serializer';
-import { JwtStrategy } from './strategies/jwt.strategy';
-import { LocalStrategy } from './strategies/local.strategy';
+import { UserJwtStrategy } from './strategies/user-jwt.strategy';
+import { LocalAccountStrategy } from './strategies/local-account.strategt';
+import { AccountJwtStrategy } from './strategies/account-jwt.strategy';
+import { LocalUserStrategy } from './strategies/local-user.strategy';
+import { AccountAuthMiddleware } from './middlewares/account-auth.middleware';
 
 const APP_SECRET = '0dd8d1d7c673300e0e800e10e13eb6ee1414c140e046ebf7e2229010ab7ab79a10f06fddeebabfb428b6a380aa12654c';
 
@@ -30,11 +33,21 @@ const APP_SECRET = '0dd8d1d7c673300e0e800e10e13eb6ee1414c140e046ebf7e2229010ab7a
         algorithms: ['HS384'],
       },
     }),
-    // TypeOrmModule.forFeature([AccountConfigEntity, AccountConfigEntityRepository]),
+    TypeOrmModule.forFeature([AccountConfigEntity, AccountConfigEntityRepository]),
   ],
   controllers: [AuthController],
-  providers: [AuthService, LocalStrategy, JwtStrategy, SessionSerializer],
-  exports: [AuthService]
+  providers: [{
+    useClass: AuthService,
+    provide: AUTH_SERVICE
+  }, LocalAccountStrategy, AccountJwtStrategy, LocalUserStrategy, UserJwtStrategy, SessionSerializer],
+  exports: [AUTH_SERVICE]
 })
-export class AuthModule {
+export class AuthModule implements NestModule{
+  public configure(consumer:MiddlewareConsumer){
+    // consumer
+    //   .apply(AccountAuthMiddleware)
+    //   .forRoutes(
+    //     { path: "auth/loginAccount", method: RequestMethod. POST }
+    //   )
+  }
 }

@@ -19,7 +19,7 @@ export class CreateTableAccountConfig1633087795687 implements MigrationInterface
             ("Id" SERIAL NOT NULL, 
             "AccountSID" uuid NOT NULL,
             "AccountName" varchar(200),
-            "AuthToken" varchar(500) NOT NULL, 
+            "AuthKey" varchar(500) NOT NULL, 
             "DateCreated" timestamp without time zone NOT NULL, 
             "DateUpdated" timestamp without time zone,
             "IsActive" boolean NOT NULL DEFAULT false,

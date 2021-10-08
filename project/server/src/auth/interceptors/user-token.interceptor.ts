@@ -1,6 +1,7 @@
 import {
   CallHandler,
   ExecutionContext,
+  Inject,
   Injectable,
   NestInterceptor,
 } from '@nestjs/common';
@@ -9,7 +10,7 @@ import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { UserEntity } from 'src/entity/user.entity';
 
-import { AuthService } from '../auth.service';
+import { AuthService, AUTH_SERVICE } from '../auth.service';
 import { UserBlacklistedTokenValidator } from '../validator/user-blacklisted-token.validator';
 
 @Injectable()
@@ -18,6 +19,7 @@ export class UserTokenInterceptor implements NestInterceptor {
   private readonly userTokenValidator = new UserBlacklistedTokenValidator();
 
   constructor(
+    @Inject(AUTH_SERVICE)
     private readonly authService: AuthService,
   ) {}
 
@@ -27,10 +29,10 @@ export class UserTokenInterceptor implements NestInterceptor {
   ): Observable<UserEntity> {
     return next.handle().pipe(
       map((user) => {
-        console.log('UserTokenInterceptor:validate -> ');
-        const response = context.switchToHttp().getResponse<Response>();
 
-        console.log('TokenInterceptor:user -> ', user);
+        console.log('UserTokenInterceptor:user -> ' , user);
+
+        const response = context.switchToHttp().getResponse<Response>();
 
         const token = this.authService.signUserToken(user);
 

@@ -7,10 +7,17 @@ import { AccountCredentialModel } from 'src/modules/account-config/models/accoun
 import { ACCOUNT_CONFIG_SERVICE, IAccountConfigService } from 'src/modules/account-config/services/account-config.interface';
 import { IUserService, USER_SERVICE } from 'src/modules/users/services/users.interface';
 import { UsersService } from 'src/modules/users/services/users.service';
+import { ReturningStatementNotSupportedError } from 'typeorm';
 import { SignUp } from './dto/sign-up.dto';
 // import { SignUp } from './dto/sign-up.dto';
 
 import { JwtPayload } from './interfaces/jwt-payload.interface';
+
+export const AUTH_SERVICE = 'AUTH_SERVICE';
+
+export interface IAuthService {
+  
+}
 
 @Injectable()
 export class AuthService {
@@ -20,8 +27,8 @@ export class AuthService {
 
     private readonly jwtService: JwtService,
     
-    // @InjectRepository(AccountConfigEntityRepository)
-    // private _accountConfigRepo: AccountConfigEntityRepository
+    @InjectRepository(AccountConfigEntityRepository)
+    private _accountConfigRepo: AccountConfigEntityRepository
   ) {}
 
   async register(signUp: SignUp): Promise<UserEntity> {
@@ -69,9 +76,30 @@ export class AuthService {
         `There isn't any user with username: ${payload.sub}`,
       );
     }
-    delete user.Password;
+
+    if (user)
+      delete user.Password;
 
     return user;
+  }
+
+  async verifyAccountPayload(payload: JwtPayload): Promise<AccountConfigEntity> {
+    let account: AccountConfigEntity;
+
+    console.log('AuthService:verifyAccountPayload -> ', payload);
+
+    try {
+      account = await this._accountConfigRepo.findOne({ where: { AuthKey: payload.sub } });
+
+      console.log('AuthService:verifyaccountpayload: account -> ', account);
+
+    } catch (error) {
+      throw new UnauthorizedException(
+        `There isn't any account with accountSID: ${payload.sub}`,
+      );
+    }
+
+    return account;
   }
 
   signUserToken(user: UserEntity): string {
@@ -88,35 +116,48 @@ export class AuthService {
     return sign;
   }
 
-  async signAccountCredsToken(account:AccountCredentialModel){
+  signAccountCredsToken(account:AccountCredentialModel){
 
     let payload = {
-      accountSID: account.accountSID,
-      sub: account.authKey
+      accountSID: account.AccountSID,
+      sub: account.AuthKey
     };
 
-    return{
-      access_token: this.jwtService.sign(payload)
-    };
+    // return{
+    //   access_token: this.jwtService.sign(payload)
+    // };
+
+    return this.jwtService.sign(payload);
   }
 
   async validateAccount(accountSID:string, authKey:string):Promise<AccountCredentialModel>{
 
-    // let account = await this._accountConfigRepo.createQueryBuilder("AccountConfig")
-    //     .where("AccountConfig.AccountSID = :accountSID", { accountSID : accountSID })
-    //     .getOne();
+    let account = await this._accountConfigRepo.createQueryBuilder("AccountConfig")
+        .where("AccountConfig.AccountSID = :accountSID", { accountSID : accountSID })
+        .getOne();
 
-    let account:any;
+    // let account:any;
 
     if (account &&
-        account.AuthToken === authKey){
+        account.AuthKey === authKey){
 
       let accountCreds : AccountCredentialModel = {
-        accountSID: account.AccountSID,
-        authKey: account.AuthToken
+        AccountSID: account.AccountSID,
+        AuthKey: account.AuthKey
       };
 
-      let { authKey, ...result } = accountCreds;
+      let { AuthKey: authKey, ...result } = accountCreds;
+      
+      // return {
+      //   Id: account.Id,
+      //   AccountName: account.AccountName,
+      //   AccountSID: account.AccountSID,
+      //   AuthKey: account.AuthKey,
+      //   IsActive: account.IsActive,
+      //   DateCreated : account.DateCreated,
+      //   DateUpdated : account.DateCreated
+      // };
+
       return accountCreds;
     }
 

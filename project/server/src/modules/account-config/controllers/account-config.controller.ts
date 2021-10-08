@@ -1,12 +1,12 @@
 import { Body, Controller, DefaultValuePipe, Get, Inject, Param, ParseIntPipe, Post, Query, UseGuards } from '@nestjs/common';
-import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import { UserJwtAuthGuard } from 'src/auth/guards/user-jwt-auth.guard';
 import { JsonDataListReturnModel } from 'src/utils/jsonDataListReturnModel';
 import { AccountConfigModel } from '../models/accountConfig.model';
 import { AccountConfigDTO } from '../models/accountConfigDto.model';
 import { ACCOUNT_CONFIG_SERVICE, IAccountConfigService } from '../services/account-config.interface';
 
 @Controller('account-config')
-@UseGuards(JwtAuthGuard)
+@UseGuards(UserJwtAuthGuard)
 export class AccountConfigController {
 
     constructor(
@@ -26,7 +26,7 @@ export class AccountConfigController {
             let accountConfigDTO : AccountConfigDTO = {
                 id: config.Id,
                 accountName: config.AccountName,
-                authKey: config.AuthToken,
+                authKey: config.AuthKey,
                 isActive: config.IsActive,
                 dateCreated: config.DateCreated,
                 accountSID: config.AccountSID
