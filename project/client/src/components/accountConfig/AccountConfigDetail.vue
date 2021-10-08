@@ -20,7 +20,7 @@
         </div>
         <div style="flex: 1; text-align: right; line-height: 2; font-size: 0.8em">
           <CalendarOutlined style="margin-right: 5px" title="Date Created" />{{
-            configItem.dateCreated
+            convertDateTime(configItem.dateCreated)
           }}
         </div>
       </div>
@@ -77,6 +77,10 @@ import {
 } from "@ant-design/icons-vue";
 import { defineComponent, toRefs, reactive, computed, onMounted } from "vue";
 import { useStore } from "vuex";
+import moment, { Moment } from "moment";
+
+const dateTimeConverter: Moment = moment();
+
 export default defineComponent({
   components: {
     ArrowLeftOutlined,
@@ -103,10 +107,14 @@ export default defineComponent({
         authToken,
       });
     };
+    const convertDateTime = (dateTime: string): string => {
+      return moment(dateTime).format("MM/DD/YYYY hh:mm A");
+    };
     return {
       ...toRefs(state),
       updateAccountConfig,
       configItem,
+      convertDateTime,
     };
   },
 });

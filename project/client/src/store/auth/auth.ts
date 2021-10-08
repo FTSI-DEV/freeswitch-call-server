@@ -9,5 +9,8 @@ export default {
         registerUser({ commit }: { commit: Commit }, params: any) {
             return HTTP().post("api/auth/register", params)
         },
+        logoutUser({ commit }: { commit: Commit }, params: any) {
+            return HTTP(params.authToken).post("api/auth/logoutUser")
+        },
     }
 }

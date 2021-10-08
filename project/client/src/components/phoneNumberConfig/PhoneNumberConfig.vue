@@ -77,7 +77,7 @@
         </a-row>  -->
     <b-row v-if="phoneNumberConfigList.length">
       <b-col>
-        <a-table :data-source="null" :columns="columns">
+        <a-table :data-source="phoneNumberConfigList" :columns="columns">
           <template #action="{ record }">
             <a title="Edit" @click="editConfig(record)"
               ><EditOutlined style="font-size: 1.2em; margin-right: 15px"

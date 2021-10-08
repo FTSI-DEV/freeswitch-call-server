@@ -22,6 +22,9 @@ const routes: Array<any> = [
         path: "/account/login",
         name: "Login",
         component: AccountPage,
+        meta: {
+            requiresAuth: true,
+        },
         children: [
             {
                 path: '/account/login',
@@ -54,11 +57,17 @@ const routes: Array<any> = [
                 path: "/call-recording",
                 name: "Call Recording",
                 component: CallRecording,
+                meta: {
+                    requiresAuth: true,
+                },
             },
             {
                 path: "/call-recording/details",
                 name: "Call Recording Details",
                 component: CallRecordingDetail,
+                meta: {
+                    requiresAuth: true,
+                },
             },
             {
                 path: "/call-logs",
@@ -93,6 +102,16 @@ const router = createRouter({
     history,
     routes,
 });
+
+// router.beforeEach((to, from, next) => {
+//     if (to.matched.some(record => record.meta.requiresAuth)) {
+//         if (!localStorage.getItem('fs_auth_token')) {
+//             next("/");
+//         } else {
+//             next();
+//         }
+//     } else { next() }
+// });
 
 export default router;
 

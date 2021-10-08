@@ -8,7 +8,7 @@ export const HTTP = (token?: string) => {
         headers: {
             Accept: 'application/json',
             'Content-Type': 'application/json',
-            'Authorization': token ? token : undefined
+            'Authorization': token
         }
     });
 }
