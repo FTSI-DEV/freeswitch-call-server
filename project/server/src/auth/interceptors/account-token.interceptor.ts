@@ -14,7 +14,7 @@ export class AccountTokenInterceptor implements NestInterceptor{
 
     intercept(
         context: ExecutionContext, 
-        next: CallHandler<AccountConfigEntity>): Observable<AccountConfigEntity> | Promise<Observable<AccountConfigEntity>> {
+        next: CallHandler<AccountCredentialModel>): Observable<AccountCredentialModel> | Promise<Observable<AccountCredentialModel>> {
 
         return next.handle().pipe(
             map((account) => {
@@ -25,10 +25,7 @@ export class AccountTokenInterceptor implements NestInterceptor{
 
                 console.log('AccountTokenInterceptor:intercept -> ', account);
 
-                let token = this.authService.signAccountCredsToken({
-                    AuthToken: account.AuthToken,
-                    AccountSID : account.AccountSID
-                });
+                let token = this.authService.signAccountCredsToken(account);
 
                 console.log('AccountTokenInterceptor:token -> ', token);
 

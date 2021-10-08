@@ -7,6 +7,7 @@ import { AccountCredentialModel } from 'src/modules/account-config/models/accoun
 import { ACCOUNT_CONFIG_SERVICE, IAccountConfigService } from 'src/modules/account-config/services/account-config.interface';
 import { IUserService, USER_SERVICE } from 'src/modules/users/services/users.interface';
 import { UsersService } from 'src/modules/users/services/users.service';
+import { ReturningStatementNotSupportedError } from 'typeorm';
 import { SignUp } from './dto/sign-up.dto';
 // import { SignUp } from './dto/sign-up.dto';
 
@@ -88,7 +89,7 @@ export class AuthService {
     console.log('AuthService:verifyAccountPayload -> ', payload);
 
     try {
-      account = await this._accountConfigRepo.findOne({ where: { AuthToken: payload.sub } });
+      account = await this._accountConfigRepo.findOne({ where: { AuthKey: payload.sub } });
 
       console.log('AuthService:verifyaccountpayload: account -> ', account);
 
@@ -119,7 +120,7 @@ export class AuthService {
 
     let payload = {
       accountSID: account.AccountSID,
-      sub: account.AuthToken
+      sub: account.AuthKey
     };
 
     // return{
@@ -129,7 +130,7 @@ export class AuthService {
     return this.jwtService.sign(payload);
   }
 
-  async validateAccount(accountSID:string, authKey:string):Promise<AccountConfigEntity>{
+  async validateAccount(accountSID:string, authKey:string):Promise<AccountCredentialModel>{
 
     let account = await this._accountConfigRepo.createQueryBuilder("AccountConfig")
         .where("AccountConfig.AccountSID = :accountSID", { accountSID : accountSID })
@@ -138,24 +139,26 @@ export class AuthService {
     // let account:any;
 
     if (account &&
-        account.AuthToken === authKey){
+        account.AuthKey === authKey){
 
       let accountCreds : AccountCredentialModel = {
         AccountSID: account.AccountSID,
-        AuthToken: account.AuthToken
+        AuthKey: account.AuthKey
       };
 
-      let { AuthToken: authKey, ...result } = accountCreds;
+      let { AuthKey: authKey, ...result } = accountCreds;
       
-      return {
-        Id: account.Id,
-        AccountName: account.AccountName,
-        AccountSID: account.AccountSID,
-        AuthToken: account.AuthToken,
-        IsActive: account.IsActive,
-        DateCreated : account.DateCreated,
-        DateUpdated : account.DateCreated
-      };
+      // return {
+      //   Id: account.Id,
+      //   AccountName: account.AccountName,
+      //   AccountSID: account.AccountSID,
+      //   AuthKey: account.AuthKey,
+      //   IsActive: account.IsActive,
+      //   DateCreated : account.DateCreated,
+      //   DateUpdated : account.DateCreated
+      // };
+
+      return accountCreds;
     }
 
     return null;

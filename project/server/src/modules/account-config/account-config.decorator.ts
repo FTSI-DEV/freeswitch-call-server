@@ -7,7 +7,7 @@ export const AuthAccount = createParamDecorator(
     (data: keyof AccountConfigEntity, 
     ctx: ExecutionContext) => {
 
-        const account = ctx.switchToHttp().getRequest<Request>().user as AccountConfigEntity;
+        const account = ctx.switchToHttp().getRequest<Request>().user as AccountCredentialModel;
 
         console.log('AuthAccount:account -> ', account);
 

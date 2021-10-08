@@ -98,7 +98,7 @@ export class AuthController {
     @UseGuards(AccountLocalAuthGuard)
     @HttpCode(HttpStatus.OK)
     @UseInterceptors(AccountTokenInterceptor)
-    async loginAccount(@AuthAccount() account: AccountConfigEntity): Promise<AccountConfigEntity>{
+    async loginAccount(@AuthAccount() account: AccountCredentialModel): Promise<AccountCredentialModel>{
       console.log('AuthController:account -> ', account);
       return account;
     }

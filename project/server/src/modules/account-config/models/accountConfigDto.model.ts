@@ -1,3 +1,5 @@
+import { IsDefined, IsNotEmpty } from "class-validator";
+
 export class AccountConfigDTO{
     id:number;
     accountSID:string;
@@ -8,6 +10,12 @@ export class AccountConfigDTO{
 }
 
 export class AccountCredentialModel{
+
+    @IsDefined()
+    @IsNotEmpty()
     AccountSID:string;
-    AuthToken:string;
+    
+    @IsDefined()
+    @IsNotEmpty()
+    AuthKey:string;
 }

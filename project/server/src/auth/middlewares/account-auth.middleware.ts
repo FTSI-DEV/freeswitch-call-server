@@ -23,7 +23,7 @@ export class AccountAuthMiddleware implements NestMiddleware{
 
         let body : AccountCredentialModel = req.body;
 
-        let account = await this.authService.validateAccount(body.AccountSID, body.AuthToken);
+        let account = await this.authService.validateAccount(body.AccountSID, body.AuthKey);
 
         console.log('AccountAuthMiddleware:Account -> ', account);
 

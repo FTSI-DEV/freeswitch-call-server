@@ -26,7 +26,7 @@ export class AccountConfigController {
             let accountConfigDTO : AccountConfigDTO = {
                 id: config.Id,
                 accountName: config.AccountName,
-                authKey: config.AuthToken,
+                authKey: config.AuthKey,
                 isActive: config.IsActive,
                 dateCreated: config.DateCreated,
                 accountSID: config.AccountSID

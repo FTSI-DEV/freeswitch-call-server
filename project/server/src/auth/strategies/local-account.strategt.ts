@@ -3,6 +3,7 @@ import { PassportStrategy } from '@nestjs/passport';
 import { Strategy } from 'passport-local';
 import { AccountConfigEntity } from 'src/entity/account-config.entity';
 import { UserEntity } from 'src/entity/user.entity';
+import { AccountCredentialModel } from 'src/modules/account-config/models/accountConfigDto.model';
 
 import { AuthService, AUTH_SERVICE } from '../auth.service';
 
@@ -13,15 +14,15 @@ export class LocalAccountStrategy extends PassportStrategy(Strategy, 'localAccou
     private readonly authService: AuthService) {
     super({
       usernameField: 'AccountSID',
-      passwordField: 'AuthToken',
+      passwordField: 'AuthKey',
       passReqToCallback: false,
     });
   }
 
-  async validate(AccountSID: string, AuthToken: string): Promise<AccountConfigEntity> {
+  async validate(AccountSID: string, AuthKey: string): Promise<AccountCredentialModel> {
     console.log('LocalAccountStrategy:AccountSID -> ', AccountSID);
-    console.log('LocalAccountStrategy:AuthToken -> ', AuthToken);
-    let result =  await this.authService.validateAccount(AccountSID, AuthToken);
+    console.log('LocalAccountStrategy:AuthToken -> ', AuthKey);
+    let result =  await this.authService.validateAccount(AccountSID, AuthKey);
     return result;
   }
 }
