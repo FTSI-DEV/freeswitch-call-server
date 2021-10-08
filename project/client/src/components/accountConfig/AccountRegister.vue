@@ -8,19 +8,32 @@
     </div>
     <a-form :layout="formState.layout" :model="formState" style="margin-top: 15px">
       <a-form-item>
-        <a-input v-model:value="formState.firstName" placeholder="First Name" />
+        <a-input
+          v-model:value="formState.firstName"
+          placeholder="First Name"
+          :class="isInvalid(formState.firstName)"
+        />
       </a-form-item>
       <a-form-item>
-        <a-input v-model:value="formState.lastName" placeholder="Last Name" />
+        <a-input
+          v-model:value="formState.lastName"
+          placeholder="Last Name"
+          :class="isInvalid(formState.lastName)"
+        />
       </a-form-item>
       <a-form-item>
-        <a-input v-model:value="formState.username" placeholder="Username" />
+        <a-input
+          v-model:value="formState.username"
+          placeholder="Username"
+          :class="isInvalid(formState.username)"
+        />
       </a-form-item>
       <a-form-item>
         <a-input
           v-model:value="formState.password"
           placeholder="Password"
           type="password"
+          :class="isInvalid(formState.password)"
         />
       </a-form-item>
       <a-button type="primary" @click="registerUser" style="width: 100%">Save</a-button>
@@ -38,6 +51,7 @@ interface FormState {
   lastName: string;
   username: string;
   password: string;
+  hasError: boolean;
 }
 export default defineComponent({
   components: { ArrowLeftOutlined, UserAddOutlined },
@@ -50,9 +64,21 @@ export default defineComponent({
       lastName: "",
       username: "",
       password: "",
+      hasError: false,
     });
-
+    const isInvalid = (value: string): string =>
+      !value && formState.hasError ? "invalid" : "";
     const registerUser = (): void => {
+      if (
+        !formState.firstName ||
+        !formState.lastName ||
+        !formState.username ||
+        !formState.password
+      ) {
+        formState.hasError = true;
+        return;
+      }
+      formState.hasError = false;
       const params = {
         FirstName: formState.firstName,
         LastName: formState.lastName,
@@ -70,7 +96,13 @@ export default defineComponent({
     return {
       formState,
       registerUser,
+      isInvalid,
     };
   },
 });
 </script>
+<style scoped>
+.invalid {
+  border: 1px solid red;
+}
+</style>

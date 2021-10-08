@@ -85,6 +85,7 @@ import {
 } from "@ant-design/icons-vue";
 import { defineComponent, ref } from "vue";
 import { useRouter } from "vue-router";
+import { useStore } from "vuex";
 export default defineComponent({
   components: {
     SettingFilled,
@@ -96,6 +97,7 @@ export default defineComponent({
     DownOutlined,
   },
   setup() {
+    const store = useStore();
     const username = ref<string>("");
     const router = useRouter();
     const navigateRoute = (path: string) => {
@@ -106,10 +108,13 @@ export default defineComponent({
       username.value = localStorage.getItem("fs_username") || "";
     }
     const signOut = (): void => {
-      localStorage.removeItem("fs_user_key");
-      localStorage.removeItem("fs_username");
-      localStorage.removeItem("fs_auth_token");
-      navigateRoute("/account/login");
+      const authToken = localStorage.getItem("fs_auth_token");
+      store.dispatch("logoutUser", { authToken }).then(() => {
+        localStorage.removeItem("fs_user_key");
+        localStorage.removeItem("fs_username");
+        localStorage.removeItem("fs_auth_token");
+        navigateRoute("/account/login");
+      });
     };
     return {
       navigateRoute,

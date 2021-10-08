@@ -20,7 +20,7 @@
         </div>
         <div style="flex: 1; text-align: right; line-height: 2; font-size: 0.8em">
           <CalendarOutlined style="margin-right: 5px" title="Date Created" />{{
-            configItem.dateCreated
+            convertDateTime(configItem.dateCreated)
           }}
         </div>
       </div>
@@ -61,6 +61,11 @@
               >
             </div>
           </a-col>
+          <a-col :span="12" style="text-align: right">
+            <a-button type="primary" danger @click="deactivateAccount(configItem)"
+              >Deactivate</a-button
+            >
+          </a-col>
         </a-row>
       </div>
     </div>
@@ -77,6 +82,10 @@ import {
 } from "@ant-design/icons-vue";
 import { defineComponent, toRefs, reactive, computed, onMounted } from "vue";
 import { useStore } from "vuex";
+import moment, { Moment } from "moment";
+
+const dateTimeConverter: Moment = moment();
+
 export default defineComponent({
   components: {
     ArrowLeftOutlined,
@@ -103,10 +112,33 @@ export default defineComponent({
         authToken,
       });
     };
+    const convertDateTime = (dateTime: string): string => {
+      return moment(dateTime).format("MM/DD/YYYY hh:mm A");
+    };
+    const deactivateAccount = (item: any): void => {
+      const authToken = localStorage.getItem("fs_auth_token");
+      store
+        .dispatch("deleteAccountConfig", { params: { id: item.id }, authToken })
+        .then((res) => {
+          if (res.data.Status === 1) {
+            store
+              .dispatch("getAccountConfigById", {
+                id: item.id,
+                authToken,
+              })
+              .then((res) => {
+                if (res.data.Status === 1)
+                  store.dispatch("setAccountConfigData", res.data.Data);
+              });
+          }
+        });
+    };
     return {
       ...toRefs(state),
       updateAccountConfig,
       configItem,
+      convertDateTime,
+      deactivateAccount,
     };
   },
 });

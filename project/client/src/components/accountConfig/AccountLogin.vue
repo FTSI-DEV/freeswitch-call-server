@@ -5,12 +5,17 @@
     </div>
     <a-form :layout="formState.layout" :model="formState" style="margin-top: 15px">
       <a-form-item>
-        <a-input v-model:value="formState.username" placeholder="Username" />
+        <a-input
+          v-model:value="formState.username"
+          placeholder="Username"
+          :class="isInvalid(formState.username)"
+        />
       </a-form-item>
       <a-form-item>
         <a-input
           v-model:value="formState.password"
           placeholder="Password"
+          :class="isInvalid(formState.password)"
           type="password"
         />
       </a-form-item>
@@ -37,6 +42,7 @@ interface FormState {
   layout: "horizontal" | "vertical" | "inline";
   username: string;
   password: string;
+  hasError: boolean;
 }
 export default defineComponent({
   components: { UserOutlined },
@@ -47,8 +53,16 @@ export default defineComponent({
       layout: "horizontal",
       username: "",
       password: "",
+      hasError: false,
     });
+    const isInvalid = (value: string): string =>
+      !value && formState.hasError ? "invalid" : "";
     const loginUser = () => {
+      if (!formState.username || !formState.password) {
+        formState.hasError = true;
+        return;
+      }
+      formState.hasError = false;
       const params = {
         Username: formState.username,
         Password: formState.password,
@@ -68,6 +82,7 @@ export default defineComponent({
     return {
       formState,
       loginUser,
+      isInvalid,
     };
   },
 });
@@ -83,5 +98,8 @@ export default defineComponent({
   flex: 1;
   border-bottom: 1px solid #cecece;
   height: 13px;
+}
+.invalid {
+  border: 1px solid red;
 }
 </style>
