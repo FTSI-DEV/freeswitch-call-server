@@ -1,6 +1,7 @@
 import { MiddlewareConsumer, Module, NestModule, RequestMethod } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from 'src/auth/auth.module';
+import { AccountAuthMiddleware } from 'src/auth/middlewares/account-auth.middleware';
 import { UserAuthMiddleware } from 'src/auth/middlewares/user-auth.middleware';
 // import { UserAuthMiddleware } from 'src/auth/middlewares/user-auth.middleware';
 import { CallRecordingStorageEntity, CallRecordingStorageRepository } from 'src/entity/callRecordingStorage.entity';
@@ -22,13 +23,19 @@ import { CallRecordingService } from './services/call-recording.service';
 })
 export class CallRecordingModule implements NestModule {
   public configure(consumer:MiddlewareConsumer){
-    consumer
-        .apply(UserAuthMiddleware)
-        .forRoutes(
-          { path: 'call-recording/deleteCallRecording/:recordingId' , method: RequestMethod.GET },
-          { path: 'call-recording/getCallRecordings' , method: RequestMethod.GET },
-          { path: 'call-recording/getCallRecord/:recordingId', method: RequestMethod.GET },
-          { path: 'call-recording/getRecordFile/:recordingId', method: RequestMethod.GET }
-        )
+    // consumer
+    //     .apply(UserAuthMiddleware, AccountAuthMiddleware)
+    //     .forRoutes(
+    //       { path: 'call-recording/deleteCallRecording/:recordingId' , method: RequestMethod.GET },
+    //       { path: 'call-recording/getCallRecordings' , method: RequestMethod.GET },
+    //       { path: 'call-recording/getCallRecord/:recordingId', method: RequestMethod.GET },
+    //       { path: 'call-recording/getRecordFile/:recordingId', method: RequestMethod.GET }
+    //     )
+
+    // consumer
+    //     .apply(AccountAuthMiddleware)
+    //     .forRoutes(
+    //       { path: 'call-recording/getCallRecordings' , method: RequestMethod.GET }
+    //     )
   }
 }

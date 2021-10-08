@@ -9,7 +9,7 @@ import { AccountConfigModule } from 'src/modules/account-config/account-config.m
 import { UsersModule } from 'src/modules/users/users.module';
 
 import { AuthController } from './auth.controller';
-import { AuthService } from './auth.service';
+import { AuthService, AUTH_SERVICE } from './auth.service';
 import { SessionSerializer } from './session.serializer';
 import { UserJwtStrategy } from './strategies/user-jwt.strategy';
 import { LocalAccountStrategy } from './strategies/local-account.strategt';
@@ -36,8 +36,11 @@ const APP_SECRET = '0dd8d1d7c673300e0e800e10e13eb6ee1414c140e046ebf7e2229010ab7a
     TypeOrmModule.forFeature([AccountConfigEntity, AccountConfigEntityRepository]),
   ],
   controllers: [AuthController],
-  providers: [AuthService, LocalAccountStrategy, AccountJwtStrategy, LocalUserStrategy, UserJwtStrategy, SessionSerializer],
-  exports: [AuthService]
+  providers: [{
+    useClass: AuthService,
+    provide: AUTH_SERVICE
+  }, LocalAccountStrategy, AccountJwtStrategy, LocalUserStrategy, UserJwtStrategy, SessionSerializer],
+  exports: [AUTH_SERVICE]
 })
 export class AuthModule implements NestModule{
   public configure(consumer:MiddlewareConsumer){

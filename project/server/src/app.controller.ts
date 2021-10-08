@@ -9,8 +9,7 @@ import { ApiCredential } from './models/apiCredential.model';
 @Controller()
 export class AppController {
   constructor(
-    private readonly appService: AppService,
-    private authService: AuthService) {}
+    private readonly appService: AppService) {}
 
   // @UseGuards(LocalAuthGuard)
   // @Post('auth/login')

@@ -12,6 +12,12 @@ import { SignUp } from './dto/sign-up.dto';
 
 import { JwtPayload } from './interfaces/jwt-payload.interface';
 
+export const AUTH_SERVICE = 'AUTH_SERVICE';
+
+export interface IAuthService {
+  
+}
+
 @Injectable()
 export class AuthService {
   constructor(
@@ -69,7 +75,9 @@ export class AuthService {
         `There isn't any user with username: ${payload.sub}`,
       );
     }
-    delete user.Password;
+
+    if (user)
+      delete user.Password;
 
     return user;
   }
@@ -81,6 +89,9 @@ export class AuthService {
 
     try {
       account = await this._accountConfigRepo.findOne({ where: { AuthToken: payload.sub } });
+
+      console.log('AuthService:verifyaccountpayload: account -> ', account);
+
     } catch (error) {
       throw new UnauthorizedException(
         `There isn't any account with accountSID: ${payload.sub}`,

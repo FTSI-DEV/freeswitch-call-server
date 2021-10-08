@@ -13,7 +13,7 @@ const APP_SECRET = '0dd8d1d7c673300e0e800e10e13eb6ee1414c140e046ebf7e2229010ab7a
 @Injectable()
 export class AccountJwtStrategy extends PassportStrategy(Strategy, 'jwtAccount') {
 
-  constructor(private readonly authService: AuthService) {
+  constructor() {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       secretOrKey: APP_SECRET,

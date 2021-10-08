@@ -1,4 +1,4 @@
-import { Controller, DefaultValuePipe, Get, Inject, Param, ParseIntPipe, Query, Request, Response } from '@nestjs/common';
+import { Controller, DefaultValuePipe, Get, Inject, Param, ParseIntPipe, Query, Request, Response, UseGuards } from '@nestjs/common';
 import { Pagination } from 'nestjs-typeorm-paginate';
 import { JsonDataListReturnModel } from 'src/utils/jsonDataListReturnModel';
 import { RangeFileStreamResult } from 'src/utils/rangeFileStreamResult';
@@ -6,6 +6,8 @@ import { CallRecordingStorageDTO } from '../models/call-recording.dto';
 import { CALL_RECORDING_SERVICE, ICallRecordingService } from '../services/call-recording.interface';
 import { CallRecordingService } from '../services/call-recording.service';
 import path from 'path';
+import { AccountGuard } from 'src/auth/guards/account.guard';
+import { BaseGuard } from 'src/auth/guards/base.guard';
 
 @Controller('call-recording')
 export class CallRecordingController {
@@ -29,6 +31,7 @@ export class CallRecordingController {
         return JsonDataListReturnModel.Error("Unable to delete call recording");
     }
 
+    @UseGuards(AccountGuard)
     @Get('getCallRecordings')
     async getCallRecordings(
         @Query('page' , new DefaultValuePipe(1), ParseIntPipe) page:number = 1,

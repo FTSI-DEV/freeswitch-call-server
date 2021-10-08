@@ -1,9 +1,9 @@
-import { HttpException, HttpStatus, Injectable, NestMiddleware, UnauthorizedException } from "@nestjs/common";
+import { HttpException, HttpStatus, Inject, Injectable, NestMiddleware, UnauthorizedException } from "@nestjs/common";
 import { Request, Response, NextFunction } from 'express';
 import { UsersService } from "src/modules/users/services/users.service";
 import * as jwt from 'jsonwebtoken';
 import { UserBlacklistedTokenValidator } from "src/auth/validator/user-blacklisted-token.validator";
-import { AuthService } from "src/auth/auth.service";
+import { AuthService, AUTH_SERVICE } from "src/auth/auth.service";
 import { AccountCredentialModel } from "src/modules/account-config/models/accountConfigDto.model";
 const APP_SECRET = '0dd8d1d7c673300e0e800e10e13eb6ee1414c140e046ebf7e2229010ab7ab79a10f06fddeebabfb428b6a380aa12654c';
 
@@ -13,6 +13,7 @@ export class AccountAuthMiddleware implements NestMiddleware{
     private readonly userBlacklistedTokenValidator = new UserBlacklistedTokenValidator();
 
     constructor(
+        @Inject(AUTH_SERVICE)
         private readonly authService: AuthService
     ){}
 

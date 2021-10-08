@@ -9,13 +9,14 @@ import {
   Request,
   UseGuards,
   UseInterceptors,
+  Inject,
 } from '@nestjs/common';
 import { response, Response } from 'express';
 import { UserEntity } from 'src/entity/user.entity';
 import { AuthAccount } from 'src/modules/account-config/account-config.decorator';
 import { AccountCredentialModel } from 'src/modules/account-config/models/accountConfigDto.model';
 import { AuthUser } from 'src/modules/users/user.decorator';
-import { AuthService } from './auth.service';
+import { AuthService, AUTH_SERVICE } from './auth.service';
 import { SignUp } from './dto/sign-up.dto';
 // import { SignUp } from './dto/sign-up.dto';
 import { UserJwtAuthGuard } from './guards/user-jwt-auth.guard';
@@ -35,7 +36,9 @@ export class AuthController {
 
   private readonly userBlacklistToken = new UserBlacklistedTokenValidator();
 
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    @Inject(AUTH_SERVICE)
+    private readonly authService: AuthService) {}
 
   @Post('register')
   @HttpCode(HttpStatus.CREATED)
