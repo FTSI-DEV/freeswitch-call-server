@@ -3,6 +3,7 @@ import ColumnArray from './helper';
 import { useStore } from 'vuex';
 
 export default function methodsObj() {
+    const authToken = localStorage.getItem("fs_auth_token");
     const store = useStore();
     const state = reactive({
         friendlyName: null,
@@ -28,17 +29,17 @@ export default function methodsObj() {
       const selectedHttpMethod = computed((): string => state.httpMethod === "POST" ? "HTTP POST" : "HTTP GET");
   
       const setMethodUpdate = (val: string) => state.selectedConfig.httpMethod = val;
-      const getPhoneNumberConfigs = () => store.dispatch('getPhoneNumberConfigs');
+      const getPhoneNumberConfigs = () => store.dispatch('getPhoneNumberConfigs', { authToken });
       const deleteConfig = (val: any) => {
         if (confirm("Are you sure you want to delete this config?")) {
-          store.dispatch("deletePhoneNumberConfig", val.id);
+          store.dispatch("deletePhoneNumberConfig", { params: val.id, authToken });
         }
       }
       const editConfig = (val: any) => {
         state.selectedConfig.friendlyName = null;
         state.selectedConfig.phoneNumber = null;
         state.selectedConfig.webhookUrl = null;
-        store.dispatch("getPhoneNumberConfigById", { id: val.id }).then((res) => {
+        store.dispatch("getPhoneNumberConfigById", { params: val.id , authToken}).then((res) => {
             const { friendlyName, phoneNumber, httpMethod, webhookUrl } = res.data;
             state.modleVisibility = true;
             state.selectedConfig.friendlyName = friendlyName;
@@ -48,7 +49,7 @@ export default function methodsObj() {
         });
       }
       const handleOk = (): void => {
-        store.dispatch('updatePhoneNumberConfig', state.selectedConfig).then((res) => {
+        store.dispatch('updatePhoneNumberConfig', { params: state.selectedConfig, authToken }).then((res) => {
            state.modleVisibility = false;
         });
       }
@@ -71,7 +72,7 @@ export default function methodsObj() {
           httpMethod: state.httpMethod,
           webhookUrl: state.webhookURL,
         };
-        store.dispatch('addPhoneNumberConfig', params).then((res) => {
+        store.dispatch('addPhoneNumberConfig', { params, authToken }).then((res) => {
           state.friendlyName = null;
           state.phoneNumber = null;
           state.webhookURL = null;

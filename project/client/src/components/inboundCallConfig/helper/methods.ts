@@ -3,6 +3,7 @@ import { reactive, computed } from "vue";
 import { useStore } from 'vuex';
 import { Status } from '../../../store/status';
 export default function methodsObj() {
+    const authToken = localStorage.getItem("fs_auth_token");
     const store = useStore();
     const state = reactive({
         from: null,
@@ -28,13 +29,13 @@ export default function methodsObj() {
       // Methods
       const deleteConfig = (val: any) => {
         if (confirm("Are you sure you want to delete this config?")) {
-          store.dispatch("deleteInboundCallConfig", val.id);
+          store.dispatch("deleteInboundCallConfig", { params: val.id, authToken });
         }
       }
       const editConfig = (val: any) => {
         state.selectedConfig.callerId = "";
         state.selectedConfig.webhookUrl = "";
-        store.dispatch("getInboundCallConfigById", val.id).then((res) => {
+        store.dispatch("getInboundCallConfigById", { params: val.id, authToken }).then((res) => {
             if (res.data.Status === Status.OK) {
               const { callerId, webhookUrl, httpMethod, id } = res.data.Data;
               state.modleVisibility = true
@@ -46,7 +47,7 @@ export default function methodsObj() {
         });
       }
       const handleOk = () => {
-        store.dispatch("updateInboundCallConfig", state.selectedConfig).then(res => {
+        store.dispatch("updateInboundCallConfig", { params: state.selectedConfig, authToken }).then(res => {
           if (res.data.Status === Status.OK) {  
             getInboundCallConfigs();
             state.modleVisibility = false;
@@ -65,7 +66,7 @@ export default function methodsObj() {
           webhookUrl: state.webhookUrl,
           httpMethod: state.httpMethod
         };
-        store.dispatch("addInboundCallConfig", params).then(res => {
+        store.dispatch("addInboundCallConfig", { params, authToken }).then(res => {
             state.callerId = null;
             state.webhookUrl = null;
             state.isSaved = true;
@@ -73,7 +74,7 @@ export default function methodsObj() {
       }
   
   
-      const getInboundCallConfigs = () => store.dispatch("getInboundCallConfigs");
+      const getInboundCallConfigs = () => store.dispatch("getInboundCallConfigs", { authToken });
       const setMethodUpdate = (val: string) => state.selectedConfig.httpMethod = val;
       const setMethod = (val: string) => state.httpMethod = val;
       const fetchInitialData = () => {

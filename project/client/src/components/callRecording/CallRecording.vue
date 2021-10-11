@@ -61,13 +61,14 @@ import { MenuFoldOutlined, PhoneFilled, DeleteFilled } from "@ant-design/icons-v
 export default defineComponent({
   components: { MenuFoldOutlined, PhoneFilled, DeleteFilled },
   setup() {
+    const authToken = localStorage.getItem("fs_auth_token");
     const store = useStore();
     const router = useRouter();
     const recordingsData = computed(
       (): CallRecordingItem[] => store.getters["getCallRecordings"]
     );
     const getRecordings = (): void => {
-      store.dispatch("getCallRecordings", { page: 1, limit: 10 }).catch((err) => {
+      store.dispatch("getCallRecordings", { params: { page: 1, limit: 10 }, authToken }).catch((err) => {
         console.log(err);
         router.push("/dashboard");
       });

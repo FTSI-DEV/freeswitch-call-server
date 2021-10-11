@@ -60,35 +60,35 @@ export default {
         }
     },
     actions: {
-        getInboundCallConfigs({ commit }: { commit: Commit }) {
-          return HTTP().get(`/api/inbound-call-config/getInboundCallConfigs`).then(res => {
+        getInboundCallConfigs({ commit }: { commit: Commit }, params: any) {
+          return HTTP(params.authToken).get(`/api/inbound-call-config/getInboundCallConfigs`).then(res => {
             if (res.data.Status === Status.OK) {
                 commit('setInboundCallConfig', res.data);
             }
           })
         },
-        getInboundCallConfigById({commit}: { commit: Commit }, params: number) {
-            return HTTP().get(`/api/inbound-call-config/getInboundCallConfigById/${params}`)
+        getInboundCallConfigById({commit}: { commit: Commit }, params: any) {
+            return HTTP(params.authToken).get(`/api/inbound-call-config/getInboundCallConfigById/${params.params}`)
         },
-        addInboundCallConfig({ dispatch }: { dispatch: Dispatch }, params: InboundConfigItem) {
+        addInboundCallConfig({ dispatch }: { dispatch: Dispatch }, params: any) {
             console.log('params: ', params)
-            return HTTP().post('/api/inbound-call-config/add', params)
+            return HTTP(params.authToken).post('/api/inbound-call-config/add', params.params)
                 .then(res => {
                     if (res.status === 201) {
-                        dispatch("getInboundCallConfigs");
+                        dispatch("getInboundCallConfigs", { authToken: params.authToken });
                     }
             })
         },
-        deleteInboundCallConfig({ dispatch }: { dispatch: Dispatch }, params: number) {
-            return HTTP().post(`/api/inbound-call-config/delete/${Number(params)}`)
+        deleteInboundCallConfig({ dispatch }: { dispatch: Dispatch }, params: any) {
+            return HTTP(params.authToken).post(`/api/inbound-call-config/delete/${Number(params.params)}`)
                 .then(res => {
                     if (res.status === 201) {
-                        dispatch("getInboundCallConfigs");
+                        dispatch("getInboundCallConfigs", { authToken: params.authToken });
                     }
                 });
         },
-        updateInboundCallConfig({ dispatch }: { dispatch: Dispatch }, params: InboundConfigItem) {
-            return HTTP().post('/api/inbound-call-config/update', params);
+        updateInboundCallConfig({ dispatch }: { dispatch: Dispatch }, params: any) {
+            return HTTP(params.authToken).post('/api/inbound-call-config/update', params.params);
         }
     }
 }

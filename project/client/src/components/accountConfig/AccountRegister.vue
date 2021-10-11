@@ -85,7 +85,6 @@ export default defineComponent({
         Username: formState.username,
         Password: formState.password,
       };
-      console.log("params: ", params);
       store.dispatch("registerUser", params).then((res) => {
         if (res.data.Id) {
           router.push({ path: "/account/login" });
