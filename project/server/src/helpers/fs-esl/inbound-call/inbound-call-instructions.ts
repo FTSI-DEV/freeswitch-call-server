@@ -7,10 +7,23 @@ import { InboundEslConnResult } from "../inbound-esl.connection";
 import { InboundCallContext } from "./models/inboundCallContext";
 import { PlayAndGetDigitsParam } from "./models/plagdParam";
 import { VoiceRequestParam } from "../models/voiceRequestParam";
+import { WebhookUrlHelper } from "../webhookUrl.helper";
+import { CallRejectedHandler } from "./handlers/callRejectedHandler";
 
 export class InboundCallDialplan{
 
-    executeNextInstruction(context:InboundCallContext,callback){
+    /**
+     *
+     */
+    constructor(
+        private readonly _context: InboundCallContext,
+        private readonly _webhookHelper = new WebhookUrlHelper(),
+        private readonly _callRejectedHandler = new CallRejectedHandler(),
+    ) {}
+
+    executeNextInstruction(callback){
+
+        let context = this._context;
 
         this.executeFirstInstruction(context,(result) => {
             
@@ -29,7 +42,8 @@ export class InboundCallDialplan{
             this.getInstruction(context, () => {
 
                 if (context.callRejected){
-                    context.Log(context.errorMessage, true);
+
+
                     return;
                 }
 
@@ -96,23 +110,44 @@ export class InboundCallDialplan{
         }); 
     }
 
-    getInstruction(context:InboundCallContext,
-        callback){
+    getInstruction(context:InboundCallContext, callback){
 
-        this.triggerWebhookUrl(context.webhookParam.actionUrl, 
-            context.webhookParam.httpMethod, context.voiceRequestParam, (twiMLResponse) => {
-            context.twiMLResponse = twiMLResponse;
-            callback(context);
-        })
-        .catch((err) => {
-            let errMessage = 'Error in requesting webhook url -> ' + err;
-            // context.logger.info(errMessage);
-            this.callRejectedHandler(context, () => {
-                context.callRejected = true;
-                context.errorMessage = errMessage;
-                callback(context);
-            });
-        });
+        this._webhookHelper
+            .triggerWebhook(
+                context.webhookParam.actionUrl,
+                context.webhookParam.httpMethod,
+                context.requestParam,
+                (response) => {
+
+                if (response.Error){
+
+                    context.legStop = true;
+
+                    context.callRejected = true;
+
+                    context.errorMessage.push(response.ErrorMessage);
+
+                    callback();
+                }
+                else{
+                    callback(response.Data);
+                }
+            })
+
+        // this.triggerWebhookUrl(context.webhookParam.actionUrl, 
+        //     context.webhookParam.httpMethod, context.voiceRequestParam, (twiMLResponse) => {
+        //     context.twiMLResponse = twiMLResponse;
+        //     callback(context);
+        // })
+        // .catch((err) => {
+        //     let errMessage = 'Error in requesting webhook url -> ' + err;
+        //     // context.logger.info(errMessage);
+        //     this.callRejectedHandler(context, () => {
+        //         context.callRejected = true;
+        //         context.errorMessage = errMessage;
+        //         callback(context);
+        //     });
+        // });
     }
 
     setInstruction(twiMLResponse:string, context: InboundCallContext){
@@ -183,7 +218,7 @@ export class InboundCallDialplan{
 
     executeLastDialplanInstruction(context:InboundCallContext, callback){
 
-        let connection = context.conn;
+        let connection = context.connection;
 
         let size = context.dialplanInstructions.length;
 
@@ -212,8 +247,8 @@ export class InboundCallDialplan{
                         context.inboundESLConnResult = {
                             callModel : {
                                 webhookParam: context.webhookParam,
-                                calldDirection: "inbound",
-                                voiceRequestParam: context.voiceRequestParam,
+                                callDirection: "inbound",
+                                requestParam: context.requestParam,
                                 callRejected:false,
                                 legId:context.legId
                             }
@@ -252,9 +287,13 @@ export class InboundCallDialplan{
         else
         {
             connection.execute('speak', `flite|kal|${context.dialplanInstructions[0].value}`, () =>{
+
                 context.logger.info('speak executed');
+
                 context.callRejected = true;
-                context.errorMessage = context.dialplanInstructions[0].value;
+
+                context.errorMessage.push(context.dialplanInstruction[0].value);
+
                 callback(context);
             });
         }
@@ -266,7 +305,7 @@ export class InboundCallDialplan{
         context:InboundCallContext,
         callback){
         
-        let connection = context.conn;
+        let connection = context.connection;
 
         let PLAGD = this.setPlayAndGetDigits(context);
 
@@ -277,7 +316,7 @@ export class InboundCallDialplan{
             let inputtedDigit = e.getHeader(`variable_${PLAGD.var_name}`);
 
             if (inputtedDigit === PLAGD.regexValue){
-                context.voiceRequestParam.Digits = inputtedDigit;
+                context.requestParam.Digits = inputtedDigit;
                 callback(context);
             }
             else
@@ -353,7 +392,7 @@ export class InboundCallDialplan{
     context:InboundCallContext,
     callback){
 
-        let connection = context.conn;
+        let connection = context.connection;
         
         let instructionSize = context.dialplanInstructions.length;
 
@@ -455,7 +494,7 @@ export class InboundCallDialplan{
     }
 
     callRejectedHandler(context:InboundCallContext, callback){
-        let connection = context.conn;
+        let connection = context.connection;
 
         connection.execute('playback', 'ivr/ivr-call_cannot_be_completed_as_dialed.wav', () => {
 

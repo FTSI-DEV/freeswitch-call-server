@@ -28,6 +28,7 @@ import { OutboundCallServerHelper } from './helpers/fs-esl/outbound-call/outboun
 import { AccountConfigModule } from './modules/account-config/account-config.module';
 import { UsersModule } from './modules/users/users.module';
 import redis from 'redis';
+import { EslServerHelper2 } from './helpers/fs-esl/inbound-call2/inboundCall2.server';
 // import { MiddleWaresModule } from './middlewares/middleware.module';
 
 @Module({
@@ -75,7 +76,9 @@ export class AppModule {
         console.log('Connected Redis Server!');
     });
 
-    new EslServerHelper(_inboundCallConfigService,_incomingCallService, client).startEslServer();
+    // new EslServerHelper(_inboundCallConfigService, client).startEslServer();
+
+    new EslServerHelper2(_inboundCallConfigService, client).startEslServer();
 
     new OutboundCallServerHelper(_callDetailRecordService, client).startOutboundCallServer();
   }

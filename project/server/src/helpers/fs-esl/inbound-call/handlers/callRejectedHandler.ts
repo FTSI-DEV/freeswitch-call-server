@@ -1,25 +1,22 @@
-import { CallTypes } from "src/helpers/constants/call-type";
-import { OutboundCallContext } from "../models/outboundCallContext";
+import { InboundCallContext } from "../models/inboundCallContext";
 
 export class CallRejectedHandler{
-
+ 
     constructor(
-        private _context:OutboundCallContext
     ){}
 
-    reject(callback){
-
-        let context = this._context;
+    reject(context:InboundCallContext, callback){
 
         let errMessage = "";
 
-        if (context.errMessage !== undefined ||
-            context.errMessage !== null){
+        if (context.errorMessage !== undefined ||
+            context.errorMessage !== null){
 
-            errMessage = context.errMessage.join(',');
+            errMessage = context.errorMessage.join(',');
+
         }
 
-        context.Log(`Call rejected -> ${errMessage}`);
+        context.Log(`Call rejected -> ${errMessage} `);
 
         let connection = context.connection;
 
@@ -34,10 +31,11 @@ export class CallRejectedHandler{
 
                 context.callRejected = true;
 
-                context.dpInstructions = [];
+                context.dialplanInstructions = [];
 
                 callback();
             });
         });
     }
+
 }

@@ -12,18 +12,16 @@ export class DialEnd{
 
     dialEnd(){
 
-        console.log('Dial End -> ');
-
         this.getInstruction((response) => {
 
             if (this._context.callRejected){
-                this.callRejectedHandler.reject(this._context, () => {
 
+                this.callRejectedHandler.reject(() => {
                 });
+                
                 return;
             }
-
-            console.log('Response Dial End -> ' , response);
+            
         });
     }
 
@@ -31,12 +29,16 @@ export class DialEnd{
 
         this.webhookHelper.triggerWebhook(this._context.webhookParam.actionUrl, 
             this._context.webhookParam.httpMethod, 
-            this._context.requestParam, (response) => {
+            this._context.outboundRequestParam, (response) => {
 
             if (response.Error){
+
                 this._context.callRejected = true;
+
                 this._context.legStop = true;
-                console.log('Error: -> ', response.ErrorMessage);
+
+                this._context.errMessage.push(response.ErrorMessage);
+
                 return callback();
             }
             else{

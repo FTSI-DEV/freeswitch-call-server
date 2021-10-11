@@ -35,6 +35,8 @@ export class UserBlacklistedTokenValidator{
 
         let client = redis.createClient(6379);
 
+        console.log('To be added : ', blacklistModel);
+
         client.on('connect', () => {
             console.log('Connected Redis Server!');
         });
@@ -43,10 +45,19 @@ export class UserBlacklistedTokenValidator{
 
         tokenList.push(blacklistModel);
 
-        if (tokenList.find(c => c.token === blacklistModel.token)){
-            console.log('Token already blacklisted');
-            return;
-        }
+        console.log('tokenlist -> ', tokenList);
+
+        client.get(USER_BLACKLIST_TOKENS, (err, reply) => {
+           
+            let obj:UserBlackListTokenModel[]= JSON.parse(reply);
+
+            console.log('get redis token -> ', reply);
+
+            if (obj.find(c => c.token === blacklistModel.token)){
+                console.log('Token already blacklisted');
+                return;
+            }
+        });
 
         let serializeToken = JSON.stringify(tokenList);
 

@@ -1,12 +1,12 @@
 import { IInboundCallConfigService } from 'src/modules/inbound-call-config/services/inbound-call-config.interface';
 import { IIncomingCallService } from 'src/modules/incomingCall/services/incomingCall.interface';
-import { InboundCallHelper } from './inbound-call';
 import esl from 'modesl';
 import { InboundCallContext } from './models/inboundCallContext';
+import { InboundCallHelper2 } from './inboundCall2';
 
 export let inboundCallServer = null;
 
-export class EslServerHelper {
+export class EslServerHelper2 {
 
   constructor(
     private readonly _inboundCallConfigService: IInboundCallConfigService,
@@ -32,6 +32,6 @@ export class EslServerHelper {
 
     context.serviceModel.inboundCallConfigSrvc = this._inboundCallConfigService;
 
-    new InboundCallHelper(context).inboundCallEnter();
+    new InboundCallHelper2(context).inboundCallEnter();
   }
 }

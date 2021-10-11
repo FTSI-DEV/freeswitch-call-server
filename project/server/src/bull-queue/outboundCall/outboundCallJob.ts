@@ -46,6 +46,10 @@ export class OutboundCallJob{
             let result = await this.saveCallDetailRecord(context);
 
             context.outboundCallParam.Id = result;
+
+            console.log('cdrRecord -> ', result);
+
+            console.log('paramoutbound -> ', context.outboundCallParam);
             
             await this.saveCallRecordingStorage(context);
         }
@@ -98,7 +102,11 @@ export class OutboundCallJob{
 
             let fileName = `${toUnixTimeSeconds}_${context.outboundCallParam.RecordingUUID}.wav`;
 
-            let filePath = path.join(context.outboundCallParam.CallDirection, fileName);
+            console.log('CallDirection -> ', context.outboundCallParam.CallDirection);
+
+            console.log('CallId -> ', context.outboundCallParam.Id);
+
+            let filePath = path.join("outbound", fileName);
 
             await this._callRecordingService.saveCallRecording({
                 RecordingUUID : context.outboundCallParam.RecordingUUID,

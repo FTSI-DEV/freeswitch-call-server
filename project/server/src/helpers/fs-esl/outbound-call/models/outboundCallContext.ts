@@ -1,6 +1,9 @@
+import { CallTypes } from "src/helpers/constants/call-type";
 import { DialplanInstruction } from "src/helpers/parser/xmlParser";
 import { CustomAppLogger } from "src/logger/customLogger";
-import { WebhookParam } from "../../inbound-call/models/webhookParam";
+import { ConnResult } from "../../inbound-esl.connection";
+import { ChannelStateModel } from "../../models/channelState.model";
+import { WebhookParam } from "../../models/webhookParam";
 import { OutboundCallServiceModel } from "./outboundCallServiceModel";
 import { OutboundRequestParam } from "./outboundRequestParam.model";
 
@@ -8,7 +11,7 @@ export class OutboundCallContext{
     server:any;
     connection:any;
     serviceModel: OutboundCallServiceModel = new OutboundCallServiceModel();
-    requestParam: OutboundRequestParam = new OutboundRequestParam();
+    outboundRequestParam: OutboundRequestParam = new OutboundRequestParam();
     redisServer:any;
     legStop:boolean=false;
     logger:CustomAppLogger;
@@ -23,18 +26,16 @@ export class OutboundCallContext{
     plagdStop:boolean=false;
     redirect:boolean=false;
     redisServerName:string="outbound_channelState";
+    inboundESLConnResult:ConnResult;
+    errMessage:string[] = [];
     Log(message:string, error:boolean=false){
-        let lmsg = `CallUid : ${this.legId} => ${message}`;
+        let lmsg = `CallUid : ${this.legId} ,
+                    CallDirection : ${CallTypes.Outbound} ,
+                    Message => ${message}`;
 
         if (error) this.logger.error(lmsg, new Error(message));
+        
         else this.logger.info(lmsg);
     }
-}
-
-export class ChannelStateModel
-{
-    legId:string;
-    answerState:string;
-    channelState:string;
 }
 

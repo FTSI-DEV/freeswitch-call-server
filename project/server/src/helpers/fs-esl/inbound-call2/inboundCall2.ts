@@ -1,18 +1,18 @@
+import { CallTypes } from "src/helpers/constants/call-type";
 import { CustomAppLogger } from "src/logger/customLogger";
 import { IInboundCallConfigService } from "src/modules/inbound-call-config/services/inbound-call-config.interface";
 import { CHANNEL_VARIABLE } from "../../constants/channel-variables.constants";
 import { InboundEslConnResult } from "../inbound-esl.connection";
-import { InboundCallDialplan } from "./inbound-call-instructions";
-import { inboundCallServer } from "./inboundCall.server";
+import { InboundCallDialplan } from "./handlers/inboundCallDiaplan";
 import { InboundCallContext } from "./models/inboundCallContext";
 
-export class InboundCallHelper{
+export class InboundCallHelper2{
 
-    private readonly _logger = new CustomAppLogger(InboundCallHelper.name);
+    private readonly _logger = new CustomAppLogger(InboundCallHelper2.name);
     private readonly _inboundEslConn = InboundEslConnResult;
 
     constructor(
-        private _context: InboundCallContext,
+        readonly _context: InboundCallContext,
         private readonly _inboundCallDialplan = new InboundCallDialplan(_context)
     ){}
 
@@ -22,13 +22,13 @@ export class InboundCallHelper{
 
         let server = this._context.server;
 
+        context.logger = this._logger;
+
         server.on('connection::ready', async (conn) => {
 
             context.Log(`InboundCall server ready`);
 
             context.connection = conn;
-
-            context.logger = this._logger;
 
             context.inboundESLConnResult = this._inboundEslConn;
 
@@ -56,54 +56,16 @@ export class InboundCallHelper{
                         actionUrl : config.webhookUrl
                     };
 
-                    this._inboundCallDialplan.getInstruction(context, async (result) => {
+                    this._inboundCallDialplan.processedInstruction(() => {
 
-                        if (result.callRejected){
-                            context.serviceModel.callRejectedHandler.reject(context, () => {});
-                            return;
-                        }
-
-                        this._inboundCallDialplan.setInstruction(context.twiMLResponse, context);
-
-                        if (context.callRejected){
-
-                            context.serviceModel.callRejectedHandler.reject(context, () => {});
-                            return;
-                        }
-
-                        if (context.instructionValidated){
-
-                            if (context.isLastDialplan){
-                                this._inboundCallDialplan.executeLastDialplanInstruction(context, () => {
-
-                                    console.log('LAST DP1 ');
-
-                                    this._inboundEslConn.callModel = context.inboundESLConnResult.callModel;
-
-                                    if (context.callRejected){
-                                        this._inboundCallDialplan.callRejectedHandler(context, () => {
-                                            context.Log('Call has rejected');
-                                        });
-                                    }
-
-                                    this._logger.info('All instructions are executed');
-                                });
-                            }
-                            else
-                            {
-                               this._inboundCallDialplan.executeNextInstruction(() => {
-                                    console.log('LAST DP2 ');
-                                    this._inboundEslConn.callModel = context.inboundESLConnResult.callModel;
-                                   this._logger.info('All instructions are executed');
-                               });
-                            }
-                        }
+                        console.log('All instructions are processed');
                     });
+
                 })
                 .catch((err) => {
                     context.Log(`Error while retrieving records to database. Message => ${err}` , true);
-                    this._inboundCallDialplan.callRejectedHandler(context, () => {
-                    });
+                    this._context.serviceModel.callRejectedHandler.reject(this._context, () => {});
+                    return;
                 });
             });
         });
@@ -116,8 +78,6 @@ export class InboundCallHelper{
         connection.on('error', (err) => {
             context.Log(`Inbound Call Error. Message : ${err}` , true);
         });
-
-        // connection.sendRecv('linger');
 
         let hangupCompleteEvent = 'esl::event::CHANNEL_HANGUP_COMPLETE::' + context.legId;
 
@@ -132,15 +92,6 @@ export class InboundCallHelper{
             context.Log(`Hnagup Cause => ${hangupCause}`);
 
             context.Log(`Webparam Cause => ${JSON.stringify(context.webhookParam)}`);
-
-            // if (!context.callRejected){
-            //     context.Log(`ActionUrl -> ${context.webhookParam.actionUrl} , ${context.webhookParam.httpMethod}`);
-            //     this._inboundCallDialplan.triggerWebhookUrl(context.webhookParam.actionUrl,
-            //         context.webhookParam.httpMethod,
-            //         context.voiceRequestParam, () => {
-            //             context.Log('Triggered webhook end call.');
-            //     });
-            // }
 
             connection.removeListener(hangupCompleteEvent, hangupCompleteWrapper);
         };

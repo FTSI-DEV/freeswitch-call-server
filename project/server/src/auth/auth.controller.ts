@@ -76,17 +76,28 @@ export class AuthController {
 
     var authHeaders = req.headers.authorization;
 
-    if (authHeaders && (authHeaders as string).split(' ')[1]){
-      let token = (authHeaders as string).split(' ')[1];
-      let decoded:any = jwt.verify(token, secret);
+    console.log('authheaders -< ' , authHeaders);
 
-      console.log('token -> ' , token);
-      console.log('decoded -> ', decoded);
+    try
+    {
+      if (authHeaders && (authHeaders as string).split(' ')[1]){
 
-        this.userBlacklistToken.addToBlacklist({
-          token: token,
-          exp: decoded.exp
-        });
+        let token = (authHeaders as string).split(' ')[1];
+
+        console.log('token -> ' , token);
+
+        let decoded:any = jwt.verify(token, secret);
+  
+  
+        console.log('decoded -> ', decoded);
+  
+          this.userBlacklistToken.addToBlacklist({
+            token: token,
+            exp: decoded.exp
+          });
+      }
+    }catch(err){
+      console.log('error logout -> ' ,err);
     }
 
     return{

@@ -34,10 +34,6 @@ export class CDRHelper{
             duration = this.calculateDuration(answer_epoch, end_epoch);
         }
 
-        console.log('duration', duration);
-        console.log('answer_epoch ', answer_epoch);
-        console.log('end_epoch', end_epoch);
-
         return{
             UUID: uuid,
             PhoneNumberFrom: callerId,
@@ -56,11 +52,10 @@ export class CDRHelper{
     }
 
     private calculateDuration(start_epoch:any, end_epoch: any):any{
-        const answeredDate = new Date(start_epoch*1000);
-        const hangupDate = new Date(end_epoch*1000);
 
-        // console.log('Answered Time -> ', answeredDate.toUTCString());
-        // console.log('HangupTime ->' , hangupDate.toUTCString());
+        const answeredDate = new Date(start_epoch*1000);
+        
+        const hangupDate = new Date(end_epoch*1000);
 
         let duration = Math.abs(answeredDate.getTime() - hangupDate.getTime());
 
