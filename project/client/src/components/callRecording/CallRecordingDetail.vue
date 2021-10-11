@@ -10,27 +10,29 @@
           <div class="detail_content">
             <div class="detail_item">
               <div class="detail_label">Date Created</div>
-              <div class="detail_value">2021-09-19</div>
-            </div>
-            <div class="detail_item">
-              <div class="detail_label">Call Id</div>
-              <div class="detail_value">Re2fsdfaedas4523asdsdgf</div>
+              <div class="detail_value">
+                {{ convertDateTime(callRecordingData.DateCreated) }}
+              </div>
             </div>
             <div class="detail_item">
               <div class="detail_label">Recording Id</div>
-              <div class="detail_value">Re2fsdfaedas4523asdsdgf</div>
+              <div class="detail_value">
+                {{ callRecordingData.RecordingId }}
+              </div>
             </div>
             <div class="detail_item">
               <div class="detail_label">Recording UUID</div>
-              <div class="detail_value">Re2fsdfaedas4523asdsdgf</div>
+              <div class="detail_value">
+                {{ callRecordingData.RecordingUUID }}
+              </div>
             </div>
             <div class="detail_item">
               <div class="detail_label">Call UUID</div>
-              <div class="detail_value">Re2fsdfaedas4523asdsdgf</div>
+              <div class="detail_value">{{ callRecordingData.CallUUID }}</div>
             </div>
             <div class="detail_item">
               <div class="detail_label">File Path</div>
-              <div class="detail_value">/recording</div>
+              <div class="detail_value">{{ callRecordingData.FilePath }}</div>
             </div>
           </div>
           <div class="play_record">RECORDING URL HE</div>
@@ -42,19 +44,29 @@
 
 <script lang="ts">
 import { useRouter } from "vue-router";
-import { defineComponent } from "vue";
+import { defineComponent, computed } from "vue";
 import { ArrowLeftOutlined } from "@ant-design/icons-vue";
+import { useStore } from "vuex";
+import moment, { Moment } from "moment";
+const dateTimeConverter: Moment = moment();
 export default defineComponent({
   components: {
     ArrowLeftOutlined,
   },
   setup() {
+    const store = useStore();
     const router = useRouter();
     const back = (): void => {
       router.push({ path: "/" });
     };
+    const convertDateTime = (dateTime: string): string => {
+      return moment(dateTime).format("MM/DD/YYYY hh:mm A");
+    };
+    const callRecordingData = computed(() => store.getters["getCallRecordingDetail"]);
     return {
       back,
+      callRecordingData,
+      convertDateTime,
     };
   },
 });

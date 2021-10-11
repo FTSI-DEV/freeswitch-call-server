@@ -12,7 +12,9 @@
                 <div>
                   <div class="d-flex">
                     <span style="margin-right: 15px">Date Created</span>
-                    <h5 style="font-size: 1em">{{ item.DateCreated }}</h5>
+                    <h5 style="font-size: 1em">
+                      {{ convertDateTime(item.DateCreated) }}
+                    </h5>
                   </div>
                   <div class="d-flex">
                     <span style="margin-right: 15px">Duration</span>
@@ -25,7 +27,7 @@
                 </div>
                 <div style="text-align: right; margin-top: 20px">
                   <MenuFoldOutlined
-                    @click="viewDetails"
+                    @click="viewDetails(item)"
                     class="view_icon"
                     title="View Details"
                   />
@@ -57,6 +59,8 @@ import { computed } from "vue";
 import { useRouter } from "vue-router";
 import { CallRecordingItem } from "../../types/callRecording";
 import { MenuFoldOutlined, PhoneFilled, DeleteFilled } from "@ant-design/icons-vue";
+import moment, { Moment } from "moment";
+const dateTimeConverter: Moment = moment();
 
 export default defineComponent({
   components: { MenuFoldOutlined, PhoneFilled, DeleteFilled },
@@ -68,14 +72,23 @@ export default defineComponent({
       (): CallRecordingItem[] => store.getters["getCallRecordings"]
     );
     const getRecordings = (): void => {
-      store.dispatch("getCallRecordings", { params: { page: 1, limit: 10 }, authToken }).catch((err) => {
-        console.log(err);
-        router.push("/dashboard");
-      });
+      store
+        .dispatch("getCallRecordings", { params: { page: 1, limit: 10 }, authToken })
+        .catch((err) => {
+          console.log(err);
+          router.push("/dashboard");
+        });
     };
     getRecordings();
-    const viewDetails = (): void => {
-      router.push({ path: "/call-recording/details" });
+    const viewDetails = (item: any): void => {
+      store
+        .dispatch("getCallRecord", { params: item.RecordingId, authToken })
+        .then((res) => {
+          if (res.data.Status === 1) {
+            store.dispatch("setCallRecord", res.data.Data);
+            router.push({ path: "/call-recording/details" });
+          }
+        });
     };
     const deleteRecording = (item: CallRecordingItem): void => {
       if (confirm("Do you want to delete this recording?")) {
@@ -83,11 +96,15 @@ export default defineComponent({
         //store.dispatch("deleteCallRecording", { recordingId: item.RecordingId });
       }
     };
+    const convertDateTime = (dateTime: string): string => {
+      return moment(dateTime).format("MM/DD/YYYY hh:mm A");
+    };
     return {
       recordingsData,
       getRecordings,
       viewDetails,
       deleteRecording,
+      convertDateTime,
     };
   },
 });
