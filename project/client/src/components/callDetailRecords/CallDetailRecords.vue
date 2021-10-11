@@ -24,23 +24,27 @@
       </template>
     </a-list> -->
     <a-table :dataSource="cdrData" :columns="CDRColumns">
-      <template #name="{ text }">
+      <!-- <template #name="{ text }">
         <a>{{ text }}</a>
       </template>
       <template #customTitle>
         <span>
           <smile-outlined />
-          Name
+          Namesa
         </span>
-      </template>
-      <template #CallStatus="{ text }">
+      </template> -->
+      <template #CallDirection="{ text }">
         <span>
           <a-tag :color="'green'"> {{ text }} </a-tag>
         </span>
       </template>
-      <template #action="{}">
+      <template #action="{ record }">
         <router-link to="/call-logs/details">
-          <MenuFoldOutlined @click="viewDetails" class="view_icon" title="View Details" />
+          <MenuFoldOutlined
+            @click="viewDetails(record)"
+            class="view_icon"
+            title="View Details"
+          />
         </router-link>
       </template>
     </a-table>
@@ -59,16 +63,13 @@ export default defineComponent({
   },
   setup() {
     const store = useStore();
-    const { getCallDetailRecords } = methodsObj();
+    const { getCallDetailRecords, viewDetails } = methodsObj();
     const cdrData = computed(() => store.getters["getCallDetailRecords"]);
     getCallDetailRecords();
-    const editConfig = (data: any) => {
-      console.log(data);
-    };
     return {
       CDRColumns,
-      editConfig,
       cdrData,
+      viewDetails,
     };
   },
 });

@@ -4,8 +4,8 @@ export interface CDRItem {
     PhoneNumberFrom?: string;
     CallStatus?: string;
     CallUUID?: string;
-    Duration?: number;
-    DateCreated: Date;
+    Duration?: string;
+    DateCreated: string;
     RecordingUUID?: string;
     CallDirection?: string;
     ParentCallUid?: string;
@@ -22,6 +22,7 @@ export interface CDRPager {
 export interface CDR {
     Data: {
         items: Array<CDRItem>,
-        meta: CDRPager
+        meta: CDRPager,
+        detail: CDRItem
     }
 }

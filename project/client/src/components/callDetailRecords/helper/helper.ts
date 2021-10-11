@@ -30,6 +30,18 @@ export const columns = [
   
 
   export const CDRColumns = [
+    // {
+    //   title: 'Call Status',
+    //   key: 'CallStatus',
+    //   dataIndex: 'CallStatus',
+    //   slots: { customRender: 'CallStatus' },
+    // },
+        {
+      title: 'Call Direction',
+      key: 'CallDirection',
+      dataIndex: 'CallDirection',
+      slots: { customRender: 'CallDirection' },
+    },
     {
       title: 'Phone Number From',
       key: 'PhoneNumberFrom',
@@ -42,31 +54,25 @@ export const columns = [
       dataIndex: 'PhoneNumberTo',
       slots: { customRender: 'PhoneNumberTo' },
     },
-    {
-      title: 'Duration',
-      key: 'Duration',
-      dataIndex: 'Duration',
-      slots: { customRender: 'Duration' },
-    },
-    {
-      title: 'Date Created',
-      key: 'DateCreated',
-      dataIndex: 'DateCreated',
-      slots: { customRender: 'DateCreated' },
-    },
-    {
-      title: 'Call Direction',
-      key: 'CallDirection',
-      dataIndex: 'CallDirection',
-      slots: { customRender: 'CallDirection' },
-    },
+    // {
+    //   title: 'Duration',
+    //   key: 'Duration',
+    //   dataIndex: 'Duration',
+    //   slots: { customRender: 'Duration' },
+    // },
+    // {
+    //   title: 'Date Created',
+    //   key: 'DateCreated',
+    //   dataIndex: 'DateCreated',
+    //   slots: { customRender: 'DateCreated' },
+    // },
+    // {
+    //   title: 'Call Direction',
+    //   key: 'CallDirection',
+    //   dataIndex: 'CallDirection',
+    //   slots: { customRender: 'CallDirection' },
+    // },
 
-    {
-      title: 'Call Status',
-      key: 'CallStatus',
-      dataIndex: 'CallStatus',
-      slots: { customRender: 'CallStatus' },
-    },
     {
       title: 'Action',
       key: 'action',

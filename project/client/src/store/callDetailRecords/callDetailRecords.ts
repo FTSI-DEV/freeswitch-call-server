@@ -13,16 +13,30 @@ export default {
                 itemsPerPage: 1,
                 totalPages: 0,
                 currentPage: 1
+            },
+            detail: {
+                Id: 1,
+                PhoneNumberTo: "",
+                PhoneNumberFrom: "",
+                CallStatus: "",
+                CallUUID: "",
+                Duration: "",
+                DateCreated: "",
+                RecordingUUID: "",
+                CallDirection: "",
+                ParentCallUid: "",
             }
-        }
+        },
     } as CDR,
     getters: {
         getCallDetailRecords: (state: CDR): CDRItem[] => state.Data.items,
-        getCallDetailPager: (state: CDR): CDRPager => state.Data.meta
+        getCallDetailPager: (state: CDR): CDRPager => state.Data.meta,
+        getCallDetail: (state: CDR): CDRItem => state.Data.detail
     },
     mutations: {
-        setCallDetailRecords(state: CDR, payload: CDR) {
-                const { items, meta } = payload.Data;
+        setCallDetailRecords(state: CDR, payload: any) {
+                console.log('payload: ', payload);
+                const { items, meta } = payload;
                 state.Data.items = [];
                 
                 state.Data.meta.totalItems = meta.totalItems;
@@ -45,6 +59,9 @@ export default {
                         ParentCallUid: prop.ParentCallUid
                     })
                 });
+        },
+        setCallRecordDetail(state: CDR, payload: CDRItem) {
+            state.Data.detail = payload;
         }
     },
     actions: {
@@ -52,12 +69,16 @@ export default {
             return HTTP(params.authToken).get('api/call-detail-record/getCdrLogs', { params: params }).then(res => {
                 if (res.data.Status === Status.OK) {
                     //commit('setCallDetailRecords', res.data.Data);
-                    commit('setCallDetailRecords', cdrData);
+                    commit('setCallDetailRecords',  res.data.Data);
                 }
             })
         },
         getCallDetailById({ commit }: { commit: Commit }, params: any) {
-            return HTTP(params.authToken).get('api/call-detail-record/getCDRById', { params: params });
+            return HTTP(params.authToken).get(`api/call-detail-record/getCDRById/${params.params}`).then(res => {
+                if (res.data.Status === Status.OK) {
+                    commit('setCallRecordDetail',  res.data.Data);
+                }
+            })
         }
     }
 }

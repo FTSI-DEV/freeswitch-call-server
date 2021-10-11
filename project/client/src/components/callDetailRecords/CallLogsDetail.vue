@@ -10,35 +10,37 @@
           <div class="detail_content">
             <div class="detail_item">
               <div class="detail_label">Call UUID</div>
-              <div class="detail_value">1BAER34Aase2aba</div>
+              <div class="detail_value">{{ callRecordDetail.CallUUID }}</div>
             </div>
             <div class="detail_item">
               <div class="detail_label">Parent Call Uid</div>
-              <div class="detail_value">1BAER34Aase2aba</div>
+              <div class="detail_value">{{ callRecordDetail.ParentCallUid }}</div>
             </div>
             <div class="detail_item">
               <div class="detail_label">Call Direction</div>
-              <div class="detail_value">1BAER34Aase2aba</div>
+              <div class="detail_value">{{ callRecordDetail.CallDirection }}</div>
             </div>
             <div class="detail_item">
               <div class="detail_label">Call Status</div>
-              <div class="detail_value">1BAER34Aase2aba</div>
+              <div class="detail_value">{{ callRecordDetail.CallStatus }}</div>
             </div>
             <div class="detail_item">
               <div class="detail_label">Duration</div>
-              <div class="detail_value">1BAER34Aase2aba</div>
+              <div class="detail_value">{{ callRecordDetail.Duration }}</div>
             </div>
             <div class="detail_item">
               <div class="detail_label">Date Created</div>
-              <div class="detail_value">1BAER34Aase2aba</div>
+              <div class="detail_value">
+                {{ convertDateTime(callRecordDetail.DateCreated) }}
+              </div>
             </div>
             <div class="detail_item">
               <div class="detail_label">Phone Number From</div>
-              <div class="detail_value">1BAER34Aase2aba</div>
+              <div class="detail_value">{{ callRecordDetail.PhoneNumberFrom }}</div>
             </div>
             <div class="detail_item">
               <div class="detail_label">Phone Number To</div>
-              <div class="detail_value">1BAER34Aase2aba</div>
+              <div class="detail_value">{{ callRecordDetail.PhoneNumberTo }}</div>
             </div>
           </div>
         </a-col>
@@ -48,11 +50,26 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
+import { defineComponent, computed } from "vue";
 import { ArrowLeftOutlined } from "@ant-design/icons-vue";
+import { useStore } from "vuex";
+import moment, { Moment } from "moment";
+const dateTimeConverter: Moment = moment();
+
 export default defineComponent({
   components: {
     ArrowLeftOutlined,
+  },
+  setup() {
+    const store = useStore();
+    const callRecordDetail = computed(() => store.getters["getCallDetail"]);
+    const convertDateTime = (dateTime: string): string => {
+      return moment(dateTime).format("MM/DD/YYYY hh:mm A");
+    };
+    return {
+      callRecordDetail,
+      convertDateTime,
+    };
   },
 });
 </script>
