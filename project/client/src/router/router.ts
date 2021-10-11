@@ -102,6 +102,10 @@ const router = createRouter({
     history,
     routes,
 });
+// window.popStateDetected = false
+// window.addEventListener('popstate', () => {
+//   window.popStateDetected = true
+// })
 
 // router.beforeEach((to, from, next) => {
 //     if (to.matched.some(record => record.meta.requiresAuth)) {

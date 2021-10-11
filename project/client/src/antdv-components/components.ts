@@ -22,7 +22,8 @@ import {
     Tabs,
     List,
     Avatar,
-    Checkbox
+    Checkbox,
+    Tooltip
 } from 'ant-design-vue';
 
 export default function AntdvUi(app: any) {
@@ -50,4 +51,5 @@ export default function AntdvUi(app: any) {
     app.use(List);
     app.use(Avatar);
     app.use(Checkbox);  
+    app.use(Tooltip);
 }

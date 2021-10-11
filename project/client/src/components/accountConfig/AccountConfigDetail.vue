@@ -36,7 +36,12 @@
                   {{ configItem.accountSID }}
                 </div>
                 <div style="width: 20px text-align: right">
-                  <CopyOutlined style="cursor: pointer" />
+                  <a-tooltip placement="left" title="Copied" trigger="click">
+                    <CopyOutlined
+                      style="cursor: pointer"
+                      @click="copyString(configItem.accountSID)"
+                    />
+                  </a-tooltip>
                 </div>
               </div>
               <!-- <input :class="['ant-input']" v-model="accountSID" /> -->
@@ -50,7 +55,12 @@
                   <span v-else @mouseover="isShow = true">Show</span>
                 </div>
                 <div style="width: 20px text-align: right">
-                  <CopyOutlined style="cursor: pointer" />
+                  <a-tooltip placement="left" title="Copied" trigger="click">
+                    <CopyOutlined
+                      style="cursor: pointer"
+                      @click="copyString(configItem.authKey)"
+                    />
+                  </a-tooltip>
                 </div>
               </div>
               <!-- <input :class="['ant-input']" v-model="authToken" /> -->
@@ -83,7 +93,7 @@ import {
 import { defineComponent, toRefs, reactive, computed, onMounted } from "vue";
 import { useStore } from "vuex";
 import moment, { Moment } from "moment";
-
+import { useRouter } from "vue-router";
 const dateTimeConverter: Moment = moment();
 
 export default defineComponent({
@@ -95,6 +105,7 @@ export default defineComponent({
     CopyOutlined,
   },
   setup() {
+    const router = useRouter();
     const store = useStore();
     const state = reactive({
       accountSID: "",
@@ -127,11 +138,18 @@ export default defineComponent({
                 authToken,
               })
               .then((res) => {
-                if (res.data.Status === 1)
+                if (res.data.Status === 1) {
                   store.dispatch("setAccountConfigData", res.data.Data);
+                  router.push({ path: "/account-config" });
+                }
               });
           }
         });
+    };
+    const copyString = (text: string): void => {
+      const clipboard = navigator.clipboard;
+
+      clipboard.writeText(text);
     };
     return {
       ...toRefs(state),
@@ -139,6 +157,7 @@ export default defineComponent({
       configItem,
       convertDateTime,
       deactivateAccount,
+      copyString,
     };
   },
 });

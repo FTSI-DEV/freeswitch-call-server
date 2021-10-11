@@ -83,7 +83,7 @@ import {
   UserOutlined,
   DownOutlined,
 } from "@ant-design/icons-vue";
-import { defineComponent, ref } from "vue";
+import { defineComponent, ref, watch } from "vue";
 import { useRouter } from "vue-router";
 import { useStore } from "vuex";
 export default defineComponent({
@@ -100,6 +100,7 @@ export default defineComponent({
     const store = useStore();
     const username = ref<string>("");
     const router = useRouter();
+    let selectedKeys2 = ref<string[]>(["1"]);
     const navigateRoute = (path: string) => {
       router.push({ path });
     };
@@ -107,19 +108,34 @@ export default defineComponent({
     if (localStorage.getItem("fs_username")) {
       username.value = localStorage.getItem("fs_username") || "";
     }
+    const resetUserInfo = () => {
+      localStorage.removeItem("fs_user_key");
+      localStorage.removeItem("fs_username");
+      localStorage.removeItem("fs_auth_token");
+    };
     const signOut = (): void => {
       const authToken = localStorage.getItem("fs_auth_token");
+      console.log("signOut: ", authToken);
       store.dispatch("logoutUser", { authToken }).then(() => {
-        localStorage.removeItem("fs_user_key");
-        localStorage.removeItem("fs_username");
-        localStorage.removeItem("fs_auth_token");
+        resetUserInfo();
         navigateRoute("/account/login");
       });
     };
+    console.log("Window: ", window);
+    window.onhashchange = function () {
+      console.log("location: ", window.location);
+    };
+    watch(router.currentRoute, (val) => {
+      if (val.path === "/dashboard") {
+        selectedKeys2.value[0] = "1";
+      }
+    });
+    window.addEventListener("popstate", () => {
+      signOut();
+    });
     return {
       navigateRoute,
-      selectedKeys1: ref<string[]>(["2"]),
-      selectedKeys2: ref<string[]>(["1"]),
+      selectedKeys2,
       collapsed: ref<boolean>(false),
       openKeys: ref<string[]>(["sub1"]),
       username,

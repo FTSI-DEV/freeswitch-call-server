@@ -67,7 +67,10 @@ export default defineComponent({
       (): CallRecordingItem[] => store.getters["getCallRecordings"]
     );
     const getRecordings = (): void => {
-      store.dispatch("getCallRecordings", { page: 1, limit: 10 });
+      store.dispatch("getCallRecordings", { page: 1, limit: 10 }).catch((err) => {
+        console.log(err);
+        router.push("/dashboard");
+      });
     };
     getRecordings();
     const viewDetails = (): void => {
