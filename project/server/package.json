@@ -59,7 +59,8 @@
     "winston": "^3.3.3",
     "winston-daily-rotate-file": "^4.5.5",
     "xml2js": "^0.4.23",
-    "xmldoc": "^1.1.2"
+    "xmldoc": "^1.1.2",
+    "yargs": "^17.2.1"
   },
   "devDependencies": {
     "@nestjs/cli": "^8.0.0",

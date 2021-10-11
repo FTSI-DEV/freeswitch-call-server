@@ -1,6 +1,7 @@
 import { async } from "rxjs";
 import { CallTypes } from "src/helpers/constants/call-type";
 import { Column, CreateDateColumn, Entity, EntityRepository, JoinColumn, OneToMany, OneToOne, PrimaryGeneratedColumn, Repository } from "typeorm";
+import { AccountConfigEntity } from "./account-config.entity";
 
 @Entity({name:"CallDetailRecord"})
 export class FsCallDetailRecordEntity{
@@ -33,6 +34,15 @@ export class FsCallDetailRecordEntity{
 
     @Column({ length:200, nullable: true, type:"varchar"})
     ParentCallUid?: string;
+
+
+    @OneToOne(type => AccountConfigEntity)
+    @JoinColumn({ 
+        name: 'AccountId', 
+        referencedColumnName : 'Id' 
+    })
+    AccountConfigEntity: AccountConfigEntity;
+    AccountId?: number;
 }
 
 @EntityRepository(FsCallDetailRecordEntity)

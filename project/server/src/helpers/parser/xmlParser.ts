@@ -48,8 +48,6 @@ export class TwiMLXMLParser{
                             length: element.attr.length
                         }
                     };
-
-                    console.log('iii -> ', instruction);
                     
                    dpInstructions.push(instruction);
                }
@@ -126,8 +124,6 @@ export class TwiMLXMLParser{
                         value: child.val,
                         name: child.name
                     };
-
-                    console.log('child ', dpInstruction);
 
                     dpInstructions.push(dpInstruction);
                }

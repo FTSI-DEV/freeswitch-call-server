@@ -5,11 +5,25 @@ export class CreateTableAccountConfig1633087795687 implements MigrationInterface
     public async up(queryRunner: QueryRunner): Promise<void>{
 
         await this.createTableAccountConfig(queryRunner);
+
+        await queryRunner
+            .query(`ALTER TABLE "CallDetailRecord" ADD "AccountId" int`);
+
+        await queryRunner
+            .query(`ALTER TABLE "CallDetailRecord"
+                ADD CONSTRAINT "FK_CallDetailRecord_AccountConfig_AccountId" 
+                FOREIGN KEY ("AccountId") REFERENCES "AccountConfig"("Id")`);
     }
 
     public async down(queryRunner: QueryRunner): Promise<void>{
         await queryRunner.dropIndex("AccountConfig", "IDX_AccountConfig_Id");
         await queryRunner.dropTable("AccountConfig");
+
+        const tblCallDetailRecord = await queryRunner.getTable("CallDetailRecord");
+
+        const fkCallDetailRecord = tblCallDetailRecord.foreignKeys.find(fk => fk.columnNames.indexOf("AccountId") !== -1);
+    
+        await queryRunner.dropForeignKey("CallDetailRecord", fkCallDetailRecord);
     }
 
     private async createTableAccountConfig(queryRunner: QueryRunner): Promise<void>{
