@@ -8,6 +8,8 @@ export class WebhookUrlHelper{
 
         let record = null;
 
+        console.log('webhook params -> '  , params);
+
         try
         {
             if (method === 'POST')
@@ -17,6 +19,8 @@ export class WebhookUrlHelper{
 
             webhookResult.Data = record.data;
 
+            console.log('Webhook data -> ', webhookResult.Data);
+
             callback(webhookResult);
         }
         catch(err){
@@ -25,9 +29,13 @@ export class WebhookUrlHelper{
 
             webhookResult.ErrorMessage = err;
 
+            console.log('Webhook err -> ', err);
+
             callback(webhookResult);
         }
     }
+
+    
 }
 
 export class WebhookResult{

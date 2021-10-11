@@ -1,8 +1,6 @@
-import axios from "axios";
 import { CommandConstants } from "src/helpers/constants/freeswitch-command.constants";
 import { FreeswitchDpConstants } from "src/helpers/constants/freeswitchdp.constants";
 import { TwiMLXMLParser } from "src/helpers/parser/xmlParser";
-import { TimeConversion } from "src/utils/timeConversion.utils";
 import { WebhookUrlHelper } from "../../webhookUrl.helper";
 import { OutboundCallContext } from "../models/outboundCallContext";
 import { CallRejectedHandler } from "./callRejectedHandler";
@@ -23,8 +21,7 @@ export class DialConfirm{
 
             if (this._context.callRejected){
 
-                this.callRejectedHandler.reject(this._context, () => {
-                    console.log('Call has been rejected');
+                this.callRejectedHandler.reject(() => {
                 });
 
                 return;
@@ -36,8 +33,7 @@ export class DialConfirm{
 
                 if (this._context.callRejected){
 
-                    this.callRejectedHandler.reject(this._context, () => {
-                        console.log('Call has been rejected');
+                    this.callRejectedHandler.reject(() => {
                     });
 
                     return;
@@ -60,15 +56,20 @@ export class DialConfirm{
 
         this.webhookHelper.triggerWebhook(this._context.webhookParam.actionUrl, 
             this._context.webhookParam.httpMethod, 
-            this._context.requestParam, (response) => {
+            this._context.outboundRequestParam, (response) => {
 
             if (response.Error){
+
                 this._context.legStop = true;
+
                 this._context.callRejected = true;
-                console.log('Error: -> ', response.ErrorMessage);
+
+                this._context.errMessage.push(response.ErrorMessage);
+
                 return callback();
             }
             else{
+                
                 callback(response.Data);
             }
         });
@@ -86,14 +87,12 @@ export class DialConfirm{
         let dialplanInstructionList = this._context.dpInstructions;
 
         if (dialplanInstructionList.length === 0){
-            console.log('total -> ', dialplanInstructionList.length);
 
-            console.log('Call must be rejected');
+            this._context.errMessage.push("No instructions found");
 
             this._context.callRejected = true;
 
-            this.callRejectedHandler.reject(this._context, () => {
-                callback();
+            this.callRejectedHandler.reject(() => {
             });
 
             return;
@@ -101,7 +100,7 @@ export class DialConfirm{
 
         let totalCount = dialplanInstructionList.length;
 
-        console.log('Total instructions to be executed ', totalCount);
+        this._context.Log(`Total instructions to be executed : ${totalCount}`);
 
         let connection = this._context.connection;
 
@@ -116,16 +115,19 @@ export class DialConfirm{
                     connection.execute(instruction.name,
                         `flite|kal|${instruction.value}`, () => {
 
-                        console.log('Speak executed');
                         totalCount--;
+
                         this.executeInstruction(() => {
                             callback();
                         });
                     });
                 }
                 else if (instruction.name === FreeswitchDpConstants.hangup){
+
                     this._context.callRejected=true;
+
                     totalCount--;
+
                     callback();
                 }
                 else if (instruction.name === FreeswitchDpConstants.bridge){
@@ -147,8 +149,6 @@ export class DialConfirm{
 
                                     connection.execute(instruction.name, gateway, (cb) => {
 
-                                        console.log('Bridge executed!');
-
                                         this._context.webhookParam = {
                                             actionUrl: instruction.dialAttribute.action,
                                             httpMethod: instruction.dialAttribute.method
@@ -157,6 +157,7 @@ export class DialConfirm{
                                         this._context.bridgeExecuted = true;
 
                                         callback(this._context);
+
                                         return;
                                     });
                                 }

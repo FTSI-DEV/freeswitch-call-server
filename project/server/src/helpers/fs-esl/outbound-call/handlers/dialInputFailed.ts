@@ -1,5 +1,3 @@
-import axios from "axios";
-import { parse } from "path/posix";
 import { CommandConstants } from "src/helpers/constants/freeswitch-command.constants";
 import { FreeswitchDpConstants } from "src/helpers/constants/freeswitchdp.constants";
 import { TwiMLXMLParser } from "src/helpers/parser/xmlParser";
@@ -24,8 +22,7 @@ export class DialInputFailed{
 
             if (this._context.callRejected){
 
-                this.callRejectedHelper.reject(this._context, () => {
-                    console.log('Call has been rejected');
+                this.callRejectedHelper.reject(() => {
                 });
 
                 return;
@@ -37,8 +34,7 @@ export class DialInputFailed{
 
                 if (this._context.callRejected){
 
-                    this.callRejectedHelper.reject(this._context, () => {
-                        console.log('Call has been rejected');
+                    this.callRejectedHelper.reject(() => {
                     });
 
                     return;
@@ -56,16 +52,19 @@ export class DialInputFailed{
         let connection = this._context.connection;
 
         if (dialplanInstructionList.length === 0){
-            console.log('Call must be rejected');
-            console.log('Total -> ', dialplanInstructionList.length);
+
             this._context.callRejected = true;
+
+            this._context.errMessage.push("No instructions found");
+
             callback();
+
             return;
         }
 
         let totalCount = dialplanInstructionList.length;
 
-        console.log('Total instructions to be executed -> ', totalCount);
+        this._context.Log(`Total instructions to be executed : ${totalCount}`);
 
         let instruction = dialplanInstructionList.shift();
 
@@ -79,7 +78,6 @@ export class DialInputFailed{
 
                     connection.execute(instruction.name, timeout, () => {
 
-                        console.log('Sleep executed');
                         totalCount--;
 
                         this.executeInstruction(() => {
@@ -92,8 +90,8 @@ export class DialInputFailed{
                     connection.execute(instruction.name,
                         `flite|kal|${instruction.value}` , () => {
 
-                        console.log('Speak Executed');
                         totalCount--;
+
                         this.executeInstruction(() => {
                             callback();
                         });
@@ -102,7 +100,9 @@ export class DialInputFailed{
                 else if (instruction.name === FreeswitchDpConstants.hangup){
 
                     this._context.callRejected = true;
+
                     totalCount--;
+
                     this.executeInstruction(() => {
                         callback();
                     });
@@ -110,23 +110,26 @@ export class DialInputFailed{
             }
         }
         else{
+            
             this._context.callRejected = true;
+
             callback();
         }
     }
 
     private getInstruction(callback){
 
-        console.log('Dial Failed ', this._context.requestParam.ActionId);
-
         this.webhookHelper.triggerWebhook(this._context.webhookParam.actionUrl, 
             this._context.webhookParam.httpMethod, 
-            this._context.requestParam, (response) => {
+            this._context.outboundRequestParam, (response) => {
 
             if (response.Error){
+
                 this._context.callRejected = true;
+
                 this._context.legStop = true;
-                console.log('Error: -> ', response.ErrorMessage);
+
+                this._context.errMessage.push(response.ErrorMessage);
 
                 return callback();
             }

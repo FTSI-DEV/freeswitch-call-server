@@ -1,19 +1,16 @@
 import { CallTypes } from '../constants/call-type';
 import { CHANNEL_VARIABLE } from '../constants/channel-variables.constants';
-import { EVENT_LIST } from '../constants/event-list.constants';
 import { FS_ESL } from '../constants/fs-esl.constants';
 import { CDRHelper } from './cdr.helper';
-import { DTMFHelper } from './dtmf.helper';
 import { FreeswitchConfigHelper } from './freeswitchConfig.helper';
 import esl from 'modesl';
 import http from 'http';
 import { CDRModel } from 'src/modules/call-detail-record/models/cdr.models';
 import moment from 'moment';
-import { DialplanInstruction } from '../parser/xmlParser';
 import axios from 'axios';
-import { VoiceRequestParam } from './models/voiceRequestParam';
-import { CustomAppLogger, ICustomAppLogger } from 'src/logger/customLogger';
-import { WebhookParam } from './inbound-call/models/webhookParam';
+import { CustomAppLogger } from 'src/logger/customLogger';
+import { WebhookInboundCallStatusCallBack, WebhookOutboundCallStatusCallBack } from 'src/utils/webhooks';
+import { WebhookParam } from './models/webhookParam';
 
 export interface ConnResult {
   connectionObj?: any;
@@ -23,9 +20,9 @@ export interface ConnResult {
 }
 
 interface CallModel{
-  calldDirection?:string;
+  callDirection?:string;
   webhookParam: WebhookParam;
-  voiceRequestParam: VoiceRequestParam;
+  requestParam: any;
   callRejected:boolean;
   legId:string;
 }
@@ -48,7 +45,7 @@ export class InboundEslConnectionHelper {
     let fsConfig = new FreeswitchConfigHelper().getFreeswitchConfig();
 
     let connection = new esl.Connection(
-      '192.168.18.80',
+      fsConfig.ip,
       fsConfig.port,
       fsConfig.password,
     );
@@ -58,9 +55,13 @@ export class InboundEslConnectionHelper {
     });
 
     connection.on(FS_ESL.CONNECTION.READY, () => {
+
       this._logger.info('Esl Inbound Connection Ready!');
+
       InboundEslConnResult.isSuccess = true;
+
       InboundEslConnResult.connectionObj = connection;
+
       connection.subscribe('CHANNEL_HANGUP_COMPLETE');
       connection.subscribe('all');
       connection.subscribe('CHANNEL_CREATE');
@@ -86,33 +87,7 @@ export class InboundEslConnectionHelper {
 
   private _onListenEvent(connection){
 
-    connection.on('esl::event::CHANNEL_CREATE::*', (fsEvent) => {
-
-      let eventName = fsEvent.getHeader('Event-Name');
-
-      let callId = fsEvent.getHeader(CHANNEL_VARIABLE.UNIQUE_ID);
-      
-      let callDirection = fsEvent.getHeader(CHANNEL_VARIABLE.CALL_DIRECTION);
-
-      if (callDirection === CallTypes.Inbound){
-
-        console.log('Call direction -> ' ,callDirection);
-        console.log('Call Id -> ', callId);
-        console.log('Event Name -> ', eventName);
-
-        let cdrValues: CDRModel = {
-          UUID: callId,
-          CallDirection: callDirection,
-          StartedDate : moment().format('YYYY-MM-DDTHH:mm:ss')
-        }
-
-        // http.get(WebhookInboundCallStatusCallBack(cdrValues));
-      }
-    });
-
     connection.on('esl::event::CHANNEL_HANGUP_COMPLETE::*', (fsEvent) => {
-
-      console.log('HAAAANGUPPPPP');
 
       let callId = fsEvent.getHeader(CHANNEL_VARIABLE.UNIQUE_ID);
      
@@ -132,15 +107,19 @@ export class InboundEslConnectionHelper {
         this._logger.info(`Parent Call : ${callId}`);
         cdrValues.ParentCallUid = channelId;
       }
-      // if (cdrValues.CallDirection === "outbound"){
-      //   http.get(WebhookOutboundCallStatusCallBack(cdrValues));
-      // }
-      // else{
-      //   http.get(WebhookInboundCallStatusCallBack(cdrValues));
-      // }
 
-        this._logger.info('HANDLE CALLS in inbound esl');
-        // this.statusCallback(cdrValues);
+      console.log('Direction -> ' , cdrValues.CallDirection);
+
+      console.log('CDRValues -> ', cdrValues);
+      
+      if (cdrValues.CallDirection === "outbound"){
+        http.get(WebhookOutboundCallStatusCallBack(cdrValues));
+      }
+      else{
+        http.get(WebhookInboundCallStatusCallBack(cdrValues));
+      }
+
+      this.statusCallback(cdrValues);
     });
 
     connection.on('esl::event::BACKGROUND_JOB::*', (evt) =>{
@@ -152,23 +131,24 @@ export class InboundEslConnectionHelper {
 
       this._logger.info(JSON.stringify(InboundEslConnResult.callModel));
 
+      console.log('StatusCallModel -> ', InboundEslConnResult.callModel);
+
       if (InboundEslConnResult.callModel !== undefined){
 
         if (!InboundEslConnResult.callModel.callRejected &&
            cdrValues.UUID === InboundEslConnResult.callModel.legId){
 
+          console.log('params StatusCallModel -> ', InboundEslConnResult.callModel);
+
           let webhook = InboundEslConnResult.callModel.webhookParam;
 
-          let params = InboundEslConnResult.callModel.voiceRequestParam;
+          let params = InboundEslConnResult.callModel.requestParam;
   
           params.Direction = cdrValues.CallDirection;
           params.DialCallStatus = cdrValues.CallStatus;
           params.CallSid = cdrValues.UUID;
           params.DialCallDuration = cdrValues.Duration.toString();
           params.RecordingSid = cdrValues.RecordingUUID;
-        
-          console.log('FROM -> ', cdrValues.PhoneNumberFrom);
-          console.log('TO -> ', cdrValues.PhoneNumberTo);
   
           if (webhook.httpMethod === "POST"){
               axios.post(webhook.actionUrl, params);

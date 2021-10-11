@@ -15,8 +15,6 @@ export class TwiMLXMLParser{
 
     tryParse(value:string):DialplanInstruction[]{
 
-        // console.log('redisclient ', this.redisClient);
-
         let dpInstructions : DialplanInstruction[] = [];
 
         try{
@@ -29,14 +27,14 @@ export class TwiMLXMLParser{
 
                let element = xmlChildren[i];
 
-            //    console.log('element -> ' ,JSON.stringify(element));
-
                if (element.name === TwiMLContants.Say){
+
                    dpInstructions.push({
                        name: FreeswitchDpConstants.speak,
                        command: CommandConstants.exec,
                        value: element.val
                    });
+
                }
                else if (element.name === TwiMLContants.Pause){
 
@@ -77,31 +75,24 @@ export class TwiMLXMLParser{
 
                     dpInstructions.push(dpInstruction);
 
-                //    dpInstructions.push({
-                //        name: FreeswitchDpConstants.play_and_get_digits,
-                //        command: CommandConstants.exec,
-                //        value: element.val,
-                //        gatherAttribute : {
-                //            numDigits: element.attr.numDigits,
-                //            action: element.attr.action,
-                //            method: element.attr.method,
-                //            timeout: element.attr.timeout
-                //        }
-                //    });
                }
                else if (element.name === TwiMLContants.Redirect){
+
                    dpInstructions.push({
                        name: "",
                        command: CommandConstants.axios,
                        value: element.val
                    });
+                   
                }
                else if (element.name === TwiMLContants.Play){
+
                    dpInstructions.push({
                        name: FreeswitchDpConstants.playback,
                        command : CommandConstants.exec,
                        value: element.val
                    });
+
                }
                else if (element.name === TwiMLContants.Dial){
                 
@@ -146,17 +137,6 @@ export class TwiMLXMLParser{
         catch(err){
             console.log('ERROR PARSING TWIML -> ',err);
         }
-
-        // let arrToString = JSON.stringify(dpInstructions);
-
-        // this.redisClient.set('outbound_dpInstructions', arrToString, (err,reply) => {
-        //     console.log(reply);
-        // });
-
-        // this.redisClient.get('outbound_dpInstructions', (err,reply) => {
-        //     console.log('Retrieve instructions from REDIS');
-        //     // console.log(JSON.parse(reply));
-        // });
 
         return dpInstructions;
     }
