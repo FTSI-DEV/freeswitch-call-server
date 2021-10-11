@@ -4,14 +4,18 @@ import { CommandConstants } from "src/helpers/constants/freeswitch-command.const
 import { FreeswitchDpConstants } from "src/helpers/constants/freeswitchdp.constants";
 import { TwiMLXMLParser } from "src/helpers/parser/xmlParser";
 import { TimeConversion } from "src/utils/timeConversion.utils";
+import { WebhookUrlHelper } from "../../webhookUrl.helper";
 import { OutboundCallContext } from "../models/outboundCallContext";
+import { CallRejectedHandler } from "./callRejectedHandler";
 
 export class DialInputFailed{
 
     constructor(
         private readonly _context: OutboundCallContext,
         private readonly twiMLParser : TwiMLXMLParser,
-        private readonly timeConversion : TimeConversion
+        private readonly timeConversion : TimeConversion,
+        private callRejectedHelper = new CallRejectedHandler(_context),
+        private readonly webhookHelper = new WebhookUrlHelper()
     ){}
 
     userDialInputFailed(){
@@ -20,9 +24,10 @@ export class DialInputFailed{
 
             if (this._context.callRejected){
 
-                this.callRejectedHandler(this._context, () => {
+                this.callRejectedHelper.reject(this._context, () => {
                     console.log('Call has been rejected');
                 });
+
                 return;
             }
 
@@ -31,7 +36,8 @@ export class DialInputFailed{
             this.executeInstruction(() => {
 
                 if (this._context.callRejected){
-                    this.callRejectedHandler(this._context, () => {
+
+                    this.callRejectedHelper.reject(this._context, () => {
                         console.log('Call has been rejected');
                     });
 
@@ -113,15 +119,21 @@ export class DialInputFailed{
 
         console.log('Dial Failed ', this._context.requestParam.ActionId);
 
-        this.triggerWebhookUrl(this._context.webhookParam.actionUrl, 
+        this.webhookHelper.triggerWebhook(this._context.webhookParam.actionUrl, 
             this._context.webhookParam.httpMethod, 
             this._context.requestParam, (response) => {
 
-            if (this._context.callRejected){
+            if (response.Error){
+                this._context.callRejected = true;
+                this._context.legStop = true;
+                console.log('Error: -> ', response.ErrorMessage);
+
                 return callback();
             }
-
-            callback(response);
+            else
+            {
+                callback(response.Data);
+            }
         });
     }
     
@@ -131,47 +143,4 @@ export class DialInputFailed{
 
         this._context.dpInstructions = parseInstruction;
     }
-
-    private async triggerWebhookUrl(url:string,method:string,params:any,callback){
-
-        let record = null;
-
-        try
-        {
-            if (method === 'POST'){
-                record = await axios.post(url, params);
-            }
-            else
-            {
-                record = await axios.get(url, { params : params } );
-            }
-
-            callback(record.data);
-        }
-        catch(err){
-            this._context.callRejected;
-            callback();
-            // this.callRejectedHandler(this._context, () => {
-            //     callback();
-            // });
-        }
-    }
-
-    callRejectedHandler(context:OutboundCallContext, callback){
-        let connection = context.connection;
-
-        connection.execute('playback', 'ivr/ivr-call_cannot_be_completed_as_dialed.wav', () => {
-
-            this._context.redisServer.del(this._context.redisServerName, (err,reply) => {
-                console.log('Deleted -> ', reply);
-            });
-
-            connection.execute('hangup', 'CALL_REJECTED', () => {
-                context.callRejected = true;
-                // context.dpInstructions = [];
-                callback();
-            });
-        });
-    }
-
 }

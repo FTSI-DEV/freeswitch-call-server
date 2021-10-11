@@ -21,7 +21,9 @@ export class OutboundCallServerHelper{
         let context = new OutboundCallContext();
 
         context.server = server;
+
         context.serviceModel.callDetailRecordSrvc = this._callDetailRecordService;
+        
         context.redisServer = this._client;
 
         new OutboundCallHelper(context).outboundCallEnter();

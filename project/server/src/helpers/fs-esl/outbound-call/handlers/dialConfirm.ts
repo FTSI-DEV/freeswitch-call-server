@@ -3,7 +3,9 @@ import { CommandConstants } from "src/helpers/constants/freeswitch-command.const
 import { FreeswitchDpConstants } from "src/helpers/constants/freeswitchdp.constants";
 import { TwiMLXMLParser } from "src/helpers/parser/xmlParser";
 import { TimeConversion } from "src/utils/timeConversion.utils";
+import { WebhookUrlHelper } from "../../webhookUrl.helper";
 import { OutboundCallContext } from "../models/outboundCallContext";
+import { CallRejectedHandler } from "./callRejectedHandler";
 import { DialEnd } from "./dialEnd";
 
 export class DialConfirm{
@@ -11,7 +13,8 @@ export class DialConfirm{
     constructor(
         private readonly _context: OutboundCallContext,
         private readonly twiMLParser = new TwiMLXMLParser(_context.redisServer),
-        private readonly timeConversion = new TimeConversion()
+        private readonly callRejectedHandler = new CallRejectedHandler(_context),
+        private readonly webhookHelper = new WebhookUrlHelper()
     ){}
 
     dialConfirm(){
@@ -19,7 +22,11 @@ export class DialConfirm{
         this.getInstruction((response) => {
 
             if (this._context.callRejected){
-                console.log('Call has been rejected. Cannot process further instructions');
+
+                this.callRejectedHandler.reject(this._context, () => {
+                    console.log('Call has been rejected');
+                });
+
                 return;
             }
 
@@ -28,34 +35,42 @@ export class DialConfirm{
             this.executeInstruction(() => {
 
                 if (this._context.callRejected){
-                    this.callRejectedHandler(this._context, () => {
+
+                    this.callRejectedHandler.reject(this._context, () => {
                         console.log('Call has been rejected');
                     });
+
                     return;
                 }
 
                 if (this._context.bridgeExecuted){
-                    new DialEnd(this._context,
-                        this.twiMLParser,
-                        this.timeConversion)
-                        .dialEnd();
-                }
 
+                    new DialEnd(this._context,
+                        this.callRejectedHandler,
+                        this.webhookHelper)
+                    .dialEnd();
+                }
             });
         });
     }
 
+    //#region Private
+
     private getInstruction(callback){
 
-        this.triggerWebhookUrl(this._context.webhookParam.actionUrl, 
+        this.webhookHelper.triggerWebhook(this._context.webhookParam.actionUrl, 
             this._context.webhookParam.httpMethod, 
             this._context.requestParam, (response) => {
 
-            if (this._context.callRejected){
+            if (response.Error){
+                this._context.legStop = true;
+                this._context.callRejected = true;
+                console.log('Error: -> ', response.ErrorMessage);
                 return callback();
             }
-
-            callback(response);
+            else{
+                callback(response.Data);
+            }
         });
     }
 
@@ -66,40 +81,21 @@ export class DialConfirm{
         this._context.dpInstructions = parseInstruction;
     }
 
-    private async triggerWebhookUrl(url:string,method:string,params:any,callback){
-
-        let record = null;
-
-        try
-        {
-            if (method === 'POST'){
-                record = await axios.post(url, params);
-            }
-            else
-            {
-                record = await axios.get(url, { params : params } );
-            }
-
-            callback(record.data);
-        }
-        catch(err){
-            this.callRejectedHandler(this._context, () => {
-                callback();
-            });
-        }
-    }
-
     private executeInstruction(callback){
 
         let dialplanInstructionList = this._context.dpInstructions;
 
         if (dialplanInstructionList.length === 0){
             console.log('total -> ', dialplanInstructionList.length);
+
             console.log('Call must be rejected');
+
             this._context.callRejected = true;
-            this.callRejectedHandler(this._context, () => {
+
+            this.callRejectedHandler.reject(this._context, () => {
                 callback();
             });
+
             return;
         }
 
@@ -180,19 +176,5 @@ export class DialConfirm{
         }
     }
 
-    private callRejectedHandler(context:OutboundCallContext, callback){
-        let connection = context.connection;
-
-        connection.execute('playback', 'ivr/ivr-call_cannot_be_completed_as_dialed.wav', () => {
-
-            this._context.redisServer.del(this._context.redisServerName, (err,reply) => {
-                console.log('Deleted -> ', reply);
-            });
-
-            connection.execute('hangup', 'CALL_REJECTED', () => {
-                context.callRejected = true;
-                callback();
-            });
-        });
-    }
+    //#endregion
 }

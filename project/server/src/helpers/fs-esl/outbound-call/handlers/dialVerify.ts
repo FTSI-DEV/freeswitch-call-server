@@ -1,23 +1,24 @@
-import { ChannelStateModel, OutboundCallContext } from "../models/outboundCallContext";
-import axios from "axios";
 import { DialplanInstruction, TwiMLXMLParser } from "src/helpers/parser/xmlParser";
 import { CommandConstants } from "src/helpers/constants/freeswitch-command.constants";
-import { connect } from "rxjs";
-import { FreeswitchDpConstants } from "src/helpers/constants/freeswitchdp.constants";
-import e from "express";
 import { TimeConversion } from "src/utils/timeConversion.utils";
 import { PlayAndGetDigitsParam } from "../../inbound-call/models/plagdParam";
 import { DialConfirm } from "./dialConfirm";
-import { ContextIdFactory } from "@nestjs/core";
-import async from 'async';
 import { DialInputFailed } from "./dialInputFailed";
+import { CallRejectedHandler } from "./callRejectedHandler";
+import { WebhookUrlHelper } from "../../webhookUrl.helper";
+import { OutboundCallContext } from "../models/outboundCallContext";
+import { FreeswitchDpConstants } from "src/helpers/constants/freeswitchdp.constants";
 
 export class DialVerify{
+
+    private outboundDialVerifyUrl = 'http://localhost:8080/TwilioCallApi/DialVerify';
 
     constructor(
         private readonly _context: OutboundCallContext,
         private readonly twiMLParser = new TwiMLXMLParser(_context.redisServer),
-        private readonly timeConversion = new TimeConversion()
+        private readonly timeConversion = new TimeConversion(),
+        private readonly _callRejectedHandler = new CallRejectedHandler(_context),
+        private readonly _webhookHelper = new WebhookUrlHelper()
     ){ }
 
     dialVerify(){
@@ -25,7 +26,9 @@ export class DialVerify{
        this.getInstruction(this._context, (response) => {
 
             if (this._context.callRejected){
-                console.log('Call has been rejected');
+                this._callRejectedHandler.reject(this._context, () => {
+                    console.log('Call has been rejected');
+                });
                 return;
             }
 
@@ -42,12 +45,14 @@ export class DialVerify{
                 }
 
                 if (this._context.plagdStop){
-                    console.log('Next instruction');
 
+                    console.log('Next instruction');
+                    
                     new DialConfirm(
                         this._context,
                         this.twiMLParser,
-                        this.timeConversion
+                        this._callRejectedHandler,
+                        this._webhookHelper
                     ).dialConfirm();
 
                 }
@@ -71,12 +76,17 @@ export class DialVerify{
         let dialplanInstructionList = this._context.dpInstructions;
 
         if (dialplanInstructionList.length === 0){
+
             console.log('total -> ', dialplanInstructionList.length);
+
             console.log('Call must be rejected');
+
             this._context.callRejected = true;
-            this.callRejectedHandler(this._context, () => {
+
+            this._callRejectedHandler.reject(this._context, () => {
                 callback();
             });
+
             return;
         }
 
@@ -170,10 +180,22 @@ export class DialVerify{
 
     private getInstruction(context:OutboundCallContext, callback){
 
-        let urlOutboundDialVerify = 'http://localhost:8080/TwilioCallApi/DialVerify';
+        this._webhookHelper
+        .triggerWebhook(this.outboundDialVerifyUrl, 'POST', context.requestParam, (response) => {
+            
+            if (response.Error){
 
-        this.triggerWebhookUrl(urlOutboundDialVerify, 'POST', context.requestParam, (response) => {
-            callback(response);
+                context.legStop = true;
+                
+                context.callRejected = true;
+                
+                console.log('Error: -> ', response.ErrorMessage);
+
+                callback();
+            }
+            else{
+                callback(response.Data);
+            }
         });
     }
 
@@ -226,29 +248,6 @@ export class DialVerify{
         });
     }
 
-    private async triggerWebhookUrl(url:string,method:string,params:any,callback){
-
-        let record = null;
-
-        try
-        {
-            if (method === 'POST'){
-                record = await axios.post(url, params);
-            }
-            else
-            {
-                record = await axios.get(url, { params : params } );
-            }
-
-            callback(record.data);
-        }
-        catch(err){
-            this.callRejectedHandler(this._context, () => {
-                callback();
-            });
-        }
-    }
-
     private setPlayAndGetDigits(nextInstruction:DialplanInstruction):PlayAndGetDigitsParam{
 
         let timeout = this.timeConversion.secondsToMS(Number(nextInstruction.gatherAttribute.timeout));
@@ -264,22 +263,5 @@ export class DialVerify{
             soundFile : 'ivr/ivr-enter_destination_telephone_number.wav',
             invalidFile: null
         };
-    }
-
-    callRejectedHandler(context:OutboundCallContext, callback){
-        let connection = context.connection;
-
-        connection.execute('playback', 'ivr/ivr-call_cannot_be_completed_as_dialed.wav', () => {
-
-            this._context.redisServer.del(this._context.redisServerName, (err,reply) => {
-                console.log('Deleted -> ', reply);
-            });
-
-            connection.execute('hangup', 'CALL_REJECTED', () => {
-                context.callRejected = true;
-                // context.dpInstructions = [];
-                callback();
-            });
-        });
     }
 }
