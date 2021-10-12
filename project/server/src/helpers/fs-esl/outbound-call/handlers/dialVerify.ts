@@ -208,9 +208,14 @@ export class DialVerify{
                 answerState: cb.getHeader('Answer-State')
             }
 
-            this._context.redisServer.set(this._context.redisServerName, 
+            this._context.redisServer.set(this._context.outboundChannelStateKey, 
                 JSON.stringify(this._context.channelState), (err,reply) => {
-                console.log('Redis State Saved! -> ');
+
+                    this._context.Log(`Redis state set: 
+                    Key: ${this._context.outboundChannelStateKey} ,
+                    Reply: ${reply} , 
+                    Error: ${err}`);
+                    
             });
 
             let inputtedDigit = cb.getHeader(`variable_${PLAGD.var_name}`);

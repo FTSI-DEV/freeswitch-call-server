@@ -1,8 +1,8 @@
 import { CallTypes } from "src/helpers/constants/call-type";
 import { CustomAppLogger } from "src/logger/customLogger";
-import { IInboundCallConfigService } from "src/modules/inbound-call-config/services/inbound-call-config.interface";
 import { CHANNEL_VARIABLE } from "../../constants/channel-variables.constants";
 import { InboundEslConnResult } from "../inbound-esl.connection";
+import { ChannelStateModel } from "../models/channelState.model";
 import { InboundCallDialplan } from "./handlers/inboundCallDiaplan";
 import { InboundCallContext } from "./models/inboundCallContext";
 
@@ -34,6 +34,25 @@ export class InboundCallHelper2{
 
             context.legId = this.getChannelVariable(CHANNEL_VARIABLE.UNIQUE_ID, context);
 
+            let channelStateModel : ChannelStateModel = {
+                legId: context.legId,
+                channelState : this.getChannelVariable('Channel-State',context),
+                answerState : this.getChannelVariable('Answer-State', context)
+            };
+
+            context.inboundChannelStateKey = `InboundChannelStateKey:${context.legId}`;
+
+            context.redisServer.set(`${context.inboundChannelStateKey}`, JSON.stringify(channelStateModel), (err,reply) => {
+                context.Log(`Redis state set: 
+                    Key: ${context.inboundChannelStateKey} ,
+                    Reply: ${reply} , 
+                    Error: ${err}`);
+            });
+
+            if (channelStateModel.answerState === 'hangup'){
+                return;
+            }
+
             let phoneNumberFrom = this.getChannelVariable(CHANNEL_VARIABLE.CALLER_CALLER_ID_NUMBER,context);
 
             let callerDestinationNumber = this.getChannelVariable(CHANNEL_VARIABLE.CALLER_DESTINATION_NUMBER, context);
@@ -59,6 +78,7 @@ export class InboundCallHelper2{
                     this._inboundCallDialplan.processedInstruction(() => {
 
                         console.log('All instructions are processed');
+
                     });
 
                 })
@@ -89,11 +109,16 @@ export class InboundCallHelper2{
 
             let hangupCause = evt.getHeader(CHANNEL_VARIABLE.HANGUP_CAUSE);
 
-            context.Log(`Hnagup Cause => ${hangupCause}`);
-
-            context.Log(`Webparam Cause => ${JSON.stringify(context.webhookParam)}`);
+            context.Log(`Hangup Cause => ${hangupCause} `);
 
             connection.removeListener(hangupCompleteEvent, hangupCompleteWrapper);
+
+            context.redisServer.del(context.inboundChannelStateKey, (err,reply) => {
+                context.Log(`Delete Redis-Server State. 
+                StateKey: ${context.inboundChannelStateKey} ,
+                Reply: ${reply} , 
+                Err: ${err}`);
+            });
         };
 
         connection.subscribe('CHANNEL_HANGUP_COMPLETE');
@@ -109,10 +134,3 @@ export class InboundCallHelper2{
     }
 }
 
-const RecordEnum = {
-    DoNotRecord: 'do-not-record',
-    RecordFromAnswer: 'record-from-answer',
-    RecordFromRinging: 'record-from-ringing',
-    RecordFromAnswerDual: 'record-from-answer-dual',
-    RecordFromRingingDual: 'record-from-ringing-dual',
-};

@@ -17,7 +17,7 @@ export class InboundCallContext{
     connection:any;
     server:any;
     redisServer:any;
-    redisServerName="inbound_channelState";
+    inboundChannelStateKey:string;
     serviceModel: InboundCallServiceModel = new InboundCallServiceModel();
     requestParam: InboundRequestParam = new InboundRequestParam();
     channelState:ChannelStateModel = new ChannelStateModel();

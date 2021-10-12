@@ -35,15 +35,20 @@ export class OutboundCallHelper{
 
             let channelStateModel: ChannelStateModel = {
                 legId : legId,
-                channelState : conn.getInfo().getHeader('Channel-State'),
-                answerState: conn.getInfo().getHeader('Answer-State')
+                channelState : this.getChannelVariable('Channel-State'),
+                answerState: this.getChannelVariable('Answer-State')
             };
 
-            context.redisServer.set(context.redisServerName, JSON.stringify(channelStateModel), (err,reply) => {
-                context.Log(`Redis state saved: ${reply}`);
+            context.outboundChannelStateKey = `OutboundChannelStateKey:${legId}`;
+
+            context.redisServer.set(context.outboundChannelStateKey, JSON.stringify(channelStateModel), (err,reply) => {
+                context.Log(`Redis state set: 
+                Key: ${context.outboundChannelStateKey} ,
+                Reply: ${reply} , 
+                Error: ${err}`);
             });
 
-            context.redisServer.get(context.redisServerName, (err,reply) => {
+            context.redisServer.get(context.outboundChannelStateKey, (err,reply) => {
             });
 
             if (channelStateModel.answerState === 'hangup'){
@@ -54,9 +59,7 @@ export class OutboundCallHelper{
                 .getInfo()
                 .getHeader(CHANNEL_VARIABLE.CALLER_CALLE_ID_NUMBER);
 
-            conn.on('error', (err) => {
-                context.Log(`ESL Error: ${err}`, true);
-            });
+            this._onListenEvent();
 
             context.outboundRequestParam.From = phoneNumberFrom;
 
@@ -82,5 +85,46 @@ export class OutboundCallHelper{
 
             });
         });
+    }
+
+    private getChannelVariable(headerName:string){
+
+        return this._context.connection.getInfo().getHeader(headerName);
+    }
+
+    private _onListenEvent(){
+
+        let connection = this._context.connection;
+
+        connection.on('error', (err) => {
+            this._context.Log(`Outbound Call Error. Message : ${err}` , true);
+        });
+
+        let hangupCompleteEvent = 'esl::event::CHANNEL_HANGUP_COMPLETE::' + this._context.legId;
+
+        let hangupCompleteWrapper = (evt) => {
+
+            this._context.legStop = true;
+
+            this._context.Log('Leg-A hangup');
+
+            let hangupCause = evt.getHeader(CHANNEL_VARIABLE.HANGUP_CAUSE);
+
+            this._context.Log(`Hangup Cause => ${hangupCause} `);
+
+            connection.removeListener(hangupCompleteEvent, hangupCompleteWrapper);
+
+            this._context.redisServer.del(this._context.outboundChannelStateKey, (err,reply) => {
+                this._context.Log(`Delete Redis-Server State. 
+                StateKey: ${this._context.outboundChannelStateKey} ,
+                Reply: ${reply} , 
+                Err: ${err}`);
+            });
+        };
+
+        connection.subscribe('CHANNEL_HANGUP_COMPLETE');
+
+        connection.on(hangupCompleteEvent, hangupCompleteWrapper);
+
     }
 }

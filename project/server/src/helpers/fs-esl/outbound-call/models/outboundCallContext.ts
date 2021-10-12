@@ -25,7 +25,7 @@ export class OutboundCallContext{
     plagdNext:boolean=false;
     plagdStop:boolean=false;
     redirect:boolean=false;
-    redisServerName:string="outbound_channelState";
+    outboundChannelStateKey:string;
     inboundESLConnResult:ConnResult;
     errMessage:string[] = [];
     Log(message:string, error:boolean=false){

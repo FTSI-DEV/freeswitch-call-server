@@ -58,9 +58,9 @@ export class InboundCallDialplan {
                             legId:context.legId
                         }
                     }
-
-                    console.log('callModel ', context.inboundESLConnResult.callModel);
                 }
+
+                callback(this._context);
             });
 
         });
@@ -115,7 +115,7 @@ export class InboundCallDialplan {
                     answerState: cb.getHeader('Answer-State')
                 }
 
-                this._context.redisServer.set(this._context.redisServerName,
+                this._context.redisServer.set(this._context.inboundChannelStateKey,
                     JSON.stringify(this._context.channelState), (err,reply) => {
 
                     if (err){
@@ -146,15 +146,6 @@ export class InboundCallDialplan {
                         actionUrl: instruction.gatherAttribute.action,
                         httpMethod:instruction.gatherAttribute.method
                     };
-
-                    // this.getInstruction(this._context,(response) => {
-
-                    //     this.parseInstruction(response);
-
-                    //     this.executeInstruction(() => {
-                    //         callback(this._context);
-                    //     });
-                    // });
     
                     callback(this._context);
                 }
@@ -183,8 +174,6 @@ export class InboundCallDialplan {
     executeInstruction(callback){
 
         let dialplanInstructionList = this._context.dialplanInstructions;
-
-        console.log('List -> ', dialplanInstructionList);
 
         if (dialplanInstructionList.length === 0){
 
@@ -266,14 +255,14 @@ export class InboundCallDialplan {
                                 callback(this._context);
                             });
 
-                            // callback(this._context);
-
                             return;
                         }
                         else{
+
                             this.executeInstruction(() => {
                                 callback();
                             });
+
                         }
 
                     });
@@ -302,6 +291,8 @@ export class InboundCallDialplan {
                                 instruction.children.name === 'Number' ){
 
                                 let callForwardingNumber = instruction.value;
+
+                                console.log('Call Forwarding Number -> ', callForwardingNumber);
 
                                 let gateway = `sofia/gateway/fs-test3/1000`;
 
@@ -344,155 +335,6 @@ export class InboundCallDialplan {
             this._context.callRejected = true;
 
             callback();
-        }
-    }
-
-    setInstruction(twiMLResponse:string, context: InboundCallContext){
-
-        let parseResult = new TwiMLXMLParser(null).tryParse(twiMLResponse);
-
-        let gatherInstructionExists: boolean = false;
-
-        if (parseResult.length <= 0 ){
-            context.instructionValidated = false;
-            return;
-        }
-
-        for (let i = 0; i < parseResult.length; i++){
-
-            let instruction = parseResult[i];
-
-            if (instruction.command === CommandConstants.exec){
-
-                let hasGatherInstruction = parseResult.find((i) => i.name === FreeswitchDpConstants.play_and_get_digits);
-
-                let hasDialInstruction = parseResult.find((i) => i.name === FreeswitchDpConstants.bridge);
-
-                if (hasGatherInstruction){
-                    gatherInstructionExists = true;
-                }
-
-                if (gatherInstructionExists){
-                    if (instruction.name === FreeswitchDpConstants.play_and_get_digits){
-                        context.dialplanInstruction = instruction;
-                        context.instructionOrder = 1;
-                        break;
-                    }
-                }
-                
-                if (instruction.name === FreeswitchDpConstants.hangup){
-                    context.dialplanInstruction = instruction;
-                    context.callRejected = true;
-                    break;
-                }
-
-                if (hasDialInstruction){
-                    if (instruction.name === FreeswitchDpConstants.bridge){
-                        instruction.order = 2;
-                        context.dialplanInstructions.push(instruction);
-                        context.isLastDialplan=true;
-                    }
-                    else if (instruction.name === FreeswitchDpConstants.playback){
-                        instruction.order = 1;
-                        context.dialplanInstructions.push(instruction);
-                    }
-                }
-
-                if (!hasDialInstruction &&
-                    !hasGatherInstruction){
-
-                    if (instruction.name === FreeswitchDpConstants.speak){
-                        context.dialplanInstructions.push(instruction);
-                        context.isLastDialplan = true;
-                    }
-                }
-              
-            }
-        }
-
-        context.instructionValidated = context.callRejected ? false : true;
-    }
-
-    executeLastDialplanInstruction(context:InboundCallContext, callback){
-
-        let connection = context.connection;
-
-        let size = context.dialplanInstructions.length;
-
-        context.logger.info(`executeLastDialplanInstruction 3 -> ${JSON.stringify(context.webhookParam)}`);
-
-        context.Log(`size -> ${size}`);
-
-        if (size === 2){
-
-            let instruction = context.dialplanInstructions[0];
-            
-
-            if (instruction.order === 1){
-                context.logger.info(`validate playback`);
-                if (instruction.name === FreeswitchDpConstants.playback){
-                    connection.execute(instruction.name, instruction.value, () => {
-                        context.Log('Playback executed');
-
-                        instruction = context.dialplanInstructions[1];
-
-                        context.webhookParam = {
-                            actionUrl: instruction.dialAttribute.action,
-                            httpMethod : instruction.dialAttribute.method
-                        }
-
-                        context.inboundESLConnResult = {
-                            callModel : {
-                                webhookParam: context.webhookParam,
-                                callDirection: "inbound",
-                                requestParam: context.requestParam,
-                                callRejected:false,
-                                legId:context.legId
-                            }
-                        }
-
-                        context.logger.info(`CB -> ${JSON.stringify(context.inboundESLConnResult)}`);
-
-                        connection.execute('set', 'hangup_after_bridge=true', () => {
-
-                            connection.execute('export', 
-                            'execute_on_answer=record_session $${recordings_dir}/${uuid}.mp3', () => {
-
-                                if (instruction.children != null &&
-                                    instruction.children.name === 'Number'){
-                                        
-                                    let callForwardingNumber = instruction.value;
-
-                                    connection.execute(instruction.name, `sofia/gateway/fs-test3/1000`, () =>{
-
-                                        context.Log('Bridge executed');
-
-                                        callback(context);
-
-                                        return;
-                                    });
-                                }
-                            });
-                            
-                        });
-
-                        callback(context);
-                    });
-                }
-            }
-        }
-        else
-        {
-            connection.execute('speak', `flite|kal|${context.dialplanInstructions[0].value}`, () =>{
-
-                context.logger.info('speak executed');
-
-                context.callRejected = true;
-
-                context.errorMessage.push(context.dialplanInstruction[0].value);
-
-                callback(context);
-            });
         }
     }
 }

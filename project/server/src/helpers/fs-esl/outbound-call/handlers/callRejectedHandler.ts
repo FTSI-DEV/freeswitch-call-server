@@ -25,9 +25,11 @@ export class CallRejectedHandler{
 
         connection.execute('playback', 'ivr/ivr-call_cannot_be_completed_as_dialed.wav', () => {
 
-            context.redisServer.del(context.redisServerName, (err,reply) => {
-                context.Log(`Delete Redis-Server State. Server Name: ${context.redisServerName} ,
-                            Reply: ${reply} , Err: ${err}`);
+            this._context.redisServer.del(this._context.outboundChannelStateKey, (err,reply) => {
+                this._context.Log(`Delete Redis-Server State. 
+                StateKey: ${this._context.outboundChannelStateKey} ,
+                Reply: ${reply} , 
+                Err: ${err}`);
             });
 
             connection.execute('hangup', 'CALL_REJECTED', () => {
