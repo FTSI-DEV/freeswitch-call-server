@@ -1,5 +1,6 @@
 import { truncate } from "fs/promises";
-import { Column, CreateDateColumn, Entity, EntityRepository, Index, PrimaryGeneratedColumn, Repository } from "typeorm";
+import { Column, CreateDateColumn, Entity, EntityRepository, Index, JoinColumn, OneToOne, PrimaryGeneratedColumn, Repository } from "typeorm";
+import { AccountConfigEntity } from "./account-config.entity";
 
 @Entity('InboundCallConfig')
 export class InboundCallConfigEntity{
@@ -21,6 +22,14 @@ export class InboundCallConfigEntity{
 
     @CreateDateColumn()
     CreatedDate: Date
+
+    @OneToOne(type => AccountConfigEntity)
+    @JoinColumn({ 
+        name: 'AccountId', 
+        referencedColumnName : 'Id' 
+    })
+    AccountConfigEntity: AccountConfigEntity;
+    AccountId?: number;
 }
 
 @EntityRepository(InboundCallConfigEntity)

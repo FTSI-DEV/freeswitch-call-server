@@ -1,4 +1,5 @@
-import { Column, Entity, EntityRepository, PrimaryGeneratedColumn, Repository } from "typeorm";
+import { Column, Entity, EntityRepository, JoinColumn, OneToOne, PrimaryGeneratedColumn, Repository } from "typeorm";
+import { AccountConfigEntity } from "./account-config.entity";
 
 @Entity('FreeswitchCallConfig')
 export class FreeswitchCallConfigEntity{

@@ -57,6 +57,8 @@ export class OutboundCallController {
     @Get('outboundCallStatusCallBack')
     outboundCallStatusCallBack(@Query() callData: CDRModel):JsonDataListReturnModel {
 
+      console.log('outboundCallStatusCallBackJob', callData);
+
     this.outboundCallJobQueue.add('outboundCall',callData);
 
     return JsonDataListReturnModel.Ok('Successfully submitted to job queue');

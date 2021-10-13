@@ -22,6 +22,7 @@ export class FirstMigration1631505375288 implements MigrationInterface {
         await queryRunner.dropTable("InboundCallConfig");
         await queryRunner.dropIndex("FreeswitchCallConfig", "IDX_FreeswitchCallConfig_Id");
         await queryRunner.dropTable("FreeswitchCallConfig");
+        
         const tblCallRecordingStorage = await queryRunner.getTable("CallRecordingStorage");
 
         const fkCallRecordingStorage = tblCallRecordingStorage.foreignKeys.find(fk => fk.columnNames.indexOf("CallId") !== -1);

@@ -29,6 +29,8 @@ export class CallDetailRecordService implements ICallDetailRecordService {
         cdr.ParentCallUid = cdrParam.ParentCallUid;
         cdr.DateCreated = cdrParam.StartedDate;
 
+        cdr.AccountId = cdrParam.AccountId
+
         let record = await this._callDetailRecordRepo.saveCDR(cdr);
 
         return record.Id;
@@ -88,7 +90,8 @@ export class CallDetailRecordService implements ICallDetailRecordService {
                 Duration: element.CallDuration,
                 Id: element.Id,
                 RecordingUUID: element.RecordingUid,
-                ParentCallUid: element.ParentCallUid
+                ParentCallUid: element.ParentCallUid,
+                AccountId: element.AccountId
             };
 
             itemObjs.push(configModel);
@@ -121,7 +124,8 @@ export class CallDetailRecordService implements ICallDetailRecordService {
                         Duration: element.CallDuration,
                         Id: element.Id,
                         RecordingUUID: element.RecordingUid,
-                        ParentCallUid: element.ParentCallUid
+                        ParentCallUid: element.ParentCallUid,
+                        AccountId: element.AccountId
                     };
 
                     itemObjs.push(configModel);

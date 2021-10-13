@@ -9,9 +9,13 @@ export class URIBuilder {
 
   inboundCallStatusCallBack(callData:CDRModel) {
 
-    let api = `/NewInboundCall/IncomingStatusCallBack`;
+    let api = `/api/inbound-call/incomingStatusCallback`;
 
     let params = this.mappedCallDataParams(callData);
+
+    console.log('inboundCallStatusCallBack -> ', callData);
+
+    console.log('inboundCallStatusCallBackparams -> ', params);
 
     return `${this.baseUrl}${api}?${params}`;
   }
@@ -21,6 +25,10 @@ export class URIBuilder {
     let api = `/api/outbound-call/outboundCallStatusCallBack`;
 
     let params = this.mappedCallDataParams(callData);
+
+    console.log('OutboundStatusCallback -> ', callData);
+    
+    console.log('OutboundStatusCallbackparams -> ', params);
 
     return `${this.baseUrl}${api}?${params}`;
   }

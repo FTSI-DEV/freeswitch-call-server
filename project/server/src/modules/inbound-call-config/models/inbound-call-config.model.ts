@@ -6,6 +6,7 @@ export class InboundCallConfigModel{
     httpMethod:string;
     id?: number;
     isDeleted:boolean;
+    accountId:number;
 }
 
 export class InboundCallConfigParam{
@@ -24,4 +25,8 @@ export class InboundCallConfigParam{
 
     @IsOptional()
     id?:number;
+
+    @IsDefined()
+    @IsNotEmpty()
+    accountId: number;
 }

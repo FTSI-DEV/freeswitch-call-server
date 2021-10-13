@@ -37,6 +37,8 @@ export class OutboundCallJob{
         {
             context.outboundCallParam = parameter.data;
 
+            console.log('OutboundJobDATA -> ', parameter.data);
+
             this._logger.info(`starting to processed job. CallUid : ${context.outboundCallParam.UUID}`);
 
             context.outboundCallParam.StartedDate = context.dateTime;

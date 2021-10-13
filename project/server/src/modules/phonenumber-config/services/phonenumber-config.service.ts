@@ -21,6 +21,8 @@ export class PhoneNumberConfigService implements IPhoneNumberConfigService{
         phoneNumberConfig.WebhookUrl = param.webhookUrl;
         phoneNumberConfig.PhoneNumber = param.phoneNumber;
 
+        phoneNumberConfig.AccountId = param.accountId;
+
         await this._phoneNumberConfigRepo.saveUpdateRecord(phoneNumberConfig);
     }
 
@@ -52,7 +54,8 @@ export class PhoneNumberConfigService implements IPhoneNumberConfigService{
             httpMethod: config.HttpMethod,
             webhookUrl: config.WebhookUrl,
             id: config.Id,
-            isDeleted: config.IsDeleted
+            isDeleted: config.IsDeleted,
+            accountId: config.AccountId
         };
 
         return configModel;
@@ -72,7 +75,8 @@ export class PhoneNumberConfigService implements IPhoneNumberConfigService{
                     phoneNumber: element.PhoneNumber,
                     id: element.Id,
                     friendlyName: element.FriendlyName,
-                    isDeleted : element.IsDeleted
+                    isDeleted : element.IsDeleted,
+                    accountId: element.AccountId
                 };
 
                 itemObjs.push(configModel);

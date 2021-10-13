@@ -21,6 +21,8 @@ export class InboundCallConfigService implements IInboundCallConfigService{
         inboundCallConfig.CallerId = param.callerId;
         inboundCallConfig.HTTPMethod = param.httpMethod;
         inboundCallConfig.CreatedDate = new Date;
+        
+        inboundCallConfig.AccountId = param.accountId;
 
         await this._inboundCallConfigRepo.saveUpdateRecord(inboundCallConfig);
     }
@@ -54,7 +56,8 @@ export class InboundCallConfigService implements IInboundCallConfigService{
                     webhookUrl: config.WebhookUrl,
                     httpMethod: config.HTTPMethod,
                     callerId:config.CallerId,
-                    isDeleted:config.IsDeleted
+                    isDeleted:config.IsDeleted,
+                    accountId : config.AccountId
                 });
             })
             .catch(err => {
@@ -74,7 +77,8 @@ export class InboundCallConfigService implements IInboundCallConfigService{
             callerId: config.CallerId,
             id: config.Id,
             httpMethod: config.HTTPMethod,
-            isDeleted: config.IsDeleted
+            isDeleted: config.IsDeleted,
+            accountId: config.AccountId
         };
 
         return configModel;
@@ -94,7 +98,8 @@ export class InboundCallConfigService implements IInboundCallConfigService{
                     callerId: element.CallerId,
                     httpMethod: element.HTTPMethod,
                     isDeleted: element.IsDeleted,
-                    id: element.Id
+                    id: element.Id,
+                    accountId: element.AccountId
                 };
 
                 itemObjs.push(configModel);

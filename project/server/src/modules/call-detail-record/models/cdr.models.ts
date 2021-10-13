@@ -9,6 +9,7 @@ export class CDRModel{
     Id?: number;
     RecordingUUID?: string;
     ParentCallUid?:string;
+    AccountId?:number;
 }
 
 export class CallDetailRecordDTO{
@@ -22,4 +23,5 @@ export class CallDetailRecordDTO{
     RecordingUUID?: string;
     CallDirection?: string;
     ParentCallUid?: string;
+    AccountId?:number;
 }

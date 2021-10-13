@@ -1,5 +1,6 @@
 import { async } from "rxjs";
-import { Column, Entity, EntityRepository, getRepository, Index, PrimaryGeneratedColumn, Repository } from "typeorm";
+import { Column, Entity, EntityRepository, getRepository, Index, JoinColumn, OneToOne, PrimaryGeneratedColumn, Repository } from "typeorm";
+import { AccountConfigEntity } from "./account-config.entity";
 
 @Entity('PhoneNumberConfig')
 export class PhoneNumberConfigEntity{
@@ -22,6 +23,14 @@ export class PhoneNumberConfigEntity{
 
     @Column( { default: false })
     IsDeleted: boolean;
+
+    @OneToOne(type => AccountConfigEntity)
+    @JoinColumn({ 
+        name: 'AccountId', 
+        referencedColumnName : 'Id' 
+    })
+    AccountConfigEntity: AccountConfigEntity;
+    AccountId?: number;
 }
 
 @EntityRepository(PhoneNumberConfigEntity)

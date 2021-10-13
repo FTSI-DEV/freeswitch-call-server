@@ -29,9 +29,9 @@ export class CallRecordingService implements ICallRecordingService{
 
         let cdr = await this._callRecordDetailService.getById(param.CallId);
 
-        // if (cdr != null){
-        //     callRecording.cdr = cdr;
-        // }
+        if (cdr != null){
+            callRecording.CallDetailRecord = cdr;
+        }
 
         await this._recordingStorageRepo.save(callRecording);
     }   

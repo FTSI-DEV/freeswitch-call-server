@@ -35,7 +35,6 @@ export class FsCallDetailRecordEntity{
     @Column({ length:200, nullable: true, type:"varchar"})
     ParentCallUid?: string;
 
-
     @OneToOne(type => AccountConfigEntity)
     @JoinColumn({ 
         name: 'AccountId', 

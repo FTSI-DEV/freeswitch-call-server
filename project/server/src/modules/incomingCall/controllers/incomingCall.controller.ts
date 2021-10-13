@@ -4,13 +4,13 @@ import { InjectQueue } from '@nestjs/bull';
 import { CDRModel } from 'src/modules/call-detail-record/models/cdr.models';
 import { JsonDataListReturnModel } from 'src/utils/jsonDataListReturnModel';
 
-@Controller('NewInboundCall')
+@Controller('inbound-call')
 export class IncomingCallController {
   constructor(@InjectQueue('default')
               private incomingCallJob: Queue
               ) {}
 
-  @Get('IncomingStatusCallBack')
+  @Get('incomingStatusCallback')
   incomingStatusCallBack(@Query() callData:CDRModel):JsonDataListReturnModel{
 
     console.log('IncomingCall/IncomingStatusCallBack' , callData);

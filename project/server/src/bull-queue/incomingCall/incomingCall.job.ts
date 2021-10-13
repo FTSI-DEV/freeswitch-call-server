@@ -40,6 +40,8 @@ export class IncomingCallJob {
 
       context.inboundCallParam.StartedDate = context.dateTime;
 
+      console.log('InboundJobData -> ', parameter.data);
+
       this._logger.info(`starting to processed job. CallUid : ${context.inboundCallParam.UUID}`);
       
       context.cdrRecord = await this._callDetailRecordService.getByCallUid(parameter.data.UUID);

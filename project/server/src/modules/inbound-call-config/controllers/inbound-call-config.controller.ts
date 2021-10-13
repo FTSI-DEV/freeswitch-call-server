@@ -30,7 +30,8 @@ export class InboundCallConfigController {
     await this._inboundCallConfigService.add({
       webhookUrl: params.webhookUrl,
       callerId: params.callerId,
-      httpMethod: params.httpMethod
+      httpMethod: params.httpMethod,
+      accountId: params.accountId
     });
 
     return JsonDataListReturnModel.Ok('Successfully added config');
@@ -46,7 +47,8 @@ export class InboundCallConfigController {
               webhookUrl: params.webhookUrl,
               callerId: params.callerId,
               httpMethod : params.httpMethod,
-              id: params.id
+              id: params.id,
+              accountId: params.accountId
             });
 
       if (isSuccess){
