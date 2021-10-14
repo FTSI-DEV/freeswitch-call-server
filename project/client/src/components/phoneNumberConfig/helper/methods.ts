@@ -10,6 +10,7 @@ export default function methodsObj() {
         phoneNumber: null,
         httpMethod: "POST",
         webhookURL: null,
+        accountId: null,
         from: null,
         to: null,
         callerId: null,
@@ -23,6 +24,7 @@ export default function methodsObj() {
           phoneNumber: null,
           httpMethod: "GET",
           webhookUrl: null,
+          accountId: null
         },
       });
   
@@ -40,12 +42,13 @@ export default function methodsObj() {
         state.selectedConfig.phoneNumber = null;
         state.selectedConfig.webhookUrl = null;
         store.dispatch("getPhoneNumberConfigById", { params: val.id , authToken}).then((res) => {
-            const { friendlyName, phoneNumber, httpMethod, webhookUrl } = res.data;
+            const { friendlyName, phoneNumber, httpMethod, webhookUrl, accountId } = res.data;
             state.modleVisibility = true;
             state.selectedConfig.friendlyName = friendlyName;
             state.selectedConfig.phoneNumber = phoneNumber;
             state.selectedConfig.httpMethod = httpMethod || "GET";
             state.selectedConfig.webhookUrl = webhookUrl;
+            state.selectedConfig.accountId = accountId;
         });
       }
       const handleOk = (): void => {
@@ -57,6 +60,7 @@ export default function methodsObj() {
       const setMethod = (val: string) => state.httpMethod = val;
       const saveConfig = () => {
         if (
+          !state.accountId ||
           !state.friendlyName ||
           !state.phoneNumber ||
           !state.httpMethod ||
@@ -71,11 +75,13 @@ export default function methodsObj() {
           phoneNumber: state.phoneNumber,
           httpMethod: state.httpMethod,
           webhookUrl: state.webhookURL,
+          accountId: Number(state.accountId),
         };
         store.dispatch('addPhoneNumberConfig', { params, authToken }).then((res) => {
           state.friendlyName = null;
           state.phoneNumber = null;
           state.webhookURL = null;
+          state.accountId = null;
           state.isSaved = true;
         });
       }

@@ -10,6 +10,7 @@ export default function methodsObj() {
         to: null,
         hasError: false,
         callerId: null,
+        accountId: null,
         webhookUrl: null,
         httpMethod: "GET",
         isSaved: false,
@@ -20,7 +21,8 @@ export default function methodsObj() {
           callerId: "",
           webhookUrl: "",
           httpMethod: "GET",
-          id: ""
+          id: "",
+          accountId: null
         },
       })
 
@@ -37,12 +39,13 @@ export default function methodsObj() {
         state.selectedConfig.webhookUrl = "";
         store.dispatch("getInboundCallConfigById", { params: val.id, authToken }).then((res) => {
             if (res.data.Status === Status.OK) {
-              const { callerId, webhookUrl, httpMethod, id } = res.data.Data;
+              const { callerId, webhookUrl, httpMethod, id, accountId } = res.data.Data;
               state.modleVisibility = true
               state.selectedConfig.callerId = callerId;
               state.selectedConfig.webhookUrl = webhookUrl;
               state.selectedConfig.httpMethod = httpMethod || "GET";
-              state.selectedConfig.id = id
+              state.selectedConfig.id = id;
+              state.selectedConfig.accountId = accountId;
             }
         });
       }
@@ -56,7 +59,7 @@ export default function methodsObj() {
       }
       const isInvalid = (value: string): string => !value && state.hasError ? "invalid" : "";
       const saveConfig = () => {
-        if (!state.callerId || !state.webhookUrl) {
+        if (!state.callerId || !state.webhookUrl || !state.accountId) {
           state.hasError = true;
           return;
         }
@@ -64,11 +67,13 @@ export default function methodsObj() {
         const params = {
           callerId: state.callerId,
           webhookUrl: state.webhookUrl,
-          httpMethod: state.httpMethod
+          httpMethod: state.httpMethod,
+          accountId: Number(state.accountId),
         };
         store.dispatch("addInboundCallConfig", { params, authToken }).then(res => {
             state.callerId = null;
             state.webhookUrl = null;
+            state.accountId = null;
             state.isSaved = true;
         });
       }

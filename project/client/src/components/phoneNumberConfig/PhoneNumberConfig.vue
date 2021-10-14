@@ -26,6 +26,14 @@
         style="text-align: left; margin-bottom: 5px"
       />
       <a-row>
+         <a-col style="margin-right: 15px">
+          <a-form-item label="Account Id" style="display: block; text-align: left">
+            <input
+              :class="['ant-input', isInvalid(accountId)]"
+              v-model="accountId"
+            />
+          </a-form-item>
+        </a-col>
         <a-col style="margin-right: 15px">
           <a-form-item label="Friendly Name" style="display: block; text-align: left">
             <input
