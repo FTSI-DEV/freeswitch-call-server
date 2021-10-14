@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { InboundCallConfigEntity, InboundCallConfigRepository } from 'src/entity/inboundCallConfig.entity';
+import { AccountConfigModule } from '../account-config/account-config.module';
 import { InboundCallConfigController } from './controllers/inbound-call-config.controller';
 import { INBOUND_CALL_CONFIG_SERVICE } from './services/inbound-call-config.interface';
 import { InboundCallConfigService } from './services/inbound-call-config.service';
@@ -11,7 +12,9 @@ import { InboundCallConfigService } from './services/inbound-call-config.service
     provide: INBOUND_CALL_CONFIG_SERVICE
   }],
   imports: [
-    TypeOrmModule.forFeature([InboundCallConfigEntity, InboundCallConfigRepository])],
+    TypeOrmModule.forFeature([InboundCallConfigEntity, InboundCallConfigRepository]),
+    AccountConfigModule
+  ],
   controllers: [InboundCallConfigController],
   exports: [INBOUND_CALL_CONFIG_SERVICE]
 })

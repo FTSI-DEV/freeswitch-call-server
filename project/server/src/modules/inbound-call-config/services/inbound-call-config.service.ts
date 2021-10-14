@@ -1,7 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { IPaginationMeta, IPaginationOptions, paginate, Pagination } from 'nestjs-typeorm-paginate';
 import { InboundCallConfigEntity, InboundCallConfigRepository } from 'src/entity/inboundCallConfig.entity';
+import { ACCOUNT_CONFIG_SERVICE, IAccountConfigService } from 'src/modules/account-config/services/account-config.interface';
 import { InboundCallConfigModel, InboundCallConfigParam } from '../models/inbound-call-config.model';
 import { IInboundCallConfigService } from './inbound-call-config.interface';
 
@@ -10,7 +11,9 @@ export class InboundCallConfigService implements IInboundCallConfigService{
 
     constructor(
         @InjectRepository(InboundCallConfigRepository)
-        private _inboundCallConfigRepo: InboundCallConfigRepository
+        private _inboundCallConfigRepo: InboundCallConfigRepository,
+        @Inject(ACCOUNT_CONFIG_SERVICE)
+        private _accountConfig : IAccountConfigService
     ) {}
 
     async add(param: InboundCallConfigParam){
@@ -23,6 +26,12 @@ export class InboundCallConfigService implements IInboundCallConfigService{
         inboundCallConfig.CreatedDate = new Date;
         
         inboundCallConfig.AccountId = param.accountId;
+
+        let account = await this._accountConfig.getById(param.accountId);
+
+        if (account != null){
+            inboundCallConfig.AccountConfigEntity = account;
+        }
 
         await this._inboundCallConfigRepo.saveUpdateRecord(inboundCallConfig);
     }

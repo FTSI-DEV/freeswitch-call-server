@@ -2,9 +2,6 @@ import { InjectQueue } from '@nestjs/bull';
 import { Body, Controller, Get, Inject, Param, Post, Query, UseGuards } from '@nestjs/common';
 import { Queue } from 'bull';
 import { AccountGuard } from 'src/auth/guards/account.guard';
-import { BaseGuard } from 'src/auth/guards/base.guard';
-import { UserJwtAuthGuard } from 'src/auth/guards/user-jwt-auth.guard';
-import { UserLocalAuthGuard } from 'src/auth/guards/user-local-auth.guard';
 import { CDRModel } from 'src/modules/call-detail-record/models/cdr.models';
 import { JsonDataListReturnModel } from 'src/utils/jsonDataListReturnModel';
 import { OutboundCallResultModel } from '../models/outbound-call-result.model';
@@ -57,7 +54,7 @@ export class OutboundCallController {
     @Get('outboundCallStatusCallBack')
     outboundCallStatusCallBack(@Query() callData: CDRModel):JsonDataListReturnModel {
 
-      console.log('outboundCallStatusCallBackJob', callData);
+    console.log('Outbound - JOB', callData);
 
     this.outboundCallJobQueue.add('outboundCall',callData);
 

@@ -13,7 +13,7 @@ export class IncomingCallController {
   @Get('incomingStatusCallback')
   incomingStatusCallBack(@Query() callData:CDRModel):JsonDataListReturnModel{
 
-    console.log('IncomingCall/IncomingStatusCallBack' , callData);
+    console.log('Inbound JOB -> ' , callData);
 
     this.incomingCallJob.add('inboundCall', callData);
     

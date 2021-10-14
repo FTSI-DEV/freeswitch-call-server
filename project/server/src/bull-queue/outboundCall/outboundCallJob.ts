@@ -25,6 +25,8 @@ export class OutboundCallJob{
     @Process('outboundCall')
     async handleTranscode(parameter: Job){
 
+        console.log('Outbound BULL QUEUE -> ' , parameter.data);
+
         let timeProvider = new TimeProvider();
 
         let context = new OutboundCallJobContext();
@@ -36,8 +38,6 @@ export class OutboundCallJob{
         try
         {
             context.outboundCallParam = parameter.data;
-
-            console.log('OutboundJobDATA -> ', parameter.data);
 
             this._logger.info(`starting to processed job. CallUid : ${context.outboundCallParam.UUID}`);
 

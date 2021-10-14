@@ -13,9 +13,9 @@ export class URIBuilder {
 
     let params = this.mappedCallDataParams(callData);
 
-    console.log('inboundCallStatusCallBack -> ', callData);
+    console.log('InboundCallData -> ', callData);
 
-    console.log('inboundCallStatusCallBackparams -> ', params);
+    console.log('MappedParams -> ', params);
 
     return `${this.baseUrl}${api}?${params}`;
   }
@@ -26,9 +26,9 @@ export class URIBuilder {
 
     let params = this.mappedCallDataParams(callData);
 
-    console.log('OutboundStatusCallback -> ', callData);
+    console.log('OutboundCallData -> ', callData);
     
-    console.log('OutboundStatusCallbackparams -> ', params);
+    console.log('MappedParams -> ', params);
 
     return `${this.baseUrl}${api}?${params}`;
   }
@@ -44,7 +44,8 @@ export class URIBuilder {
     let duration = `Duration=${callData.Duration}`;
     let recordingUUID = `RecordingUUID=${callData.RecordingUUID}`;
     let parentCallUUID = `ParentCallUid=${callData.ParentCallUid}`;
+    let accountId = `AccountId=${callData.AccountId}`;
 
-    return `${callUUID}&${callerIdNumber}&${calleeIdNumber}&${callDirection}&${callStatus}&${startedDate}&${duration}&${recordingUUID}&${parentCallUUID}`;
+    return `${callUUID}&${callerIdNumber}&${calleeIdNumber}&${callDirection}&${callStatus}&${startedDate}&${duration}&${recordingUUID}&${parentCallUUID}&${accountId}`;
   }
 }

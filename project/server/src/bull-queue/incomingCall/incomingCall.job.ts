@@ -25,6 +25,8 @@ export class IncomingCallJob {
   @Process('inboundCall')
   async handleTranscode(parameter: Job){
 
+    console.log('Inbound BULL QUEUE -> ' , parameter.data);
+
     let timeProvider = new TimeProvider();
 
     let context = new InboundCallJobContext();
