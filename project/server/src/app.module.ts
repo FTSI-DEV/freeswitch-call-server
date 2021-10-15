@@ -5,7 +5,6 @@ import { AuthModule } from './auth/auth.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { configService } from './config/config.service';
 import { PhoneNumberConfigModule } from './modules/phonenumber-config/phonenumber-config.module';
-import { IvrModule } from './modules/ivr/ivr.module';
 import { IncomingCallModule } from './modules/incomingCall/incomingCall.module';
 import { CallDetailRecordModule } from './modules/call-detail-record/call-detail-record.module';
 import { EslServerHelper } from './helpers/fs-esl/inbound-call/inboundCall.server';
@@ -30,11 +29,10 @@ import { UsersModule } from './modules/users/users.module';
 import redis from 'redis';
 import { EslServerHelper2 } from './helpers/fs-esl/inbound-call2/inboundCall2.server';
 // import { MiddleWaresModule } from './middlewares/middleware.module';
-
+import { IvrConfigModule } from './modules/ivr-config/ivr-config.module';
 @Module({
   imports: [
     AuthModule,
-    IvrModule,
     TypeOrmModule.forRoot(configService.getTypeOrmConfig()),
     PhoneNumberConfigModule,
     IncomingCallModule,
@@ -54,6 +52,7 @@ import { EslServerHelper2 } from './helpers/fs-esl/inbound-call2/inboundCall2.se
     CustomLoggerModule,
     AccountConfigModule,
     UsersModule,
+    IvrConfigModule,
  ],
   controllers: [AppController],
   providers: [AppService],

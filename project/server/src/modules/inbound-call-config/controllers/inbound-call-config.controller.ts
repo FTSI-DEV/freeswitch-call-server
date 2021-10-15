@@ -1,11 +1,12 @@
-import { Body, Controller, DefaultValuePipe, Get, Inject, Param, ParseIntPipe, Post, Query } from '@nestjs/common';
+import { Body, Controller, DefaultValuePipe, Get, Inject, Param, ParseIntPipe, Post, Query, UseGuards } from '@nestjs/common';
 import { Pagination } from 'nestjs-typeorm-paginate';
+import { BaseGuard } from 'src/auth/guards/base.guard';
 import { JsonDataListReturnModel } from 'src/utils/jsonDataListReturnModel';
 import { InboundCallConfigModel, InboundCallConfigParam } from '../models/inbound-call-config.model';
 import { IInboundCallConfigService, INBOUND_CALL_CONFIG_SERVICE } from '../services/inbound-call-config.interface';
 import { InboundCallConfigService } from '../services/inbound-call-config.service';
 
-
+@UseGuards(BaseGuard)
 @Controller('inbound-call-config')
 export class InboundCallConfigController {
 

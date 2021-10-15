@@ -9,6 +9,7 @@ import path from 'path';
 import { AccountGuard } from 'src/auth/guards/account.guard';
 import { BaseGuard } from 'src/auth/guards/base.guard';
 
+@UseGuards(BaseGuard)
 @Controller('call-recording')
 export class CallRecordingController {
 

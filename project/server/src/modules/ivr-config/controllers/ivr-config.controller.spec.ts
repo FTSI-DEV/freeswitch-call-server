@@ -1,15 +1,15 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { IvrController } from './ivr.controller';
+import { IvrConfigController } from './ivr-config.controller';
 
-describe('IvrController', () => {
-  let controller: IvrController;
+describe('IvrConfigController', () => {
+  let controller: IvrConfigController;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      controllers: [IvrController],
+      controllers: [IvrConfigController],
     }).compile();
 
-    controller = module.get<IvrController>(IvrController);
+    controller = module.get<IvrConfigController>(IvrConfigController);
   });
 
   it('should be defined', () => {

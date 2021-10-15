@@ -1,15 +1,15 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { IvrService } from './ivr.service';
+import { IvrConfigService } from './ivr-config.service';
 
-describe('IvrService', () => {
-  let service: IvrService;
+describe('IvrConfigService', () => {
+  let service: IvrConfigService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [IvrService],
+      providers: [IvrConfigService],
     }).compile();
 
-    service = module.get<IvrService>(IvrService);
+    service = module.get<IvrConfigService>(IvrConfigService);
   });
 
   it('should be defined', () => {
