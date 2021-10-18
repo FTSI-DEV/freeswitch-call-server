@@ -30,6 +30,7 @@ import redis from 'redis';
 import { EslServerHelper2 } from './helpers/fs-esl/inbound-call2/inboundCall2.server';
 // import { MiddleWaresModule } from './middlewares/middleware.module';
 import { IvrConfigModule } from './modules/ivr-config/ivr-config.module';
+import { InboundRulesConfigModule } from './modules/inbound-rules-config/inbound-rules-config.module';
 @Module({
   imports: [
     AuthModule,
@@ -53,6 +54,7 @@ import { IvrConfigModule } from './modules/ivr-config/ivr-config.module';
     AccountConfigModule,
     UsersModule,
     IvrConfigModule,
+    InboundRulesConfigModule,
  ],
   controllers: [AppController],
   providers: [AppService],

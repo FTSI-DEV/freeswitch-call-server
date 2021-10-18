@@ -218,5 +218,5 @@ export class IvrConfigService implements IIvrConfigService {
       .getOne();
 
     return value;
-  };
+  }
 }

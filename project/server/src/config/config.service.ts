@@ -10,6 +10,7 @@ import { AccountConfigEntity } from "src/entity/account-config.entity";
 import { AccountConfigModel } from "src/modules/account-config/models/accountConfig.model";
 import { UserEntity } from "src/entity/user.entity";
 import { IvrConfigEntity } from "src/entity/ivr-config.entity";
+import { InboundRulesConfigEntity } from "src/entity/inbound-rules-config.entityt";
 require('dotenv').config();
 
 @Injectable()
@@ -56,7 +57,9 @@ export class ConfigService implements IConfigService{
                 PhoneNumberConfigEntity,
                 AccountConfigEntity,
                 UserEntity,
-                IvrConfigEntity],
+                IvrConfigEntity,
+                InboundRulesConfigEntity
+            ],
             // entities : ["dist/entity/**/*.js"],
             migrationsTableName : "MigrationTable",
             migrations: ['dist/migration/**/*.js'],
