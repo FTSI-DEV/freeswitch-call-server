@@ -1,4 +1,4 @@
-export interface PlayAndGetDigitsParam{
+export interface PlayAndGetDigitsParamModel{
     minValue:number; //minimum number of digits to collect
     maxValue:number; //maximum number of digits to collect
     tries:number; // number of attempts to play the file and collect the digits

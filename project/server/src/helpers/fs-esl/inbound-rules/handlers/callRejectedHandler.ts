@@ -1,9 +1,8 @@
-import { InboundCallContext } from "../models/inboundCallContext";
+import { InboundCallContext } from "../models/inbound-call-context.model";
 
-export class CallRejectedHandler{
- 
-    constructor(
-    ){}
+export class InboundCallRejectedHandler{
+
+    constructor(){}
 
     reject(context:InboundCallContext, callback){
 
@@ -13,18 +12,19 @@ export class CallRejectedHandler{
             context.errorMessage !== null){
 
             errMessage = context.errorMessage.join(',');
-
         }
 
-        context.Log(`Call rejected -> ${errMessage} `);
+        context.Log(`Call rejected -> ${errMessage}`);
 
         let connection = context.connection;
 
         connection.execute('playback', 'ivr/ivr-call_cannot_be_completed_as_dialed.wav', () => {
 
-            context.redisServer.del(context.redisServerName, (err,reply) => {
-                context.Log(`Delete Redis-Server State. Server Name: ${context.redisServerName} ,
-                            Reply: ${reply} , Err: ${err}`);
+            context.redisServer.del(context.inboundChannelStateKey, (err,reply) => {
+                context.Log(`Delete Redis-Server State. 
+                StateKey: ${context.inboundChannelStateKey} ,
+                Reply: ${reply} , 
+                Err: ${err}`);
             });
 
             connection.execute('hangup', 'CALL_REJECTED', () => {
@@ -37,5 +37,4 @@ export class CallRejectedHandler{
             });
         });
     }
-
 }
