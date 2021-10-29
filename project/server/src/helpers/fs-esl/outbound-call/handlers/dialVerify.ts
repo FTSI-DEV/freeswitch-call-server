@@ -1,7 +1,6 @@
 import { DialplanInstruction, TwiMLXMLParser } from "src/helpers/parser/xmlParser";
 import { CommandConstants } from "src/helpers/constants/freeswitch-command.constants";
 import { TimeConversion } from "src/utils/timeConversion.utils";
-import { PlayAndGetDigitsParam } from "../../inbound-call/models/plagdParam";
 import { DialConfirm } from "./dialConfirm";
 import { DialInputFailed } from "./dialInputFailed";
 import { CallRejectedHandler } from "./callRejectedHandler";
@@ -9,6 +8,7 @@ import { WebhookUrlHelper } from "../../webhookUrl.helper";
 import { OutboundCallContext } from "../models/outboundCallContext";
 import { FreeswitchDpConstants } from "src/helpers/constants/freeswitchdp.constants";
 import { ConflictException } from "@nestjs/common";
+import { PlayAndGetDigitsParam } from "../../inbound-call2/models/plagdParam";
 
 export class DialVerify{
 

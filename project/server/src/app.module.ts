@@ -7,7 +7,6 @@ import { configService } from './config/config.service';
 import { PhoneNumberConfigModule } from './modules/phonenumber-config/phonenumber-config.module';
 import { IncomingCallModule } from './modules/incomingCall/incomingCall.module';
 import { CallDetailRecordModule } from './modules/call-detail-record/call-detail-record.module';
-import { EslServerHelper } from './helpers/fs-esl/inbound-call/inboundCall.server';
 import { BullModule } from '@nestjs/bull';
 import { BullModuleQueue } from './bull-queue/bull.module';
 import { TestModule } from './modules/test/test.module';
