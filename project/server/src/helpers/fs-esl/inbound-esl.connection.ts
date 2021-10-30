@@ -2,7 +2,7 @@ import { CallTypes } from '../constants/call-type';
 import { CHANNEL_VARIABLE } from '../constants/channel-variables.constants';
 import { FS_ESL } from '../constants/fs-esl.constants';
 import { CDRHelper } from './cdr.helper';
-import { FreeswitchConfigHelper } from './freeswitchConfig.helper';
+import { FreeswitchConfigHelper } from '../../../../../freeswitchConfig.helper';
 import esl from 'modesl';
 import http from 'http';
 import { CDRModel } from 'src/modules/call-detail-record/models/cdr.models';

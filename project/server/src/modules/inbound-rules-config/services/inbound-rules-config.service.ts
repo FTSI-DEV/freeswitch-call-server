@@ -5,9 +5,10 @@ import { InboundRulesConfigEntity, InboundRulesConfigRepository } from 'src/enti
 import { ACCOUNT_CONFIG_SERVICE, IAccountConfigService } from 'src/modules/account-config/services/account-config.interface';
 import { InboundRulesConfigModel } from '../models/inbound-rules.model';
 import { IvrOptionsCommandModel } from '../models/ivr-options.model';
+import { IInboundRulesConfigService } from './inbound-rules.config.interface';
 
 @Injectable()
-export class InboundRulesConfigService {
+export class InboundRulesConfigService implements IInboundRulesConfigService {
 
     constructor(
         @InjectRepository(InboundRulesConfigEntity)
