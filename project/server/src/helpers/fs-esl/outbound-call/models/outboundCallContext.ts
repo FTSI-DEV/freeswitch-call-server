@@ -33,9 +33,13 @@ export class OutboundCallContext{
                     CallDirection : ${CallTypes.Outbound} ,
                     Message => ${message}`;
 
+        console.log('logger -> ', this.logger);
+
         if (error) this.logger.error(lmsg, new Error(message));
         
         else this.logger.info(lmsg);
+
+
     }
 }
 

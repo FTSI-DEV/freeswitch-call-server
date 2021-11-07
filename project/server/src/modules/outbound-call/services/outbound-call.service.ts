@@ -41,14 +41,14 @@ export class OutboundCallService implements IOutboundCallService{
         
                 console.log('Originate CallUid -> ', callUid);
 
-                this._callDetailRecordService.saveCDR({
-                    UUID: callUid,
-                    CallDirection: 'outbound',
-                    StartedDate:  new TimeProvider().getDateTimeNow(),
-                    PhoneNumberTo : phoneNumberTo
-                });
+                // this._callDetailRecordService.saveCDR({
+                //     UUID: callUid,
+                //     CallDirection: 'outbound',
+                //     StartedDate:  new TimeProvider().getDateTimeNow(),
+                //     PhoneNumberTo : phoneNumberTo
+                // });
 
-                resolve(callUid);
+                // resolve(callUid);
             }
         });
     }
