@@ -1,50 +1,42 @@
 <template>
   <a-layout>
-    <!-- <div style="padding: 10px; text-align: left; fontSize: 1.5em">
-      Freeswitch
-    </div> -->
-    <!-- <a-layout-content
-      :style="{
-        background: '#fff',
-        padding: '10px',
-        marginBottom: '10px',
-        fontSize: '1.3em',
-      }"
-    > -->
-      <div class="grid-container" style="padding: 10px">
-        <div class="item1" @click="openClickToCall" title="Click To Call">
-          <PhoneFilled style="font" :style="{ fontSize: '30px' }" />
-          <div style="font-weight: 500; margin-top: 3px;">Click To Call</div>
+    <div class="grid-container" style="padding: 0px 10px 10px 0px">
+      <div class="item1 stat-item">
+        <div style="flex: 1">
+          <div class="stat-label">Phone Numbers</div>
+          <div class="stat-value">50</div>
         </div>
-         <!-- <div class="item2" @click="openConfig">
-         <SettingFilled style="font" :style="{ fontSize: '30px' }" />
-          <div>Call Config</div>
+        <div class="stat-icon-container">
+          <PhoneFilled class="stat-icon" />
         </div>
-        <div class="item3" @click="openCallRecording">
-         <PlayCircleFilled style="font" :style="{ fontSize: '30px' }" />
-          <div>Call Recording</div>
-        </div> -->
       </div>
-      <a-modal
-          v-model:visible="modeVisibility"
-          title="Click To Call"
-          ok-text="Call"
-          @ok="clickToCall"
-        >
-          <ClickToCall ref="childRef"/>
-      </a-modal>
-      <a-layout-content
-      :style="{
-        background: '#fff',
-        padding: '24px',
-        margin: 0,
-        minHeight: '280px',
-        fontSize: '1.3em',
-      }"
+      <div class="item2 stat-item">
+        <div style="flex: 1">
+          <div class="stat-label">Call logs</div>
+          <div class="stat-value">100</div>
+        </div>
+        <div class="stat-icon-container">
+          <PhoneFilled class="stat-icon" />
+        </div>
+      </div>
+      <div class="item3 stat-item">
+        <div style="flex: 1">
+          <div class="stat-label">Recordings</div>
+          <div class="stat-value">100</div>
+        </div>
+        <div class="stat-icon-container">
+          <PhoneFilled class="stat-icon" />
+        </div>
+      </div>
+    </div>
+    <a-modal
+      v-model:visible="modeVisibility"
+      title="Click To Call"
+      ok-text="Call"
+      @ok="clickToCall"
     >
-      <!-- <CallDetailRecords /> -->
-    </a-layout-content>
-    <!-- </a-layout-content>
+      <ClickToCall ref="childRef" />
+    </a-modal>
     <a-layout-content
       :style="{
         background: '#fff',
@@ -54,40 +46,39 @@
         fontSize: '1.3em',
       }"
     >
-      <CallDetailRecords />
-    </a-layout-content> -->
+    </a-layout-content>
   </a-layout>
 </template>
 <script lang="ts">
 import { defineComponent, ref, toRefs, reactive } from "vue";
-import { PhoneFilled } from "@ant-design/icons-vue";
 import ClickToCall from "./clickToCall/ClickToCall.vue";
 import { useRouter } from "vue-router";
+import { PhoneFilled } from "@ant-design/icons-vue";
 export default defineComponent({
-  components: { PhoneFilled, ClickToCall},
+  components: { ClickToCall, PhoneFilled },
   setup() {
-     const router = useRouter()
+    const router = useRouter();
     const state = reactive({
-      modeVisibility: false
+      modeVisibility: false,
     });
-    const childRef = ref<InstanceType<typeof ClickToCall>>()
-    const openClickToCall = () => state.modeVisibility = true;
+    const childRef = ref<InstanceType<typeof ClickToCall>>();
+    const openClickToCall = () => (state.modeVisibility = true);
     const clickToCall = () => {
-      childRef.value?.clickToCall()
-    }
+      childRef.value?.clickToCall();
+    };
     const openConfig = () => {
       router.push({ path: "call-config" });
-    }
+    };
     const openCallRecording = () => {
       router.push({ path: "call-recording" });
-    }
+    };
     return {
       ...toRefs(state),
       openClickToCall,
       clickToCall,
       childRef,
       openConfig,
-      openCallRecording
+      openCallRecording,
     };
   },
 });
@@ -111,44 +102,57 @@ export default defineComponent({
 }
 .grid-container {
   display: grid;
-  grid-template-columns: 100px 100px 100px;
+  grid-template-columns: 250px 250px 250px;
   grid-gap: 10px;
   /* background-color: #2196F3; */
   padding: 5px;
 }
 
 .grid-container > div {
-  text-align: center;
   padding: 10px 0px;
 }
 .item1 {
-  background: #F8485E;
-  color: #eee;
-  cursor: pointer;
+  /* background: #f8485e;
+  color: #eee; */
   border-radius: 5px;
 }
-.item1:hover {
-  box-shadow: 1px 1px 15px #a8a8a8;
-  border-radius: 5px;
-}
+
 .item2 {
-  background: #889EAF;
-  color: #eee;
-  cursor: pointer;
+  /* background: #889eaf;
+  color: #eee; */
   border-radius: 5px;
 }
-.item2:hover {
-  box-shadow: 1px 1px 15px #a8a8a8;
-  border-radius: 5px;
-}
+
 .item3 {
-  background: #297F87;
-  color: #eee;
-  cursor: pointer;
+  /* background: #297f87;
+  color: #eee; */
   border-radius: 5px;
 }
-.item3:hover {
-  box-shadow: 1px 1px 15px #a8a8a8;
-  border-radius: 5px;
+
+.stat-item {
+  box-shadow: 1px 1px 15px #dfdfdf;
+  background: white;
+  display: flex;
+}
+.stat-label {
+  text-align: left;
+  padding-left: 10px;
+  color: #a5a5a5;
+}
+.stat-value {
+  font-size: 3em;
+  font-weight: 700;
+  text-align: left;
+  padding-left: 10px;
+}
+.stat-icon-container {
+  width: 80px;
+}
+.stat-icon {
+  font-size: 3em;
+  margin-top: 30px;
+  padding: 10px;
+  background: #d1d1d157;
+  border-radius: 30px;
 }
 </style>

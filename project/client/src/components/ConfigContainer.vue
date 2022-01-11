@@ -21,22 +21,22 @@
         <a-tab-pane key="3" tab="Inbound">
           <InboundCallConfig />
         </a-tab-pane>
-        <a-tab-pane key="4" tab="IVR">
+        <!-- <a-tab-pane key="4" tab="IVR">
           <IVRConfig />
-        </a-tab-pane>
+        </a-tab-pane> -->
       </a-tabs>
     </div>
   </a-layout>
 </template>
 <script>
 import PhoneNumberConfig from "./phoneNumberConfig/PhoneNumberConfig";
-import InboundCallConfig from "./inboundCallConfig/InboundCallConfig";
-import IVRConfig from "./ivr/IVRConfig.vue";
+import InboundCallConfig from "./inboundCallConfig/InboundConfigContainer.vue";
+// import IVRConfig from "./ivr/IVRConfig.vue";
 export default {
   components: {
     PhoneNumberConfig,
     InboundCallConfig,
-    IVRConfig,
+    // IVRConfig,
   },
   computed: {
     gridSize() {

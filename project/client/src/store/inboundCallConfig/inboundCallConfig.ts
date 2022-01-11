@@ -89,6 +89,20 @@ export default {
         },
         updateInboundCallConfig({ dispatch }: { dispatch: Dispatch }, params: any) {
             return HTTP(params.authToken).post('/api/inbound-call-config/update', params.params);
+        },
+        createInboundRulesConfig({ dispatch }: { dispatch: Dispatch }, params: any) {
+            return HTTP(params.authToken).post('/api/inbound-rules-config/createInboundConfig', params.params);
+        },
+        getInboundRulesConfig({ commit }: { commit: Commit }, params: any) {
+            return HTTP(params.authToken).get('/api/inbound-rules-config/getInboundConfigs', {
+                params: {
+                    page: 1,
+                    limit: 50
+                }
+            });
+        },
+        getCallTypes({ commit }: { commit: Commit }, params: any) {
+            return HTTP(params.authToken).get('/api/inbound-rules-config/getCallTypes')
         }
     }
 }
