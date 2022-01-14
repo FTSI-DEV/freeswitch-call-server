@@ -6,7 +6,7 @@ import { InboundRulesConfigModel } from "src/modules/inbound-rules-config/models
 import { InboundEslConnResult } from "../inbound-esl.connection";
 import { ChannelStateModel } from "../models/channelState.model";
 import { InboundCallDialplanHelper } from "./handlers/inbound-call-dialplan";
-import { IvrCallHelper } from "./ivr-call";
+import { IvrCallHelper } from "./ivr-handlers/ivr-call";
 import { InboundCallContext } from "./models/inbound-call-context.model";
 
 export class InboundCallHelper{
@@ -78,7 +78,9 @@ export class InboundCallHelper{
                             Error: ${err}`);
                     });
 
-                    if (config.callTypeId === CallTypeEnum.IVR){
+                    this._context.inboundRulesConfig = config;
+
+                    if (config.callTypeId === CallTypeEnum.IVR){    
                         new IvrCallHelper(this._context);
                     }
                     else if (config.callTypeId === CallTypeEnum.Inbound){

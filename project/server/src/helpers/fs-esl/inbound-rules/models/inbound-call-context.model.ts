@@ -1,6 +1,8 @@
 import { CallTypes } from "src/helpers/constants/call-type";
 import { DialplanInstruction } from "src/helpers/parser/xmlParser";
 import { CustomAppLogger } from "src/logger/customLogger";
+import { InboundRulesConfigModel } from "src/modules/inbound-rules-config/models/inbound-rules.model";
+import { IvrOptionsCommandModel } from "src/modules/inbound-rules-config/models/ivr-options.model";
 import { ConnResult } from "../../inbound-esl.connection";
 import { ChannelStateModel } from "../../models/channelState.model";
 import { WebhookParam } from "../../models/webhookParam";
@@ -49,6 +51,10 @@ export class InboundCallContext{
     logger: CustomAppLogger;
 
     inboundEslConnResult: ConnResult;
+
+    ivrCallModel : IvrOptionsCommandModel = new IvrOptionsCommandModel();
+
+    inboundRulesConfig : InboundRulesConfigModel = new InboundRulesConfigModel();
 
     Log(message:string, error:boolean=false){
 

@@ -23,6 +23,8 @@ export class OutboundCallHelper{
 
         let context = this._context;
 
+        context.logger = this._logger;
+        
         server.on('connection::ready', (conn) => {
 
             context.Log(`OutboundCall server ready`);
