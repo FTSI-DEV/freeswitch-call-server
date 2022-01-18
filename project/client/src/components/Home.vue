@@ -4,7 +4,7 @@
       <div class="item1 stat-item">
         <div style="flex: 1">
           <div class="stat-label">Phone Numbers</div>
-          <div class="stat-value">50</div>
+          <div class="stat-value">100</div>
         </div>
         <div class="stat-icon-container">
           <PhoneFilled class="stat-icon" />
@@ -13,7 +13,7 @@
       <div class="item2 stat-item">
         <div style="flex: 1">
           <div class="stat-label">Call logs</div>
-          <div class="stat-value">100</div>
+          <div class="stat-value">1548</div>
         </div>
         <div class="stat-icon-container">
           <PhoneFilled class="stat-icon" />
@@ -22,7 +22,7 @@
       <div class="item3 stat-item">
         <div style="flex: 1">
           <div class="stat-label">Recordings</div>
-          <div class="stat-value">100</div>
+          <div class="stat-value">150</div>
         </div>
         <div class="stat-icon-container">
           <PhoneFilled class="stat-icon" />
@@ -46,6 +46,11 @@
         fontSize: '1.3em',
       }"
     >
+    <a-row>
+      <a-col span="12">
+        <Chart />
+      </a-col>
+    </a-row>
     </a-layout-content>
   </a-layout>
 </template>
@@ -54,8 +59,9 @@ import { defineComponent, ref, toRefs, reactive } from "vue";
 import ClickToCall from "./clickToCall/ClickToCall.vue";
 import { useRouter } from "vue-router";
 import { PhoneFilled } from "@ant-design/icons-vue";
+import Chart from './Chart.vue';
 export default defineComponent({
-  components: { ClickToCall, PhoneFilled },
+  components: { ClickToCall, PhoneFilled, Chart },
   setup() {
     const router = useRouter();
     const state = reactive({

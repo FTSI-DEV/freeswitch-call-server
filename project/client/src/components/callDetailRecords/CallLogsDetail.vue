@@ -1,11 +1,17 @@
 <template>
-  <div class="call-recording-container">
-    <div style="text-align: left; font-size: 1.3em">
-      <router-link to="/call-logs"> <ArrowLeftOutlined /> Back </router-link>
-    </div>
-    <div class="detail_container">
-      <div class="detail_header">Call Log Detail</div>
-      <a-row style="margin-top: 10px">
+  <div>
+    <a-page-header :style="{
+        background: '#fff',
+        padding: '0px 10px 10px 10px',
+        textAlign: 'left',
+        marginBottom: '5px'
+    }" @back="() => null">
+      <router-link to="/call-logs">
+        <ArrowLeftOutlined /> Back
+      </router-link>
+    </a-page-header>
+    <a-layout style="padding: 20px; background: white">
+      <a-row>
         <a-col :span="12">
           <div class="detail_content">
             <div class="detail_item">
@@ -30,9 +36,7 @@
             </div>
             <div class="detail_item">
               <div class="detail_label">Date Created</div>
-              <div class="detail_value">
-                {{ convertDateTime(callRecordDetail.DateCreated) }}
-              </div>
+              <div class="detail_value"> {{ convertDateTime(callRecordDetail.DateCreated) }} </div>
             </div>
             <div class="detail_item">
               <div class="detail_label">Phone Number From</div>
@@ -45,54 +49,55 @@
           </div>
         </a-col>
       </a-row>
-    </div>
+    </a-layout>
   </div>
 </template>
-
 <script lang="ts">
-import { defineComponent, computed } from "vue";
-import { ArrowLeftOutlined } from "@ant-design/icons-vue";
-import { useStore } from "vuex";
-import moment, { Moment } from "moment";
-const dateTimeConverter: Moment = moment();
+  import { defineComponent, computed } from "vue";
+  import { ArrowLeftOutlined } from "@ant-design/icons-vue";
+  import { useStore } from "vuex";
+  import moment, { Moment } from "moment";
+  const dateTimeConverter: Moment = moment();
 
-export default defineComponent({
-  components: {
-    ArrowLeftOutlined,
-  },
-  setup() {
-    const store = useStore();
-    const callRecordDetail = computed(() => store.getters["getCallDetail"]);
-    const convertDateTime = (dateTime: string): string => {
-      return moment(dateTime).format("MM/DD/YYYY hh:mm A");
-    };
-    return {
-      callRecordDetail,
-      convertDateTime,
-    };
-  },
-});
+  export default defineComponent({
+    components: {
+      ArrowLeftOutlined,
+    },
+    setup() {
+      const store = useStore();
+      const callRecordDetail = computed(() => store.getters["getCallDetail"]);
+      const convertDateTime = (dateTime: string): string => {
+        return moment(dateTime).format("MM/DD/YYYY hh:mm A");
+      };
+      return {
+        callRecordDetail,
+        convertDateTime,
+      };
+    },
+  });
 </script>
-
 <style scoped>
-.detail_header {
-  padding: 10px;
-  text-align: left;
-  font-size: 1.5em;
-  border-bottom: 1px solid #c8c8c8;
-}
-.detail_item {
-  display: flex;
-}
-.detail_label {
-  text-align: left;
-  font-weight: 600;
-  width: 200px;
-  padding: 10px;
-}
-.detail_value {
-  flex: 1;
-  text-align: left;
-  padding: 10px;
-}
+  .detail_header {
+    padding: 10px;
+    text-align: left;
+    font-size: 1.5em;
+    border-bottom: 1px solid #c8c8c8;
+  }
+
+  .detail_item {
+    display: flex;
+  }
+
+  .detail_label {
+    text-align: left;
+    font-weight: 600;
+    width: 200px;
+    padding: 10px;
+  }
+
+  .detail_value {
+    flex: 1;
+    text-align: left;
+    padding: 10px;
+  }
 </style>

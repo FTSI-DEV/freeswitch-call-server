@@ -13,6 +13,13 @@ import AccountLogin from "@/components/accountConfig/AccountLogin.vue";
 import AccountRegister from "@/components/accountConfig/AccountRegister.vue";
 import MainContainer from "@/components/MainContainer.vue";
 import Dashboard from "@/components/Home.vue";
+import CallConfigNew from "@/components/callConfig/CallConfigContainer.vue";
+
+// Config
+import PhoneNumberConfig from "@/components/callConfig/phoneNumber/PhoneNumber.vue";
+import InboundConfig from "@/components/callConfig/inbound/Inbound.vue";
+import IVRConfig from "@/components/callConfig/ivr/IVR.vue";
+
 const isServer = typeof window === 'undefined';
 
 const history = isServer ? createMemoryHistory() : createWebHistory();
@@ -52,6 +59,26 @@ const routes: Array<any> = [
                 path: "/call-config",
                 name: "Call Config",
                 component: ConfigContainer,
+            },
+            {
+                path: "/call-config-new",
+                name: "Call Config New",
+                component: CallConfigNew,
+            },
+             {
+                path: "/call-config-new/phone-number",
+                name: "Phone Number",
+                component: PhoneNumberConfig,
+            },
+             {
+                path: "/call-config-new/inbound",
+                name: "Inbound",
+                component: InboundConfig,
+            },
+             {
+                path: "/call-config-new/ivr",
+                name: "IVR",
+                component: IVRConfig,
             },
             {
                 path: "/call-recording",

@@ -6,28 +6,9 @@
     >
       <div class="logo" style="color: #ffb344; text-align: left; flex: 1">
           <img src="../assets/Q-voice-7.png" style="width: 170px"/>
-        <!-- <span> HOUSTON FORD </span> -->
       </div>
       <div class="user-icon" style="flex: 1; font-size: 0.6em; text-align: right">
         <div style="display: flex; justify-content: flex-end">
-          <div style="margin-right: 10px">
-            <a-dropdown>
-              <a
-                class="ant-dropdown-link"
-                @click.prevent
-                style="color: #fff; font-weight: 600"
-              >
-                <HomeFilled style="color: #fff; margin-right: 5px" title="Select Store" />
-              </a>
-              <template #overlay>
-                <a-menu>
-                  <a-menu-item> Chevy Houston </a-menu-item>
-                  <a-menu-item> DCJR Houston </a-menu-item>
-                  <a-menu-item> DCJR Temple </a-menu-item>
-                </a-menu>
-              </template>
-            </a-dropdown>
-          </div>
           <div class="user">
             <UserOutlined style="color: #fff; margin-right: 5px" />
 
@@ -75,7 +56,11 @@
             <play-circle-filled />
             <span>Call Recording</span>
           </a-menu-item>
-          <a-menu-item key="5" @click="navigateRoute('/call-config')">
+          <!-- <a-menu-item key="5" @click="navigateRoute('/call-config')">
+            <setting-filled />
+            <span>Call Config</span>
+          </a-menu-item> -->
+          <a-menu-item key="6" @click="navigateRoute('/call-config-new')">
             <setting-filled />
             <span>Call Config</span>
           </a-menu-item>
