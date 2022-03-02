@@ -37,8 +37,10 @@ export class ConfigService implements IConfigService{
     }
 
     public isProduction(){
-        const mode = this.getValue('MODE', false);
-        return mode != 'DEV';
+        // const mode = this.getValue('MODE', false);
+        // return mode != 'DEV';
+
+        return true;
     }
 
     // public getTypeOrmConfig(): TypeOrmModuleOptions{
