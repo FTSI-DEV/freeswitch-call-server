@@ -12,8 +12,10 @@
     "ant-design-vue": "^2.2.3",
     "axios": "^0.21.1",
     "core-js": "^3.6.5",
+    "echarts": "^5.2.2",
     "momentjs": "^2.0.0",
     "vue": "^3.0.0",
+    "vue-echarts": "^6.0.1",
     "vue-router": "^4.0.11",
     "vuex": "^4.0.2"
   },

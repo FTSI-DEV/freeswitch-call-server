@@ -1,10 +1,9 @@
 <template>
   <div>
     <a-row>
-      <a-col :span="18" style="background: #001529; height: 100vh">
-        <div>
-          <LoginCoverImage />
-          <!-- <cluster-outlined style="margin-right: 20px" />Freeswitch -->
+      <a-col :span="18" style="background: #3db2ff; height: 100vh">
+        <div class="center-logo">
+          <img src="../../assets//Q-voice-7.png" alt="">
         </div>
       </a-col>
       <a-col :span="6">
@@ -15,23 +14,12 @@
     </a-row>
   </div>
 </template>
-
-<script>
-// import { ClusterOutlined } from "@ant-design/icons-vue";
-import LoginCoverImage from "./LoginCoverImage.vue";
-export default {
-  components: { LoginCoverImage },
-};
-</script>
-
 <style scoped>
-.icon-container {
-  color: #ffb344;
-  width: 640px; /* Can be in percentage also. */
-  height: auto;
-  margin: 20% auto;
-  padding: 10px;
-  position: relative;
-  font-size: 4em;
-}
+  .center-logo {
+    width: 640px;
+    height: auto;
+    margin: 30% auto;
+    padding: 10px;
+    position: relative;
+  }
 </style>
