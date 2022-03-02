@@ -33,7 +33,7 @@ export class ConfigService implements IConfigService{
     }
 
     public getPort(){
-        return this.getValue('PORT', true);
+        return 3000;
     }
 
     public isProduction(){
@@ -41,14 +41,46 @@ export class ConfigService implements IConfigService{
         return mode != 'DEV';
     }
 
+    // public getTypeOrmConfig(): TypeOrmModuleOptions{
+    //     return{
+    //         type: 'postgres',
+    //         host: this.getValue('POSTGRES_HOST'),
+    //         port: parseInt(this.getValue('POSTGRES_PORT')),
+    //         username: this.getValue('POSTGRES_USER'),
+    //         password: this.getValue('POSTGRES_PASSWORD'),
+    //         database: this.getValue('POSTGRES_DATABASE'),
+    //         entities: [
+    //             FreeswitchCallConfigEntity,
+    //             FsCallDetailRecordEntity,
+    //             CallRecordingStorageEntity,
+    //             InboundCallConfigEntity,
+    //             PhoneNumberConfigEntity,
+    //             AccountConfigEntity,
+    //             UserEntity,
+    //             IvrConfigEntity,
+    //             InboundRulesConfigEntity
+    //         ],
+    //         // entities : ["dist/entity/**/*.js"],
+    //         migrationsTableName : "MigrationTable",
+    //         migrations: ['dist/migration/**/*.js'],
+    //         migrationsRun: true,
+    //         cli: {
+    //             migrationsDir: 'src/migration',
+    //             entitiesDir: 'src/entity'
+    //         },
+    //         ssl: this.isProduction(),
+    //         synchronize: false
+    //     };
+    // }
+
     public getTypeOrmConfig(): TypeOrmModuleOptions{
         return{
             type: 'postgres',
-            host: this.getValue('POSTGRES_HOST'),
-            port: parseInt(this.getValue('POSTGRES_PORT')),
-            username: this.getValue('POSTGRES_USER'),
-            password: this.getValue('POSTGRES_PASSWORD'),
-            database: this.getValue('POSTGRES_DATABASE'),
+            host: "127.0.0.1",
+            port: parseInt("5432"),
+            username: "postgres",
+            password: "123456",
+            database: "postgres",
             entities: [
                 FreeswitchCallConfigEntity,
                 FsCallDetailRecordEntity,
